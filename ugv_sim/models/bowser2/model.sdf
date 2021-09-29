@@ -1,0 +1,416 @@
+<?xml version='1.0'?>
+<sdf version="1.5">
+    <model name="bowser2">
+        <pose>0 0 0 0 0 0</pose>
+        <static>false</static>
+        <link name="bowser2/base_link">
+            <inertial>
+                <mass>10</mass>
+                <inertia> <!-- inertias are tricky to compute -->
+                <!-- http://gazebosim.org/tutorials?tut=inertia&cat=build_robot -->
+                <!-- <ixx>4.6314</ixx>         for a box: ixx = 0.083 * mass * (y*y + z*z) -->
+                <ixx>.3735</ixx>
+                <ixy>0.0</ixy>            <!-- for a box: ixy = 0 -->
+                <ixz>0.0</ixz>            <!-- for a box: ixz = 0 -->
+                <!-- <iyy>9.2628</iyy>         for a box: iyy = 0.083 * mass * (x*x + z*z) -->
+                <iyy>.747</iyy>
+                <iyz>0.0</iyz>            <!-- for a box: iyz = 0 -->
+                <izz>.9711</izz>
+                <!-- <izz>12.04164</izz>       for a box: izz = 0.083 * mass * (x*x + y*y) -->
+                </inertia>
+            </inertial>
+            <!-- chassis -->
+            <collision name="collision">
+                <geometry>
+                <box>
+                    <size>.9 .6 .3</size>
+                </box>
+                </geometry>
+            </collision>
+            <visual name="visual">
+                <geometry>
+                <box>
+                    <size>.9 .6 .3</size>
+                </box>
+                </geometry>
+            </visual>
+            <!-- caster -->
+            <collision name='caster_collision'>
+                <pose>-.35 0 -0.15 0 0 0</pose>
+                <geometry>
+                    <sphere>
+                    <radius>.075</radius>
+                </sphere>
+                </geometry>
+                <surface>
+                <friction>
+                    <ode>
+                    <mu>0</mu>
+                    <mu2>0</mu2>
+                    <slip1>1.0</slip1>
+                    <slip2>1.0</slip2>
+                    </ode>
+                </friction>
+                </surface>
+            </collision>  
+            <visual name='caster_visual'>
+                <pose>-.35 0 -.15 0 0 0</pose>
+                <geometry>
+                <sphere>
+                    <radius>.075</radius>
+                </sphere>
+                </geometry>
+            </visual>
+        </link>
+
+        <link name="bowser2/front_right_wheel">
+            <pose>0.3 -.37 -0.05 0 0 0</pose>
+            <inertial>
+                <mass>2.6357</mass>
+                <pose>0 0 0 0 0 0</pose>
+                <inertia>
+                    <ixx>0.0246688</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>0.0246688</iyy>
+                    <iyz>0</iyz>
+                    <izz>0.0441058</izz>
+                </inertia>
+            </inertial>
+            <collision name="front_right_wheel_collision">
+                <pose>0 0 0 -1.5707 0 0</pose>
+                <geometry>
+                <cylinder>
+                    <radius>0.17775</radius>
+                    <length>0.1143</length>
+                </cylinder>
+                </geometry>
+                <surface>
+                <friction>
+                    <ode>
+                    <mu>100000.0</mu>
+                    <mu2>100000.0</mu2>
+                    <slip1>0.0</slip1>
+                    <slip2>0.0</slip2>
+                    </ode>
+                </friction>
+                </surface>
+            </collision>
+            <visual name="front_right_wheel">
+                <pose>0 0 0 -3.14159 0 0</pose>
+                <geometry>
+                <mesh>
+                    <uri>model://husky/meshes/wheel.stl</uri>
+                </mesh>
+                </geometry>
+                <material>
+                <script>
+                    <name>Gazebo/Grey</name>
+                </script>
+                </material>
+            </visual>
+        </link>
+        <joint name="bowser2/front_right_joint" type="revolute">
+            <parent>bowser2/base_link</parent>
+            <child>bowser2/front_right_wheel</child>
+            <axis>
+                <xyz>0 1 0</xyz>
+                <use_parent_model_frame>true</use_parent_model_frame>
+            </axis>
+            <physics>
+                <ode>
+                <limit>
+                    <cfm>0.000000</cfm>
+                    <erp>0.900000</erp>
+                </limit>
+                </ode>
+            </physics>
+        </joint>
+
+        <link name="bowser2/front_left_wheel">
+            <pose>0.3 .37 -0.05 0 0 0</pose>
+            <inertial>
+                <mass>2.6357</mass>
+                <pose>0 0 0 0 0 0</pose>
+                <inertia>
+                <ixx>0.0246688</ixx>
+                <ixy>0</ixy>
+                <ixz>0</ixz>
+                <iyy>0.0246688</iyy>
+                <iyz>0</iyz>
+                <izz>0.0441058</izz>
+                </inertia>
+            </inertial>
+            <collision name="front_left_wheel_collision">
+                <pose>0 0 0 -1.5707 0 0</pose>
+                <geometry>
+                <cylinder>
+                    <radius>0.17775</radius>
+                    <length>0.1143</length>
+                </cylinder>
+                </geometry>
+                <surface>
+                <friction>
+                    <ode>
+                    <mu>100000.0</mu>
+                    <mu2>100000.0</mu2>
+                    <slip1>0.0</slip1>
+                    <slip2>0.0</slip2>
+                    </ode>
+                </friction>
+                </surface>
+            </collision>
+            <visual name="front_left_wheel">
+                <pose>0 0 0 -3.14159 0 0</pose>
+                <geometry>
+                <mesh>
+                    <uri>model://husky/meshes/wheel.stl</uri>
+                </mesh>
+                </geometry>
+                <material>
+                <script>
+                    <name>Gazebo/Grey</name>
+                </script>
+                </material>
+            </visual>
+        </link>
+        <joint name="bowser2/front_left_joint" type="revolute">
+            <parent>bowser2/base_link</parent>
+            <child>bowser2/front_left_wheel</child>
+            <axis>
+                <xyz>0 1 0</xyz>
+                <use_parent_model_frame>true</use_parent_model_frame>
+            </axis>
+            <physics>
+                <ode>
+                <limit>
+                    <cfm>0.000000</cfm>
+                    <erp>0.900000</erp>
+                </limit>
+                </ode>
+            </physics>
+        </joint>
+
+        <!-- IMU sensor -->
+        <link name="bowser2/imu_link">
+            <visual name="imu_link_visual">
+                <geometry>
+                    <box>
+                        <size> 0.1 0.1 0.1 </size>
+                    </box>
+                </geometry>
+            </visual>
+            <collision name="imu_link_collision">
+                <geometry>
+                    <box>
+                        <size> 0.1 0.1 0.1 </size>
+                    </box>
+                </geometry>
+            </collision>
+
+            <sensor name="imu_sensor" type="imu">
+                <always_on>true</always_on> <!-- required TRUE -->
+                <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+                    <robotNamespace>bowser2</robotNamespace>
+                    <topicName>imu</topicName>
+                    <updateRateHZ>30</updateRateHZ>
+                    <frameName>bowser2/imu_link</frameName>
+                    <initialOrientationAsReference>false</initialOrientationAsReference>
+                </plugin>
+            </sensor>
+        </link>
+        <joint name="bowser2/imu_joint" type="fixed">
+            <parent>bowser2/base_link</parent>
+            <child>bowser2/imu_link</child>
+        </joint>
+
+
+        <!-- differential drive plugin; publishes odom frame-->
+        <plugin filename="libgazebo_ros_diff_drive.so" name="diff_drive_controller">
+            <robotNamespace>bowser2</robotNamespace>    
+            <rosDebugLevel>debug</rosDebugLevel>
+            <!-- <always_on>true</always_on> -->
+
+            <!-- 'physical' characteristics -->
+            <leftJoint>bowser2/front_left_joint</leftJoint>
+            <rightJoint>bowser2/front_right_joint</rightJoint>
+            <wheelSeparation>0.74</wheelSeparation>
+            <wheelDiameter>0.3555</wheelDiameter>
+            <wheelTorque>20</wheelTorque>   <!-- in Nm -->
+
+            <!-- plugin characteristics -->
+            <odometrySource>world</odometrySource> 
+            <publishOdom>true</publishOdom> 
+            <updateRate>100</updateRate>
+
+            <!-- tf -->
+            <publishTf>true</publishTf> <!-- publish the transforms -->
+            <publishOdomTF>true</publishOdomTF>
+            <publishWheelTF>true</publishWheelTF>
+            <odometryFrame>bowser2/odom</odometryFrame>
+            <robotBaseFrame>bowser2/base_link</robotBaseFrame>
+
+            <!-- ros messaging -->
+            <commandTopic>/cmd_vel</commandTopic> <!-- listens to -->
+            <odometryTopic>odom</odometryTopic> <!-- publishes on -->
+        </plugin>
+
+        <joint name="bowser2/camera_joint" type="fixed">
+            <parent>bowser2/base_link</parent>
+            <child>bowser2/camera_link</child>
+            <axis>
+                <xyz>1 0 0</xyz>
+                <use_parent_model_frame>true</use_parent_model_frame>
+            </axis>
+        </joint>
+        <!-- houses the depth camera sensor -->
+        <link name="bowser2/camera_link">
+            <!-- "physical" description of camera -->
+            <!-- <pose>0.45 0 0.5 0 0 0</pose> -->
+            <pose>0 0 0.35 0 0 0</pose>
+            <collision name="camera_collision">
+                <pose>0 0 0.1 0 0 0</pose>
+                <geometry>
+                    <box>
+                    <size>.1 0.1 0.1</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="camera_visual">
+                <pose>0 0 0 0 0 0</pose>
+                <geometry>
+                    <box>
+                    <size>.1 0.1 0.1</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>
+                    <name>Gazebo/Grey</name>
+                    </script>
+                </material>
+            </visual>
+
+            <sensor type="depth" name="depth_sensor">
+                <!-- Set always_on only sensor, not on plugin -->
+                <always_on>0</always_on>
+                <!-- Set update_rate only sensor, not on plugin -->
+                <updateRate>20</updateRate>
+
+                <camera name="bowser2_dc">
+                    <horizontal_fov>1.57079</horizontal_fov>
+                    <image>
+                        <width>640</width>
+                        <height>480</height>
+                    </image>
+                    <clip>
+                        <near>0.5</near>
+                        <far>20</far>
+                    </clip>
+                    <!-- no distortions: "ideal" camera -->
+                    <distortion>
+                        <k1>0.0</k1>
+                        <k2>0.0</k2>
+                        <k3>0.0</k3>
+                        <p1>0.0</p1>
+                        <p2>0.0</p2>
+                        <center>0.0 0.0</center>
+                    </distortion>
+                </camera>
+
+                <!-- <visualize>true</visualize> -->
+                
+                <plugin name="bowser2_camera_plugin" filename="libgazebo_ros_depth_camera.so">
+                    <robotNamespace>bowser2</robotNamespace>
+                    <always_on>true</always_on>
+                    <updateRate>0.0</updateRate> <!-- use sensor rate -->
+                    <cameraName>bowser2_dc</cameraName>
+
+                    <baseline>0.05</baseline>
+                    <pointCloudCutoff>0.05</pointCloudCutoff>
+                    <pointCloudCutoffMax>20</pointCloudCutoffMax>
+
+                    <!-- configure output topics; will be prepended with robotNamespace value (AKA relative names) -->
+                    <imageTopicName>image/image</imageTopicName>
+                    <cameraInfoTopicName>image/camera_info</cameraInfoTopicName>
+                    <depthImageTopicName>depth/image</depthImageTopicName>
+                    <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
+                    <pointCloudTopicName>depth/points</pointCloudTopicName>
+
+                    <!-- Set TF frame name. If empty, defaults to link name (i.e. "link_name") -->
+                    <frameName>bowser2/camera_link</frameName> <!-- namespaced -->
+                    
+                    <distortionK1>0.0</distortionK1>
+                    <distortionK2>0.0</distortionK2>
+                    <distortionK3>0.0</distortionK3>
+                    <distortionT1>0.0</distortionT1>
+                    <distortionT2>0.0</distortionT2>
+                </plugin>
+            </sensor>
+        </link>
+
+        <joint name="bowser2/lidar_joint" type="fixed">
+            <parent>bowser2/base_link</parent>
+            <child>bowser2/lidar_link</child>
+            <axis>
+                <xyz>0 1 0</xyz>
+                <use_parent_model_frame>true</use_parent_model_frame>
+            </axis>
+        </joint>
+        <link name="bowser2/lidar_link">
+            <!-- "physical" description of lidar -->
+            <pose>0.0 0 0.2 0 0 0</pose>
+            <collision name="lidar_collision">
+                <pose>0 0 0.1 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>.1 0.1 0.1</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="lidar_visual">
+                <pose>0 0 0 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>.1 0.1 0.1</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>
+                        <name>Gazebo/Grey</name>
+                    </script>
+                </material>
+            </visual>
+
+            <!-- LiDAR -->
+            <sensor name="laser_sensor" type="ray">
+                <!-- <pose>0.01 0 0.0175 0 0 0</pose> -->
+                <ray>
+                    <scan>
+                        <horizontal>
+                            <samples>256</samples>
+                            <resolution>1</resolution>
+                            <min_angle>-1.5707</min_angle>                        
+                            <max_angle>1.5707</max_angle>
+                        </horizontal>
+                    </scan>
+                    <range>
+                        <min>0.08</min>
+                        <max>30</max>
+                        <resolution>0.01</resolution>
+                    </range>
+                </ray>
+
+                <!-- visualizing sensor rays can be resource intensive -->
+                <visualize>false</visualize>
+                
+                <plugin name='laser_plugin' filename='libgazebo_ros_laser.so'>
+                    <robotNamespace>bowser2</robotNamespace>
+                    <updateRate>30</updateRate>
+                    <topicName>/scan</topicName> <!-- NOT namespaced (/ prefix is absolute topic name) -->
+                    <frameName>bowser2/lidar_link</frameName> <!-- prepended with robotNamespace value -->
+                    <gaussianNoise>0.01</gaussianNoise>
+                </plugin>
+            </sensor>
+        </link>
+    </model>    
+</sdf>

@@ -1,0 +1,178 @@
+<sdf version='1.6'>
+  <world name='default'>
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose frame=''>0 0 10 0 -0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+    <gravity>0 0 -9.8</gravity>
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+    <atmosphere type='adiabatic'/>
+    <physics name='default_physics' default='0' type='ode'>
+      <max_step_size>0.05</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>20</real_time_update_rate>
+    </physics>
+    <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <shadows>1</shadows>
+    </scene>
+    <audio>
+      <device>default</device>
+    </audio>
+    <wind/>
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>0</latitude_deg>
+      <longitude_deg>0</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+    <model name='apollo15_landing_site_1000x1000'>
+      <static>1</static>
+      <link name='link'>
+        <collision name='collision'>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.2</mu>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <soft_cfm>1</soft_cfm>
+                <kp>100000</kp>
+                <kd>1</kd>
+                <max_vel>1e-06</max_vel>
+                <min_depth>0.02</min_depth>
+              </ode>
+            </contact>
+            <bounce/>
+          </surface>
+          <geometry>
+            <heightmap>
+              <uri>model://apollo15_landing_site_1000x1000/materials/textures/NAC_DTM_APOLLO15_E261N0036_257x257+7472+2152.png</uri>
+              <size>514 514 49</size>
+              <pos>0 0 -45</pos>
+              <texture>
+                <size>10</size>
+                <diffuse>__default__</diffuse>
+                <normal>__default__</normal>
+              </texture>
+              <blend>
+                <min_height>0</min_height>
+                <fade_dist>0</fade_dist>
+              </blend>
+            </heightmap>
+          </geometry>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <heightmap>
+              <texture>
+                <diffuse>model://apollo15_landing_site_1000x1000/materials/textures/AS16-110-18026HR-512x512.jpg</diffuse>
+                <normal>file://media/materials/textures/flat_normal.png</normal>
+                <size>2</size>
+              </texture>
+              <uri>model://apollo15_landing_site_1000x1000/materials/textures/NAC_DTM_APOLLO15_E261N0036_257x257+7472+2152.png</uri>
+              <size>514 514 49</size>
+              <pos>0 0 -45</pos>
+              <blend>
+                <min_height>0</min_height>
+                <fade_dist>0</fade_dist>
+              </blend>
+            </heightmap>
+          </geometry>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <pose frame=''>2.39178 -1.5551 0 0 -0 0</pose>
+    </model>
+    
+    <include>
+      <uri>model://bowser2</uri>
+    </include>
+
+    <state world_name='default'>
+      <sim_time>126 455000000</sim_time>
+      <real_time>128 442839631</real_time>
+      <wall_time>1623339659 611110344</wall_time>
+      <iterations>126455</iterations>
+      <model name='apollo15_landing_site_1000x1000'>
+        <pose frame=''>2.39178 -1.5551 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>2.39178 -1.5551 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='bowser2'>
+        <pose frame=''>-5.66956 -1.39187 0.442299 -0.099097 -0.010157 0.001445</pose>
+        <scale>1 1 1</scale>
+        <link name='base_link'>
+          <pose frame=''>-5.66956 -1.39187 0.442299 -0.099097 -0.010157 0.001445</pose>
+          <velocity>0.002152 -0.014839 -0.264075 -0.05066 0.136441 -0.008297</velocity>
+          <acceleration>1e-06 -6.9e-05 5e-06 -0.000532 0.000114 0.002673</acceleration>
+          <wrench>1.3e-05 -0.000693 5.5e-05 0 -0 0</wrench>
+        </link>
+        <link name='camera_link'>
+          <pose frame=''>-5.67314 -1.35725 0.790564 -0.099097 -0.010157 0.001446</pose>
+          <velocity>0.049934 0.00284 -0.265341 -0.050546 0.136549 -0.008463</velocity>
+          <acceleration>3e-06 -7.3e-05 6e-06 9e-06 5e-06 1.7e-05</acceleration>
+          <wrench>3e-06 -7.3e-05 6e-06 0 -0 0</wrench>
+        </link>
+        <link name='front_left_wheel'>
+          <pose frame=''>-5.3689 -1.76457 0.432199 -0.103989 -0.308135 0.03208</pose>
+          <velocity>-0.002521 -0.017927 -0.286425 -0.052951 0.138706 -0.008801</velocity>
+          <acceleration>4e-06 -5e-05 4e-06 -0.001833 -0.000859 -0.000263</acceleration>
+          <wrench>1e-05 -0.000132 1.1e-05 0 -0 0</wrench>
+        </link>
+        <link name='front_right_wheel'>
+          <pose frame=''>-5.36922 -1.02821 0.35899 -0.103327 -0.284993 0.029577</pose>
+          <velocity>-0.006247 -0.020872 -0.323525 -0.040152 0.137662 -0.008229</velocity>
+          <acceleration>-4e-06 -8.3e-05 8e-06 -0.001952 -0.000567 -0.000274</acceleration>
+          <wrench>-1e-05 -0.00022 2.1e-05 0 -0 0</wrench>
+        </link>
+        <link name='imu_link'>
+          <pose frame=''>-5.66956 -1.39187 0.442299 -0.099097 -0.010157 0.001446</pose>
+          <velocity>0.002088 -0.014801 -0.26408 -0.050621 0.136536 -0.00851</velocity>
+          <acceleration>2e-06 -7e-05 6e-06 9e-06 5e-06 1.8e-05</acceleration>
+          <wrench>2e-06 -7e-05 6e-06 0 -0 0</wrench>
+        </link>
+        <link name='lidar_link'>
+          <pose frame=''>-5.67161 -1.37209 0.641307 -0.099098 -0.010157 0.001446</pose>
+          <velocity>0.02943 -0.004731 -0.264799 -0.050486 0.136561 -0.008419</velocity>
+          <acceleration>2e-06 -7.2e-05 6e-06 9e-06 5e-06 1.7e-05</acceleration>
+          <wrench>2e-06 -7.2e-05 6e-06 0 -0 0</wrench>
+        </link>
+      </model>
+      <light name='sun'>
+        <pose frame=''>0 0 10 0 -0 0</pose>
+      </light>
+    </state>
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose frame=''>-12.1123 -15.5672 6.82272 0 0.235456 1.32819</pose>
+        <view_controller>orbit</view_controller>
+        <projection_type>perspective</projection_type>
+      </camera>
+    </gui>
+  </world>
+</sdf>

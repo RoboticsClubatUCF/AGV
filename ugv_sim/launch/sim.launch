@@ -1,0 +1,56 @@
+<launch>
+    <param name="/use_sim_time" value="true" />
+
+    <!-- configuring CLI arguments -->
+    <arg name="robot_desc" default="$(find ugv_sim)/models/bowser2/model.urdf" />
+    <arg name="world" default="empty"/>
+    <arg name="gazebo" default="false" />   <!-- launch the full Gazebo gui window (resource intensive)-->
+    <arg name="rviz" default="false"/>   <!-- use rviz window for robot information -->
+    <arg name="rviz_cfg" default="$(find ugv_sim)/rviz/bowser2.rviz" />
+    <arg name="slam" default="true" />
+    <arg name="debug" default="false" />
+    <arg name="no_costmap_2d" default="false" />
+
+    <!-- launching gazebo_ros, which is just gazebo with ros integrated -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find ugv_sim)/worlds/$(arg world).world"/> 
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="$(arg gazebo)"/>
+        <arg name="recording" value="false"/> 
+        <arg name="debug" value="false"/>
+        <arg name="verbose" value="true"/>
+    </include>
+
+    <!-- load robot description to parameter server (for robot_state_publisher) -->
+    <param name="robot_description" textfile="$(arg robot_desc)" />
+
+    <!-- use robot description to publish robot tf tree -->
+    <!-- tf_prefix: robot tf transforms are prepended with bowser2 to match model.sdf plugin convention-->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+        <param name="tf_prefix" type="string" value="bowser2"/>
+    </node>
+
+    <!-- publishes tf transforms between joints -->
+    <!-- <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" /> -->
+
+    <!-- launches rviz with specified configuration (if CLI arg is true)-->
+    <node if="$(arg rviz)" name="rviz" pkg="rviz" type="rviz" args="-d $(arg rviz_cfg)"/>
+
+    <!-- slam_toolbox generates map in real-time as robot moves around (SLAM)-->
+    <node if="$(arg slam)" pkg="slam_toolbox" type="async_slam_toolbox_node" name="slam_toolbox" output="screen">
+        <rosparam command="load" file="$(find ugv_sim)/config/slam.yaml" />
+    </node>
+
+    <!-- publishes the pose (geometry_msgs/PoseWithCovarianceStamped) of robot from simulation plugin (nav_msgs/Odometry) -->
+    <!-- <node pkg="ugv_sim" type="pose_publisher.py" name="pose_publisher" output="screen" /> -->
+
+    <node pkg="move_base" type="move_base" name="move_base" output="screen">
+        <rosparam file="$(find ugv_sim)/config/move_base/costmap_common_params.yaml" command="load" ns="global_costmap" /> 
+        <rosparam file="$(find ugv_sim)/config/move_base/costmap_common_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find ugv_sim)/config/move_base/local_costmap_params.yaml" command="load" />
+        <rosparam file="$(find ugv_sim)/config/move_base/global_costmap_params.yaml" command="load" /> 
+        <rosparam file="$(find ugv_sim)/config/move_base/base_local_planner_params.yaml" command="load" />
+    </node>
+
+</launch>
