@@ -29,11 +29,13 @@ pip3 install pynput
 sudo apt install -y ros-noetic-navigation
 sudo apt install -y ros-noetic-slam-toolbox
 
-# if we don't have a catkin_ws, we're gonna make one
+# if we somehow don't have a catkin_ws, we're gonna make one and clone our code into it
 if ! [-d "/home/$USER/catkin_ws"]
 then
 	echo "Creating catkin workspace at: /home/$USER/catkin_ws"
 	mkdir -p /home/$USER/catkin_ws/src
+	cd /home/$USER/catkin_ws/src
+	git clone https://github.com/RoboticsClubatUCF/UNTITLED_UGV.git
 	cd /home/$USER/catkin_ws
 	catkin_make # catkin_make to create our build and devel folders
 fi
