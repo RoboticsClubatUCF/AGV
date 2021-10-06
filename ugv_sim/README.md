@@ -1,84 +1,66 @@
-# simple_sim
-### a ROS package that contains resources for a simple UGV simulation
----
+## ugv_sim: Ground Vehicle Simulation Package
 
-## Setup
-### **Dependencies/Requirements**
-* Ubuntu 18.04 (supports ROS1 Melodic)
-* ROS1 Melodic (ros-melodic-desktop-full)
-* [Navigation Stack](https://github.com/ros-planning/navigation/tree/melodic-devel) (ros-melodic-navigation)
-* [slam_toolbox](https://github.com/SteveMacenski/slam_toolbox/tree/melodic-devel) (ros-melodic-slam-toolbox)
-* [elevation_mapping](https://github.com/anybotics/elevation_mapping)
-    * [grid_map](https://github.com/anybotics/grid_map) (ros-melodic-grid-map)
-    * [kindr](https://github.com/ANYbotics/kindr.git)
-    * [kindr_ros](https://github.com/ANYbotics/kindr_ros.git)
-    * [perception_pcl](https://github.com/ros-perception/perception_pcl) (release 1.7.2)
+A ROS package that contains the resources (models/scripts/worlds) to simulate various ground robots. Currently being used as part of the UNTITLED_UGV repo, but broadly useful.
 
-### **Installation**
+Currently, this package is meant to target ROS Noetic/Ubuntu 20.04. 
 
-**Tldr: use the setup script to install ROS1 Melodic, set up workspace, and install dependencies -> `setup.sh`**
+### Setup/Configuration:
 
-The long version:
+This package requires Ubuntu 20.04 (either as a VM, container, or actual system). Like all ROS1 packages, it's meant to be placed inside a [catkin_ws](http://wiki.ros.org/catkin/conceptual_overview) at path ```/home/$USER/catkin_ws```
 
-This package is designed to be used with ROS1 Melodic (on Ubuntu 18.04) and cloned into a catkin workspace (like other ROS packages). You'll need to install ROS1 Melodic first. Alternatively, you can just follow the official guide [here](http://wiki.ros.org/melodic/Installation/Ubuntu).
+1. Clone this repo into ```catkin_ws/src``` with:
 
-> sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+   > git clone https://github.com/RoboticsClubatUCF/UNTITLED_UGV.git
 
-> sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+   (NOTE: this will also pull down every other package in UNTITLED_UGV)
 
-> sudo apt update
+2. Make sure that our workspace builds with ```catkin_make```
 
-> sudo apt install ros-melodic-desktop-full
+   > cd ~/catkin_ws
+   >
+   > catkin_make
 
-Set up our (bash) terminal to source our ROS install automatically
-> echo "source /opt/ros/melodic/setup.bash" >> /home/$USER/.bashrc
+   This will build all of the packages inside our catkin workspace. Make sure that this completes without errors.
 
-Install some useful ROS dependencies
-> sudo apt install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential -y
+3.  Run the setup script to grab all of our dependencies (including ROS, if necessary) and configure our environment variables.
 
-> sudo apt-get install ros-melodic-catkin python-catkin-tools -y
+   > cd ~/catkin_ws/src/UNTITLED_UGV/ugv_sim/
+   >
+   > ./setup.sh
 
-> sudo rosdep init
+4. We should be all set. To test it, try to launch the simulator:
 
-> rosdep update
+   > roslaunch ugv_sim sim.launch gazebo:=true
 
-Once we have ROS1 Melodic installed and configured, we need to install the Navigation Stack and slam_toolbox:
+   If you see a Gazebo window with a robot in it, we're good to go.
 
-> sudo apt install ros-melodic-navigation -y
+### Anatomy
 
-> sudo apt install ros-melodic-slam-toolbox -y
+#### config/
 
-Then, we'll create our workspace and clone this package into it: 
+The .yaml configuration files that determine the behavior of various ROS nodes. On launch, selected .yaml files will be parsed by ROS and converted into parameters stored on the shared [Parameter Server](http://wiki.ros.org/Parameter%20Server). These parameters can be retrieved/modified at runtime to adjust nodes or pass (static) information back and forth.
 
-> mkdir -p ~/catkin_ws/src
+#### scripts/
 
-> cd ~/catkin_ws/src
+Various ROS-adjacent scripts created for convenience when simulating robots, such as a keyboard teleoperation script (```motors.py```).
 
-> git clone https://github.com/wesfletch/simple_sim.git --branch melodic
+#### launch/
 
-> cd ~/catkin_ws
+ROS [launch files](http://wiki.ros.org/roslaunch) to be invoked by ```roslaunch``` command to bring up our ROS nodes at system start. Each system supported by this package can have its own set of launch files, on top of those listed here.
 
-<!-- > catkin_make -->
+#### models/
 
-Finally, we need to install/build elevation_mapping. First, it's dependencies: 
+The models that will be loaded into Gazebo for simulation purposes. Currently, there is just ```bowser2``` in here, but we'll add more as time goes on.
 
-* Grid Map:
-    > sudo apt install ros-melodic-grid-map
-* kindr:
-    > git clone https://github.com/ANYbotics/kindr.git
-* kindr_ros:
-    > git clone https://github.com/ANYbotics/kindr_ros.git
-* perception_pcl (we need release 1.7.2, the last one labeled for ROS1):
-    > git clone https://github.com/ros-perception/perception_pcl --branch 1.7.2
+#### meshes/
 
-And then elevation_mapping itself;
-> git clone https://github.com/anybotics/elevation_mapping.git --branch release
+Meshes to be used by the models in models/. Pointed to by the ```GAZEBO_RESOURCE_PATH``` environment variable.
 
-Now we can build everything with `catkin build` (normally, it'd be catkin_make, but for whatever reason, elevation_mapping uses `build` and our workspace requires us to choose only one):
-> catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
+#### worlds/
 
-> catkin build
+.world files are the environment that our robot models get loaded into in the Gazebo simulator. World files can contain models themselves, as well as various configuration parameters about the environment, lighting, etc.
 
-To verify everything is ready, run the following command to launch simple_sim (after sourcing your workspace again):
+#### rviz/
 
-> roslaunch simple_sim elevation.launch
+.rviz files used for data visualization.
+
