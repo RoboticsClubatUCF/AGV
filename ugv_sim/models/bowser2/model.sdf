@@ -304,7 +304,7 @@
                     </image>
                     <clip>
                         <near>0.5</near>
-                        <far>20</far>
+                        <far>25</far>
                     </clip>
                     <!-- no distortions: "ideal" camera -->
                     <distortion>
@@ -389,8 +389,8 @@
                         <horizontal>
                             <samples>1875</samples>
                             <resolution>1</resolution>
-                            <min_angle>-1.5707</min_angle>                        
-                            <max_angle>1.5707</max_angle>
+                            <min_angle>-3.14159</min_angle>                        
+                            <max_angle>3.14159</max_angle>
                         </horizontal>
                         <vertical>
                 	     <samples>16</samples>
@@ -412,7 +412,7 @@
                 </ray>
 
                 <!-- visualizing sensor rays can be resource intensive -->
-                <visualize>true</visualize>
+                <visualize>false</visualize>
                 
                 <plugin name="laser_plugin" filename="libgazebo_ros_velodyne_laser.so">
             		<topicName>/velodyne</topicName>
