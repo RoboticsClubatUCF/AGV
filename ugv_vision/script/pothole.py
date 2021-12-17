@@ -7,12 +7,11 @@
     This script is meant to:
     1. Listen for image messages from the depth camera
     2. Find the circles in the image
-    3. Calculate the location and area of all circles
+    3. Get the locations of the circles
     4. Update costmap with location and area of all circles
 
-    Right now, the script gets the image, and displays the edges seen in the image
-    using openCV. I need to figure out how to get the location and area of all circles
-    in the image, and update the costmap with the location of the obstacles.
+    Right now, the script finds and highlights the circles. We'll need to use the depth camera to 
+    get the actual locations.
 
 """
 
@@ -20,7 +19,7 @@ import rospy
 from sensor_msgs.msg import Image
 import cv2
 from cv_bridge import CvBridge
-import numpy as np
+import math
 
 class img_detect:
 
@@ -49,6 +48,17 @@ class img_detect:
         self.img = img_msg
         self.ready = True
 
+    # Helper method to calculate circularity     
+    def get_circularity(self, perimeter, area):
+        
+        if perimeter == 0:
+            return 0
+
+        if area == 0:
+            return 0
+
+        return (4*math.pi*area)/(math.pow(perimeter,2))
+
     # Runs the circle detection process
     def run(self):
 
@@ -74,25 +84,34 @@ class img_detect:
             # Cut the image in half. 
             cv_img = cv_img[int(len(cv_img)/2) + 20:]
 
-            params = cv2.SimpleBlobDetector_Params()
+            # Apply simple thresholding to the image, to remove everything that isn't close to white. 
+            ret, cv_img = cv2.threshold(cv_img, 125, 255, 0) 
+            
+            # Find the contours in the image
+            contours, hierarchy = cv2.findContours(cv_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            
+            # Filter for contours with the desired area and circularity
+            validContours = []
 
-            ver = (cv2.__version__).split('.')
-            if int(ver[0]) < 3 :
-                detector = cv2.SimpleBlobDetector(params)
-            else : 
-                detector = cv2.SimpleBlobDetector_create(params)
-
-            # Run blob detection using cv2 blob detection.
-            # detector = cv2.SimpleBlobDetector()
-        
-            # Get blobs
-            poi = detector.detect(cv_img)
-
-            im_with_keypoints = cv2.drawKeypoints(cv_img, poi, np.array([]), (255,0,0), 
-                                                cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
+            for i in contours:
+                
+                # Get the area and peremiter, then use it to calculate circularity.
+                area = cv2.contourArea(i)
+                perimeter = cv2.arcLength(i, True)
+                circularity = self.get_circularity(perimeter, area)
+                
+                #  Add to contour array if the contour is circular, and the contour is the size that we want.
+                if 100 < area < 6000 and circularity > 0.3:
+                    validContours.append(i)
+            
+            # Convert the image to color, so we can draw on it properly
+            cv_img = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR) 
+            
+            # Highlight the detected contours 
+            cv2.drawContours(cv_img, validContours, -1, (0,250,0), 3)
+            
             # Show what's going on as a sanity check
-            cv2.imshow("fuck marc", im_with_keypoints)
+            self.show_image(cv_img)
             cv2.waitKey(1)
 
             self.ready = False
