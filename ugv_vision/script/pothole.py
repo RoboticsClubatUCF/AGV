@@ -6,12 +6,13 @@
 
     This script is meant to:
     1. Listen for image messages from the depth camera
-    2. Find the circles in the image
-    3. Get the locations of the circles
-    4. Update costmap with location and area of all circles
+    2. Find the potholes in the image
+    3. Get the locations of the potholes using the depth image
+    4. Publish these locations to the costmap... somehow...
 
-    Right now, the script finds and highlights the circles. We'll need to use the depth camera to 
-    get the actual locations.
+    I'm nearly finished. All we need to do is clean up the code a bit, fix up the process we use to get the locations 
+    (I'm probably gonna make it a class function so this code is actually readable) and publish the locations of the potholes. 
+    
 
 """
 
@@ -32,7 +33,7 @@ class img_detect:
         self.img = None
         self.ready_img = False
         self.ready_depth = False
-        self.depth_img = None 
+        self.depth_img = None
         self.bridge = CvBridge()
 
         # Initialize computer vision node
@@ -67,19 +68,13 @@ class img_detect:
     # Helper method to calculate circularity     
     def get_circularity(self, perimeter, area):
         
-        if perimeter == 0:
-            return 0
-
-        if area == 0:
+        if perimeter == 0 or area == 0:
             return 0
 
         return (4*math.pi*area)/(math.pow(perimeter,2))
 
     # Runs the circle detection process
     def run(self):
-
-        # Instantiate Image message to cv2 matrix conversion class
-        bridge = CvBridge()
         
         # Runs while the ros is up
         while not rospy.is_shutdown():
@@ -88,8 +83,8 @@ class img_detect:
             if (not self.ready_img) and (not self.ready_depth):
                 continue
 
-            # Convert image from ROS image to cv2 image
-            cv_img = bridge.imgmsg_to_cv2(self.img)
+            # Convert image from ROS image type to cv2 image
+            cv_img = self.bridge.imgmsg_to_cv2(self.img)
 
             # Get a grayscale image 
             cv_img = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
@@ -117,28 +112,34 @@ class img_detect:
                 circularity = self.get_circularity(perimeter, area)
                 
                 #  Add to contour array if the contour is circular, and the contour is the size that we want.
-                if 100 < area < 20000 and circularity > 0.4:
+                if (100 < area < 20000) and (circularity > 0.4):
                     validContours.append(i)
             
+            # Get the locations of the points in the circle by getting the pixels in the depth image. 
             if not len(validContours) <= 0:
                 for contour in validContours:
                     print("------------------------------")
                     for point in contour:
                         point = np.squeeze(point)
                         try:
+                            # Try to get the point in the contour in the depth image.
+                            # Right now, this just prints the location. Sometimes it prints the max range of the sensor, 
+                            # Which means it isn't detecting anything.
                             print(self.depth_img[point[1]][point[0]])
                         except IndexError:
+                            # This error might happen when the points are not within the range of the array
+                            # Ex: There are no contours, or the countours detected are incredibly far away
                             print("Index Err: {} {}".format(point[1], point[0]))
                         except TypeError:
+                            # Wes and I have no idea why this happens. Feel free to figure it out.
                             print("fuck you")
 
             # Convert the image to color, so we can draw on it properly
             cv_img = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
             
-            # Draw the contours 
+            # Draw the contours
             cv2.drawContours(cv_img, validContours, -1, (0,250,0), 3)
 
-            # Find the location in the depth image
             
             # Show what's going on as a sanity check
             self.show_image(cv_img)
