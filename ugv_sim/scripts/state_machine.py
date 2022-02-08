@@ -19,9 +19,12 @@ class Boot(smach.State):
 
         # TODO: define message callbacks for topics to watch and throw flags
         # what needs to be verified before we can begin?
+
         self._velodyne_flag = False
         self._odom_flag = False
         self._cam_flag = False
+        self._imu_flag= False
+        self._gps_flag = False
 
         # Odom subscriber
         rospy.Subscriber('/bowser2/odom', sens.Imu, callback = self.odom_callback)
@@ -32,6 +35,12 @@ class Boot(smach.State):
         # Depth camera
         rospy.Subscriber('/bowser2/bowser2_dc/depth/camera_info', sens.CameraInfo, callback = self.cam_callback)
 
+        # Imu Subscriber
+        rospy.Subscriber('/bowser2/imu', sens.Imu, callback = self.imu_callback)
+
+        # GPS Subscriber
+        rospy.Subscriber('/bowser2/gps', sens.Imu, callback = self.gps_callback)
+
 
         # received ACK from all software modules (define list in XML/YAML format?)
 
@@ -39,7 +48,7 @@ class Boot(smach.State):
 
         while not rospy.is_shutdown():
 
-            if self._odom_flag and self._odom_flag:
+            if self._velodyne_flag and self._odom_flag and self._cam_flag and self._imu_flag and self._gps_flag:
                 return 'boot_success'
 
             # what constitutes an error?
@@ -56,6 +65,14 @@ class Boot(smach.State):
 
         self._odom_flag = True
 
+    def imu_callback(self, data):
+
+        self.imu_flag = True
+
+    def gps_callback(self, data):
+
+        self.gps_flag = True
+
 class Standby(smach.State):
 
     def __init__(self):
@@ -69,7 +86,7 @@ class Standby(smach.State):
 
         self._pose_target = geom.PoseStamped()
 
-        cmd_sub = rospy.Subscriber('/command', rov.Cmd, callback=self.cmd_callback)
+        # cmd_sub = rospy.Subscriber('/command', rov.Cmd, callback=self.cmd_callback)
 
     def execute(self, userdata):
 
@@ -243,8 +260,7 @@ def main():
 
     # initialize ROS node
     rospy.init_node('rover_sm', anonymous=True)
-
-        smach.StateMachine.add('BOOT',
+    
     # create state machine with outcomes
     sm = smach.StateMachine(outcomes=['success', 'err'])
 
