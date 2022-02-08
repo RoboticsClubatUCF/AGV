@@ -19,12 +19,19 @@ class Boot(smach.State):
 
         # TODO: define message callbacks for topics to watch and throw flags
         # what needs to be verified before we can begin?
+        self._velodyne_flag = False
+        self._odom_flag = False
+        self._cam_flag = False
 
-        # RX HEARTBEAT
-        rospy.Subscriber('/heartbeat', rov.Heartbeat, callback=self.hb_callback)
-        self._hb_flag = False
+        # Odom subscriber
+        rospy.Subscriber('/bowser2/odom', sens.Imu, callback = self.odom_callback)
 
-        # RX data from all sensor stream topics
+        # Lidar subscriber
+        rospy.Subscriber('/velodyne', sens.PointCloud2, callback = self.velodyne_callback)
+
+        # Depth camera
+        rospy.Subscriber('/bowser2/bowser2_dc/depth/camera_info', sens.CameraInfo, callback = self.cam_callback)
+
 
         # received ACK from all software modules (define list in XML/YAML format?)
 
@@ -32,14 +39,22 @@ class Boot(smach.State):
 
         while not rospy.is_shutdown():
 
-            if self._hb_flag:
+            if self._odom_flag and self._odom_flag:
                 return 'boot_success'
 
             # what constitutes an error?
 
-    def hb_callback(self, data):
+    def cam_callback(self, data):
+        
+        self._cam_flag = True
 
-        self._hb_flag = True
+    def velodyne_callback(self, data):
+
+        self._velodyne_flag = True
+
+    def odom_callback(self, data):
+
+        self._odom_flag = True
 
 class Standby(smach.State):
 
@@ -229,8 +244,7 @@ def main():
     # initialize ROS node
     rospy.init_node('rover_sm', anonymous=True)
 
-    # TODO: publisher for Telemetry message
-
+        smach.StateMachine.add('BOOT',
     # create state machine with outcomes
     sm = smach.StateMachine(outcomes=['success', 'err'])
 
@@ -239,9 +253,9 @@ def main():
 
     # define states within sm
     with sm:
-        smach.StateMachine.add('BOOT', 
-            Boot(), 
-            transitions={'error':'WARN', 'boot_success':'STANDBY'}, 
+        smach.StateMachine.add('BOOT',
+            Boot(),
+            transitions={'error':'WARN', 'boot_success':'STANDBY'},
             remapping={})
         smach.StateMachine.add('STANDBY',
             Standby(),
