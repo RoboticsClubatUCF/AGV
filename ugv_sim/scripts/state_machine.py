@@ -15,7 +15,7 @@ from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 class Boot(smach.State):
 
     def __init__(self):
-        smach.State.__init__(self, outcomes=['error', 'boot_success'])
+        smach.State.__init__(self, outcomes=['boot_success', 'None'])
 
         # TODO: define message callbacks for topics to watch and throw flags
         # what needs to be verified before we can begin?
@@ -39,7 +39,7 @@ class Boot(smach.State):
         rospy.Subscriber('/bowser2/imu', sens.Imu, callback = self.imu_callback)
 
         # GPS Subscriber
-        rospy.Subscriber('/bowser2/gps', sens.Imu, callback = self.gps_callback)
+        rospy.Subscriber('/bowser2/gps', geom.PoseStamped, callback = self.gps_callback)
 
 
         # received ACK from all software modules (define list in XML/YAML format?)
@@ -76,10 +76,11 @@ class Boot(smach.State):
 class Standby(smach.State):
 
     def __init__(self):
-        smach.State.__init__(self, outcomes=['got_pose', 'rc_preempt', 'error', 'end'],
-                                   output_keys=['pose_target', 'end_status', 'end_reason'] )
+        smach.State.__init__(self, outcomes=['got_pose'],
+                                   output_keys=['gps_x', 'gps_y', 'gps_z', 'gps_x0', 'gps_y0', 'gps_z0', 'gps_w0'])
 
-        self._pose_target = geom.PoseStamped()
+        self.got_pose = False
+        self.data_copy = None
 
         cmd_sub = rospy.Subscriber('/cmd_pose', geom.PoseStamped, callback = self.cmd_callback)
 
@@ -92,10 +93,25 @@ class Standby(smach.State):
             #   userdata.end_reason = 'Fatal Error'
             #   userdata.end_status = 'err'
             #   return 'end'
+            if (self.got_pose):
+                userdata.gps_x = self.data_copy.pose.position.x
+                userdata.gps_y = self.data_copy.pose.position.y
+                userdata.gps_z = self.data_copy.pose.position.z
+
+                userdata.gps_x0 = self.data_copy.pose.orientation.x
+                userdata.gps_y0 = self.data_copy.pose.orientation.y
+                userdata.gps_z0 = self.data_copy.pose.orientation.z
+                userdata.gps_w0 = self.data_copy.pose.orientation.w
+
+                return 'got_pose'
             pass
+            
+
 
     # Called when movement data is received
     def cmd_callback(self, data):
+        self.data_copy = data
+        self.got_pose = True
         return None
 
 class Waypoint(smach.State):
@@ -104,70 +120,25 @@ class Waypoint(smach.State):
         NOT guaranteed to remain the pose_target during operation '''
 
     def __init__(self):
-        smach.State.__init__(self, outcomes=['nav_finish', 'rc_preempt', 'error'],
-                                   input_keys=['pose_target'],
-                                   output_keys=['status'])
-
-        # create the client that will connect to move_base
-        self.client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+        smach.State.__init__(self, outcomes=[],
+                                   input_keys=['way_x', 'way_y', 'way_z', 'way_x0', 'way_y0', 'way_z0', 'way_w0'],
+                                   output_keys=[])
         
-        # listen for pose updates that will change our pose_target
-        pose_sub = rospy.Subscriber('/pose_updates', geom.PoseStamped, callback=self.pose_callback)
-        self.pose_update = False
-
-        # the pose target that WAYPOINT will use for navigation
-        self._pose_target = None
+        self.waypoint = rospy.Publisher('move_base_simple/goal', geom.PoseStamped, queue_size=10)
+        self.geom_temp = geom.PoseStamped()
 
     def execute(self, userdata):
+        self.geom_temp.pose.position.x = userdata.way_x
+        self.geom_temp.pose.position.y = userdata.way_y
+        self.geom_temp.pose.position.z = userdata.way_z
 
-        ''' manages the lifecycle of calls to the autonomy stack '''
+        self.geom_temp.pose.orientation.x = userdata.way_x0
+        self.geom_temp.pose.orientation.y = userdata.way_y0
+        self.geom_temp.pose.orientation.z = userdata.way_z0
+        self.geom_temp.pose.orientation.w = userdata.way_w0
 
-        # get input pose target (pose that caused us to transition to Waypoint)
-        self._pose_target = userdata.pose_target
-        self._pose_update = True
+        self.waypoint.Publish(self.geom_temp)
 
-        # make sure we have connection to client server before continuing
-        self.client.wait_for_server()
-
-        while not rospy.is_shutdown():
-
-            # will need to use an actionlib connection to move_base, like below:
-            # https://hotblackrobotics.github.io/en/blog/2018/01/29/action-client-py/
-            # this approach may require multithreading to not block the main loop
-
-            # for a non-blocking method: https://answers.ros.org/question/347823/action-client-wait_for_result-in-python/
-            # 1. send goal with send_goal()
-            # 2. query action server for state with getState()
-            # 3. if we're in the appropriate state, getResult()
-            # api docs: http://docs.ros.org/melodic/api/actionlib/html/classactionlib_1_1simple__action__client_1_1SimpleActionClient.html
-
-            # if we received a pose update, create a new goal
-            if self._pose_update:
-                
-                # goal = MoveBaseGoal()
-
-                # goal.target_pose.header.frame_id = "map"
-                # goal.target_pose.header.stamp = rospy.Time.now()
-                # goal.target_pose.pose.position.x = 0.5
-                # goal.target_pose.pose.orientation.w = 1.0
-
-                # client.send_goal(goal)
-                # wait = client.wait_for_result()
-                # if not wait:
-                #     rospy.logerr("Action server not available!")
-                #     rospy.signal_shutdown("Action server not available!")
-                # else:
-                #     return client.get_result()
-
-                # reset the flag
-                self._pose_update = False
-
-    def pose_callback(self, data):
-        # update internal pose target
-        self._pose_target = data.pose
-        # set flag to true
-        self._pose_update = True
-    
 class Manual(smach.State):
 
     def __init__(self):
@@ -199,14 +170,13 @@ class Warn(smach.State):
                                    output_keys=['end_status', 'end_reason'])
 
     def execute(self, userdata):
-
         pass
 
 class End(smach.State):
 
     def __init__(self):
-        smach.State.__init__(self, outcomes=['end_success', 'end_err'],
-                                   input_keys=['end_status', 'end_reason'])
+        smach.State.__init__(self, outcomes=[],
+                                   input_keys=[])
 
     def execute(self, userdata):
 
@@ -214,10 +184,10 @@ class End(smach.State):
         # http://wiki.ros.org/rospy/Overview/Initialization%20and%20Shutdown
         rospy.signal_shutdown(userdata.end_reason)
 
-        if userdata.end_status == 'success':
-            return 'end_success'
-        elif userdata.end_status == 'err':
-            return 'end_err'
+        # if userdata.end_status == 'success':
+        #     return 'end_success'
+        # elif userdata.end_status == 'err':
+        #     return 'end_err'
 
 def main():
 
@@ -225,47 +195,63 @@ def main():
     rospy.init_node('rover_sm', anonymous=True)
 
     # create state machine with outcomes
-    sm = smach.StateMachine(outcomes=['success', 'err'])
+    sm = smach.StateMachine(outcomes = ['success', 'err'])
 
     # declare userdata
-    sm.userdata.pose_target = geom.PoseStamped()
+    sm.userdata.x_pos = 0
+    sm.userdata.y_pos = 0
+    sm.userdata.z_pos = 0
+
+    sm.userdata.x_ori = 0
+    sm.userdata.y_ori = 0
+    sm.userdata.z_ori = 0
+    sm.userdata.w_ori = 0
 
     # define states within sm
     with sm:
         smach.StateMachine.add('BOOT',
             Boot(),
-            transitions={'error':'WARN', 'boot_success':'STANDBY'},
+            transitions={'boot_success':'STANDBY', 'None':'END'},
             remapping={})
         smach.StateMachine.add('STANDBY',
             Standby(),
-            transitions={'got_pose':'WAYPOINT', 'rc_preempt':'MANUAL', 'error':'WARN', 'end':'END'},
-            remapping={'pose_target':'pose_target', 'end_status':'end_status', 'end_reason':'end_reason'})
+            transitions={'got_pose':'WAYPOINT'},
+            remapping={'gps_x':'x_pos',
+                        'gps_y':'y_pos',
+                        'gps_z':'z_pos',
+                        'gps_xO':'x_ori',
+                        'gps_yO':'y_ori',
+                        'gps_zO':'z_ori',
+                        'gps_wO':'w_ori'})
         smach.StateMachine.add('WAYPOINT',
             Waypoint(),
-            transitions={'nav_finish':'STANDBY', 'rc_preempt':'MANUAL', 'error':'WARN'},
-            remapping={'pose_target':'pose_target', 'status':'waypoint_status'})
-        smach.StateMachine.add('MANUAL',
-            Manual(),
-            transitions={'rc_un_preempt':'STANDBY', 'resume_waypoint':'WAYPOINT', 'error':'WARN'},
-            remapping={})
-        smach.StateMachine.add('WARN',
-            Warn(),
-            transitions={'reset':'BOOT', 'standby':'STANDBY', 'end':'END'},
-            remapping={})
+            transitions={},
+            remapping={'way_x':'x_pos',
+                        'way_y':'y_pos',
+                        'way_z':'z_pos',
+                        'way_x0':'x_ori',
+                        'way_y0':'y_ori',
+                        'way_z0':'z_ori',
+                        'way_w0':'w_ori'})
+        # smach.StateMachine.add('MANUAL',
+        #     Manual(),
+        #     transitions={'rc_un_preempt':'STANDBY', 'resume_waypoint':'WAYPOINT'},
+        #     remapping={})
+        # smach.StateMachine.add('WARN',
+        #     Warn(),
+        #     transitions={'reset':'BOOT', 'standby':'STANDBY', 'end':'END'},
+        #     remapping={})
         smach.StateMachine.add('END',
             End(),
-            transitions={'end_success':'success', 'end_err':'err'},
-            remapping={'end_status':'end_status', 'end_reason':'end_reason'})
+            transitions={},
+            remapping={})
 
 
     # create an introspection server for debugging transitions
-    introspect = smach_ros.IntrospectionServer('rover_sm_info', sm, '/SM_ROOT')
-    introspect.start()
 
     outcome = sm.execute()
 
     rospy.spin()
-    introspect.stop()
 
 if __name__ == '__main__':
     main()
