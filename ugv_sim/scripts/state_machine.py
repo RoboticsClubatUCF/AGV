@@ -79,61 +79,24 @@ class Standby(smach.State):
         smach.State.__init__(self, outcomes=['got_pose', 'rc_preempt', 'error', 'end'],
                                    output_keys=['pose_target', 'end_status', 'end_reason'] )
 
-        # flags
-        self._rc_preempt = False
-        self._pose_preempt = False
-        self._end = False
-
         self._pose_target = geom.PoseStamped()
 
-        # cmd_sub = rospy.Subscriber('/command', rov.Cmd, callback=self.cmd_callback)
+        cmd_sub = rospy.Subscriber('/cmd_pose', geom.PoseStamped, callback = self.cmd_callback)
+
 
     def execute(self, userdata):
 
         while not rospy.is_shutdown():
-
-            # if we received motor commands, 
-            if self.rc_preempt:
-                rospy.logdebug("Standby preempted by RC command.")
-                return 'rc_preempt'
-            # if we received a pose in Command msg, pass that as output of state
-            if self.pose_preempt:
-                userdata.pose_target = self._pose_target
-                rospy.logdebug("Standby preempted by pose target.")
-                return 'got_pose'
-
             # check for errors
             # if err:
             #   userdata.end_reason = 'Fatal Error'
             #   userdata.end_status = 'err'
             #   return 'end'
+            pass
 
-            # check for user-initiated end
-            if self._end:
-                rospy.logdebug('Standby preempted by end signal.')
-                userdata.end_reason = 'User initiated end state.'
-                userdata.end_status = 'success'
-                return 'end'
-
-
+    # Called when movement data is received
     def cmd_callback(self, data):
-
-        ''' TODO: check for override flag in RC message, throw rc_preempt '''
-
-        # assumes that pose_target field of Command msg is empty if we don't want waypoint navigation
-        if data.pose_target is not None:
-            self._pose_target = data.pose_target
-            self._pose_preempt = True
-
-        if data.rc_preempt is not None:
-            if data.rc_preempt.data:
-                self._rc_preempt = True
-            
-        # check for the shutdown flag    
-        if data.shutdown is not None:
-            if data.shutdown.data:
-                self._end = True
-
+        return None
 
 class Waypoint(smach.State):
 
@@ -260,7 +223,7 @@ def main():
 
     # initialize ROS node
     rospy.init_node('rover_sm', anonymous=True)
-    
+
     # create state machine with outcomes
     sm = smach.StateMachine(outcomes=['success', 'err'])
 
