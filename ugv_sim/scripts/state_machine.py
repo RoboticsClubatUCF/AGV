@@ -120,7 +120,7 @@ class Waypoint(smach.State):
         NOT guaranteed to remain the pose_target during operation '''
 
     def __init__(self):
-        smach.State.__init__(self, outcomes=[],
+        smach.State.__init__(self, outcomes=['End'],
                                    input_keys=['way_x', 'way_y', 'way_z', 'way_x0', 'way_y0', 'way_z0', 'way_w0'],
                                    output_keys=[])
         
@@ -138,6 +138,8 @@ class Waypoint(smach.State):
         self.geom_temp.pose.orientation.w = userdata.way_w0
 
         self.waypoint.Publish(self.geom_temp)
+
+        return 'End'
 
 class Manual(smach.State):
 
@@ -225,7 +227,7 @@ def main():
                         'gps_wO':'w_ori'})
         smach.StateMachine.add('WAYPOINT',
             Waypoint(),
-            transitions={},
+            transitions={'End': 'END'},
             remapping={'way_x':'x_pos',
                         'way_y':'y_pos',
                         'way_z':'z_pos',
