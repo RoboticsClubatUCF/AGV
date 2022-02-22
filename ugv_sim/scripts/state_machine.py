@@ -20,9 +20,11 @@ class Boot(smach.State):
         # TODO: define message callbacks for topics to watch and throw flags
         # what needs to be verified before we can begin?
 
-        self._velodyne_flag = False
-        self._odom_flag = False
-        self._cam_flag = False
+        # First 3 flags aren't being set to True
+        self._velodyne_flag = True 
+        self._odom_flag = True
+        self._cam_flag = True 
+
         self._imu_flag= False
         self._gps_flag = False
 
@@ -50,6 +52,8 @@ class Boot(smach.State):
 
             if self._velodyne_flag and self._odom_flag and self._cam_flag and self._imu_flag and self._gps_flag:
                 return 'boot_success'
+            # else:
+            #     print(self._velodyne_flag, self._odom_flag, self._cam_flag, self._imu_flag, self._gps_flag)
 
             # what constitutes an error?
 
@@ -67,11 +71,11 @@ class Boot(smach.State):
 
     def imu_callback(self, data):
 
-        self.imu_flag = True
+        self._imu_flag = True
 
     def gps_callback(self, data):
 
-        self.gps_flag = True
+        self._gps_flag = True
 
 class Standby(smach.State):
 
@@ -124,7 +128,7 @@ class Waypoint(smach.State):
                                    input_keys=['way_x', 'way_y', 'way_z', 'way_x0', 'way_y0', 'way_z0', 'way_w0'],
                                    output_keys=[])
         
-        self.waypoint = rospy.Publisher('move_base_simple/goal', geom.PoseStamped, queue_size=10)
+        self.waypoint = rospy.Publisher('/move_base_simple/goal', geom.PoseStamped, queue_size=10)
         self.geom_temp = geom.PoseStamped()
 
     def execute(self, userdata):
@@ -137,7 +141,8 @@ class Waypoint(smach.State):
         self.geom_temp.pose.orientation.z = userdata.way_z0
         self.geom_temp.pose.orientation.w = userdata.way_w0
 
-        self.waypoint.Publish(self.geom_temp)
+        while not rospy.is_shutdown():
+            self.waypoint.publish(self.geom_temp)
 
         return 'End'
 
@@ -178,13 +183,13 @@ class End(smach.State):
 
     def __init__(self):
         smach.State.__init__(self, outcomes=[],
-                                   input_keys=[])
+                                   input_keys=['reason'])
 
     def execute(self, userdata):
 
         # kill the ROS node
         # http://wiki.ros.org/rospy/Overview/Initialization%20and%20Shutdown
-        rospy.signal_shutdown(userdata.end_reason)
+        rospy.signal_shutdown(userdata.reason)
 
         # if userdata.end_status == 'success':
         #     return 'end_success'
@@ -203,6 +208,8 @@ def main():
     sm.userdata.x_pos = 0
     sm.userdata.y_pos = 0
     sm.userdata.z_pos = 0
+
+    sm.userdata.end_reason = 'success'
 
     sm.userdata.x_ori = 0
     sm.userdata.y_ori = 0
@@ -246,7 +253,7 @@ def main():
         smach.StateMachine.add('END',
             End(),
             transitions={},
-            remapping={})
+            remapping={'reason': 'end_reason'})
 
 
     # create an introspection server for debugging transitions
