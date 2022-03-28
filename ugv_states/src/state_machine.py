@@ -20,10 +20,9 @@ class Boot(smach.State):
         # TODO: define message callbacks for topics to watch and throw flags
         # what needs to be verified before we can begin?
 
-        # First 3 flags aren't being set to True
         self._velodyne_flag = False 
         self._odom_flag = False
-        self._cam_flag = True
+        self._cam_flag = True   # TODO: we shouldn't need to hard-code a true here
         self._imu_flag= False
         self._gps_flag = False
 
@@ -45,6 +44,8 @@ class Boot(smach.State):
         # configure timer to output status of subscribers every 2 secs
         status_timer = rospy.Timer(rospy.Duration(2), self.timer_status_callback)
 
+        rate = rospy.Rate(20)
+
         while not rospy.is_shutdown():
 
             if self._velodyne_flag and self._odom_flag and self._cam_flag and self._imu_flag and self._gps_flag:
@@ -52,6 +53,8 @@ class Boot(smach.State):
                 # end the status timer
                 status_timer.shutdown()
                 return 'boot_success'
+
+            rate.sleep()
 
     def timer_status_callback(self, event):
 
@@ -88,37 +91,37 @@ class Boot(smach.State):
 class Standby(smach.State):
 
     def __init__(self):
-        smach.State.__init__(self, outcomes=['got_pose'],
+        smach.State.__init__(self, outcomes=['got_pose', 'rc_preempt'],
                                    output_keys=['gps_x', 'gps_y', 'gps_z', 'gps_x0', 'gps_y0', 'gps_z0', 'gps_w0'])
 
         self.got_pose = False
         self.data_copy = None
 
-        cmd_sub = rospy.Subscriber('/cmd_pose', geom.PoseStamped, callback = self.cmd_callback)
-
+        # cmd_sub = rospy.Subscriber('/cmd_pose', geom.PoseStamped, callback = self.cmd_callback)
 
     def execute(self, userdata):
 
+        # wait until execute to initialize subscribers so that multiple states can listen to same topic names without clashing
+        cmd_sub = rospy.Subscriber('/cmd_pose', geom.PoseStamped, callback = self.cmd_callback)
+
+        rate = rospy.Rate(20)
+
         while not rospy.is_shutdown():
-            # check for errors
-            # if err:
-            #   userdata.end_reason = 'Fatal Error'
-            #   userdata.end_status = 'err'
-            #   return 'end'
-            if (self.got_pose):
+
+            if self.got_pose:
+                # fill pose fields
                 userdata.gps_x = self.data_copy.pose.position.x
                 userdata.gps_y = self.data_copy.pose.position.y
                 userdata.gps_z = self.data_copy.pose.position.z
-
+                # fill orientation fields
                 userdata.gps_x0 = self.data_copy.pose.orientation.x
                 userdata.gps_y0 = self.data_copy.pose.orientation.y
                 userdata.gps_z0 = self.data_copy.pose.orientation.z
                 userdata.gps_w0 = self.data_copy.pose.orientation.w
 
                 return 'got_pose'
-            pass
-            
 
+            rate.sleep()
 
     # Called when movement data is received
     def cmd_callback(self, data):
@@ -148,6 +151,8 @@ class Waypoint(smach.State):
         self.geom_temp.pose.orientation.y = userdata.way_y0
         self.geom_temp.pose.orientation.z = userdata.way_z0
         self.geom_temp.pose.orientation.w = userdata.way_w0
+
+        rospy.logdebug(self.geom_temp)
 
         while not rospy.is_shutdown():
             self.waypoint.publish(self.geom_temp)
@@ -232,7 +237,7 @@ def main():
             remapping={})
         smach.StateMachine.add('STANDBY',
             Standby(),
-            transitions={'got_pose':'WAYPOINT'},
+            transitions={'got_pose':'WAYPOINT', 'rc_preempt':'MANUAL'},
             remapping={'gps_x':'x_pos',
                         'gps_y':'y_pos',
                         'gps_z':'z_pos',
@@ -250,10 +255,10 @@ def main():
                         'way_y0':'y_ori',
                         'way_z0':'z_ori',
                         'way_w0':'w_ori'})
-        # smach.StateMachine.add('MANUAL',
-        #     Manual(),
-        #     transitions={'rc_un_preempt':'STANDBY', 'resume_waypoint':'WAYPOINT'},
-        #     remapping={})
+        smach.StateMachine.add('MANUAL',
+            Manual(),
+            transitions={'rc_un_preempt':'STANDBY', 'resume_waypoint':'WAYPOINT', 'error':'END'},
+            remapping={})
         # smach.StateMachine.add('WARN',
         #     Warn(),
         #     transitions={'reset':'BOOT', 'standby':'STANDBY', 'end':'END'},
