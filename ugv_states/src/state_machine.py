@@ -21,41 +21,47 @@ class Boot(smach.State):
         # what needs to be verified before we can begin?
 
         # First 3 flags aren't being set to True
-        self._velodyne_flag = True 
-        self._odom_flag = True
-        self._cam_flag = True 
-
+        self._velodyne_flag = False 
+        self._odom_flag = False
+        self._cam_flag = True
         self._imu_flag= False
         self._gps_flag = False
 
         # Odom subscriber
-        rospy.Subscriber('/bowser2/odom', sens.Imu, callback = self.odom_callback)
-
+        rospy.Subscriber('/bowser2/odom', nav.Odometry, callback=self.odom_callback)
         # Lidar subscriber
-        rospy.Subscriber('/velodyne', sens.PointCloud2, callback = self.velodyne_callback)
-
+        rospy.Subscriber('/velodyne', sens.PointCloud2, callback=self.velodyne_callback)
         # Depth camera
-        rospy.Subscriber('/bowser2/bowser2_dc/depth/camera_info', sens.CameraInfo, callback = self.cam_callback)
-
+        rospy.Subscriber('/bowser2/bowser2_dc/depth/camera_info', sens.CameraInfo, callback=self.cam_callback)
         # Imu Subscriber
-        rospy.Subscriber('/bowser2/imu', sens.Imu, callback = self.imu_callback)
-
+        rospy.Subscriber('/bowser2/imu', sens.Imu, callback=self.imu_callback)
         # GPS Subscriber
-        rospy.Subscriber('/bowser2/gps', geom.PoseStamped, callback = self.gps_callback)
-
+        rospy.Subscriber('/fix', sens.NavSatFix, callback=self.gps_callback)
 
         # received ACK from all software modules (define list in XML/YAML format?)
 
     def execute(self, userdata):
 
+        # configure timer to output status of subscribers every 2 secs
+        status_timer = rospy.Timer(rospy.Duration(2), self.timer_status_callback)
+
         while not rospy.is_shutdown():
 
             if self._velodyne_flag and self._odom_flag and self._cam_flag and self._imu_flag and self._gps_flag:
+                rospy.logdebug("All sources up. Transitioning to STANDBY.")
+                # end the status timer
+                status_timer.shutdown()
                 return 'boot_success'
-            # else:
-            #     print(self._velodyne_flag, self._odom_flag, self._cam_flag, self._imu_flag, self._gps_flag)
 
-            # what constitutes an error?
+    def timer_status_callback(self, event):
+
+        rospy.logdebug(
+            "\nODOM: \t\t{}\n".format(self._odom_flag) + \
+            "LIDAR: \t\t{}\n".format(self._velodyne_flag) + \
+            "CAMERA: \t\t{}\n".format(self._cam_flag) + \
+            "IMU: \t\t{}\n".format(self._imu_flag) + \
+            "GPS: \t\t{}\n".format(self._gps_flag)
+        )
 
     def cam_callback(self, data):
         
@@ -66,6 +72,8 @@ class Boot(smach.State):
         self._velodyne_flag = True
 
     def odom_callback(self, data):
+
+        # rospy.logdebug("ODOM CALLBACK")
 
         self._odom_flag = True
 
