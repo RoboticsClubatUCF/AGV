@@ -34,17 +34,17 @@
     <!-- publishes tf transforms between joints -->
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
 
-    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true">
+    <!-- <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true">
         <rosparam command="load" file="$(find ugv_sim)/config/robot_localization/ekf.yaml" />
-    </node>
+    </node> -->
 
     <!-- launches rviz with specified configuration (if CLI arg is true)-->
     <node if="$(arg rviz)" name="rviz" pkg="rviz" type="rviz" args="-d $(arg rviz_cfg)"/>
 
     <!-- slam_toolbox generates map in real-time as robot moves around (SLAM)-->
-    <node if="$(arg slam)" pkg="slam_toolbox" type="async_slam_toolbox_node" name="slam_toolbox" output="screen">
+    <!-- <node if="$(arg slam)" pkg="slam_toolbox" type="async_slam_toolbox_node" name="slam_toolbox" output="screen">
         <rosparam command="load" file="$(find ugv_sim)/config/slam.yaml" />
-    </node>
+    </node> -->
 
     <!-- publishes the pose (geometry_msgs/PoseWithCovarianceStamped) of robot from simulation plugin (nav_msgs/Odometry) -->
     <!-- <node pkg="ugv_sim" type="pose_publisher.py" name="pose_publisher" output="screen" /> -->
