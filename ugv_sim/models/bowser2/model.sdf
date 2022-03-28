@@ -348,6 +348,27 @@
             </sensor>
         </link>
 
+        <!-- http://wiki.ros.org/hector_gazebo_plugins#GazeboRosGps -->
+        <plugin name="gps_controller" filename="libhector_gazebo_ros_gps.so">
+            <alwaysOn>true</alwaysOn>
+            <rosDebugLevel>debug</rosDebugLevel>
+            <updateRate>1.0</updateRate>
+            <bodyName>bowser2/base_link</bodyName>
+            <topicName>/fix</topicName> <!-- output topic-->
+            <velocityTopicName>/fix_velocity</velocityTopicName>
+            <drift>5.0 5.0 5.0</drift>
+            <gaussianNoise>0.1 0.1 0.1</gaussianNoise>
+            <velocityDrift>0 0 0</velocityDrift>
+            <velocityGaussianNoise>0.1 0.1 0.1</velocityGaussianNoise>
+            <frameId>map</frameId>
+
+            <!-- references -->
+            <!-- <referenceLatitude></referenceLatitude>
+            <referenceLongitude></referenceLongitude>
+            <referenceHeading></referenceHeading>
+            <referenceAltitude></referenceAltitude> -->
+        </plugin>
+
         <joint name="bowser2/lidar_joint" type="fixed">
             <parent>bowser2/base_link</parent>
             <child>bowser2/lidar_link</child>
