@@ -10,7 +10,7 @@ import std_msgs.msg as std
 import nav_msgs.msg as nav
 import sensor_msgs.msg as sens
 import geometry_msgs.msg as geom
-from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+import move_base_msgs.msg as move_base
 
 class Boot(smach.State):
 
@@ -92,7 +92,7 @@ class Standby(smach.State):
 
     def __init__(self):
         smach.State.__init__(self, outcomes=['got_pose', 'rc_preempt'],
-                                   output_keys=['gps_x', 'gps_y', 'gps_z', 'gps_x0', 'gps_y0', 'gps_z0', 'gps_w0'])
+                                   output_keys=['frame_id', 'gps_x', 'gps_y', 'gps_z', 'gps_x0', 'gps_y0', 'gps_z0', 'gps_w0'])
 
         self.got_pose = False
         self.data_copy = None
@@ -109,6 +109,8 @@ class Standby(smach.State):
         while not rospy.is_shutdown():
 
             if self.got_pose:
+                # fill header fields
+                userdata.frame_id = self.data_copy.header.frame_id
                 # fill pose fields
                 userdata.gps_x = self.data_copy.pose.position.x
                 userdata.gps_y = self.data_copy.pose.position.y
@@ -136,28 +138,59 @@ class Waypoint(smach.State):
 
     def __init__(self):
         smach.State.__init__(self, outcomes=['End'],
-                                   input_keys=['way_x', 'way_y', 'way_z', 'way_x0', 'way_y0', 'way_z0', 'way_w0'],
+                                   input_keys=['frame_id', 'way_x', 'way_y', 'way_z', 'way_x0', 'way_y0', 'way_z0', 'way_w0'],
                                    output_keys=[])
-        
-        self.waypoint = rospy.Publisher('/move_base_simple/goal', geom.PoseStamped, queue_size=10)
-        self.geom_temp = geom.PoseStamped()
 
     def execute(self, userdata):
-        self.geom_temp.pose.position.x = userdata.way_x
-        self.geom_temp.pose.position.y = userdata.way_y
-        self.geom_temp.pose.position.z = userdata.way_z
 
-        self.geom_temp.pose.orientation.x = userdata.way_x0
-        self.geom_temp.pose.orientation.y = userdata.way_y0
-        self.geom_temp.pose.orientation.z = userdata.way_z0
-        self.geom_temp.pose.orientation.w = userdata.way_w0
+        # wait until execute to initialize subscribers so that multiple states can listen to same topic names without clashing
+        cmd_sub = rospy.Subscriber('/cmd_pose', geom.PoseStamped, callback = self.pose_callback)
 
-        rospy.logdebug(self.geom_temp)
+        # create a client to the movebase action server
+        self.client = actionlib.SimpleActionClient("move_base", move_base.MoveBaseAction)
+        # make sure we have connection to client server before continuing, timeout after 10s
+        self.client.wait_for_server(timeout=rospy.Duration(10))
 
+        # create MoveBaseGoal message from userdata
+        self.goal_temp = move_base.MoveBaseGoal()
+        # fill header fields
+        self.goal_temp.target_pose.header.frame_id = userdata.frame_id
+        self.goal_temp.target_pose.header.stamp = rospy.Time.now()
+        # fill pose fields
+        self.goal_temp.target_pose.pose.position.x = userdata.way_x
+        self.goal_temp.target_pose.pose.position.y = userdata.way_y
+        self.goal_temp.target_pose.pose.position.z = userdata.way_z
+        # fill orientation fields
+        self.goal_temp.target_pose.pose.orientation.x = userdata.way_x0
+        self.goal_temp.target_pose.pose.orientation.y = userdata.way_y0
+        self.goal_temp.target_pose.pose.orientation.z = userdata.way_z0
+        self.goal_temp.target_pose.pose.orientation.w = userdata.way_w0
+
+        # send goal
+        self.client.send_goal(self.goal_temp)
+
+        rate = rospy.Rate(20)
         while not rospy.is_shutdown():
-            self.waypoint.publish(self.geom_temp)
 
-        return 'End'
+
+            current_state = self.client.get_state()
+            if current_state == actionlib.GoalStatus.SUCCEEDED:
+                rospy.loginfo("Goal Succeeded.\n {}".format(self.client.get_goal_status_text()))
+                return 'nav_finish'
+            elif current_state == actionlib.GoalStatus.REJECTED or \
+                 current_state == actionlib.GoalStatus.ABORTED:
+                rospy.logerr("Goal returned an error:\n\t {}".format(self.client.get_goal_status_text))
+                return 'error'
+            elif current_state == actionlib.GoalStatus.LOST:
+                rospy.logerr("Goal state returned LOST. Are we sure we sent a goal?")
+
+            # self.waypoint.publish(self.geom_temp)
+            # pass
+
+            # return 'End'
+
+    def pose_callback(self, data):
+        pass
 
 class Manual(smach.State):
 
@@ -238,7 +271,8 @@ def main():
         smach.StateMachine.add('STANDBY',
             Standby(),
             transitions={'got_pose':'WAYPOINT', 'rc_preempt':'MANUAL'},
-            remapping={'gps_x':'x_pos',
+            remapping={ 'frame_id':'frame_id',
+                        'gps_x':'x_pos',
                         'gps_y':'y_pos',
                         'gps_z':'z_pos',
                         'gps_xO':'x_ori',
@@ -248,7 +282,8 @@ def main():
         smach.StateMachine.add('WAYPOINT',
             Waypoint(),
             transitions={'End': 'END'},
-            remapping={'way_x':'x_pos',
+            remapping={ 'frame_id':'frame_id',
+                        'way_x':'x_pos',
                         'way_y':'y_pos',
                         'way_z':'z_pos',
                         'way_x0':'x_ori',
