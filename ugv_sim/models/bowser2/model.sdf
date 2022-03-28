@@ -246,7 +246,7 @@
             <!-- tf -->
             <publishTf>true</publishTf> <!-- publish the transforms -->
             <publishOdomTF>true</publishOdomTF>
-            <publishWheelTF>true</publishWheelTF>
+            <publishWheelTF>false</publishWheelTF>
             <odometryFrame>bowser2/odom</odometryFrame>
             <robotBaseFrame>bowser2/base_link</robotBaseFrame>
 
