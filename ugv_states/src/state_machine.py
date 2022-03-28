@@ -207,7 +207,7 @@ class End(smach.State):
 def main():
 
     # initialize ROS node
-    rospy.init_node('rover_sm', anonymous=True)
+    rospy.init_node('rover_sm', anonymous=True, log_level=rospy.DEBUG)
 
     # create state machine with outcomes
     sm = smach.StateMachine(outcomes = ['success', 'err'])
