@@ -36,6 +36,7 @@ void loop(){
   Serial.print(get_input(ESTOP));
   Serial.print("F");
   Serial.print(get_input(DIAL));
+  Serial.print("G");
 }
 
 String get_input(int pin){
