@@ -17,6 +17,7 @@ import rospy
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import Polygon, PolygonStamped, Point32
 import cv2
+import std_msgs
 from cv_bridge import CvBridge
 import math
 import numpy as np
@@ -35,13 +36,13 @@ class pothole_detect:
         self.bridge = CvBridge()
         self.frame = "bowser2/camera_link"
 
-        rospy.init_node("Detected Obstacles", anonymous = False, log_level = rospy.INFO)
+        rospy.init_node("potholes", anonymous = False, log_level = rospy.INFO)
 
         self.image_sub = rospy.Subscriber("/bowser2/bowser2_dc/image/image", Image, callback=self.img_callback)
  
         self.depth_sub = rospy.Subscriber("/bowser2/bowser2_dc/depth/image", Image, callback = self.depth_callback)
 
-        self.pub = rospy.Publisher("Potholes", Polygon, queue_size = 3)
+        self.pub = rospy.Publisher("bowser2/potholes", PolygonStamped, queue_size = 3)
     
     def show_image(self, img):
         cv2.imshow("Image Window", img)
@@ -62,10 +63,9 @@ class pothole_detect:
 
         circularity = (4*math.pi*area)/(math.pow(perimeter,2))
 
-        if circularity > 0.5 and (75 < area < 20000):
+        if circularity > 0.5 and 75<area<50000:
             return True
-
-    # The angular distance is correct and the trig checks out, but this still doesn't work correctly for some reason. 
+ 
     def getLocation(self, coordinate, depth):
         
         if depth > 19:
@@ -126,7 +126,6 @@ class pothole_detect:
                 # Polygon
                 for contour in validContours:
                     p = PolygonStamped()
-                    p.header = self.frame
                     # Point
                     for point in contour:
                         point = np.squeeze(point)
@@ -136,7 +135,7 @@ class pothole_detect:
                             # which means it isn't detecting anything. Other times, weird shit happens.
                             xPoint = self.getLocation(point, self.depth_img[point[1]][point[0]])
                             zPoint = self.depth_img[point[1]][point[0]]
-                            p.polygon.points = Point32(x=xPoint, y=0.000, z = zPoint)
+                            p.polygon.points.append( Point32(x=xPoint, y=0.000, z = zPoint))
                             # Prints (z, x). y is assumed to be the ground plane.
                             #print(self.depth_img[point[1]][point[0]], self.getLocation(point, self.depth_img[point[1]][point[0]]))
                         
@@ -145,6 +144,8 @@ class pothole_detect:
                         
                         except TypeError:
                             continue
+                    p.header.stamp = rospy.Time.now()
+                    p.header.frame_id = self.frame
                     self.pub.publish(p)
 
 

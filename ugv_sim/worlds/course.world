@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="default">
+
+    <include>
+      <uri>model://course_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- <model:physical name="terrain_model">
+      <body:heightmap name ="terrain_body">
+        <geom:heightmap name="terrain_geom">
+          <image>terrain.png</image>
+          <worldTexture>test.jpg</worldTexture>
+          <detailTexture>ttest.jpg</detailTexture>
+          <size>10 10 1</size>
+        </geom:heightmap>
+      </body:heightmap>
+    </model:physical> -->
+
+    <include>
+      <uri>model://bowser2</uri>
+    </include>
+
+  </world>
+</sdf>
