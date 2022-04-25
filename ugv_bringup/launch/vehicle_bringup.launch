@@ -1,0 +1,8 @@
+<launch>
+
+    <!-- VECTORNAV IMU-->
+    <include file="$(find vectornav)/launch/vn100_imu.launch">
+        <!-- put PARAMS here-->
+    </include>
+
+</launch>

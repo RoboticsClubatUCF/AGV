@@ -246,7 +246,7 @@
             <!-- tf -->
             <publishTf>true</publishTf> <!-- publish the transforms -->
             <publishOdomTF>true</publishOdomTF>
-            <publishWheelTF>true</publishWheelTF>
+            <publishWheelTF>false</publishWheelTF>
             <odometryFrame>bowser2/odom</odometryFrame>
             <robotBaseFrame>bowser2/base_link</robotBaseFrame>
 
@@ -304,7 +304,7 @@
                     </image>
                     <clip>
                         <near>0.5</near>
-                        <far>20</far>
+                        <far>25</far>
                     </clip>
                     <!-- no distortions: "ideal" camera -->
                     <distortion>
@@ -348,6 +348,27 @@
             </sensor>
         </link>
 
+        <!-- http://wiki.ros.org/hector_gazebo_plugins#GazeboRosGps -->
+        <plugin name="gps_controller" filename="libhector_gazebo_ros_gps.so">
+            <alwaysOn>true</alwaysOn>
+            <rosDebugLevel>debug</rosDebugLevel>
+            <updateRate>1.0</updateRate>
+            <bodyName>bowser2/base_link</bodyName>
+            <topicName>/fix</topicName> <!-- output topic-->
+            <velocityTopicName>/fix_velocity</velocityTopicName>
+            <drift>5.0 5.0 5.0</drift>
+            <gaussianNoise>0.1 0.1 0.1</gaussianNoise>
+            <velocityDrift>0 0 0</velocityDrift>
+            <velocityGaussianNoise>0.1 0.1 0.1</velocityGaussianNoise>
+            <frameId>map</frameId>
+
+            <!-- references -->
+            <!-- <referenceLatitude></referenceLatitude>
+            <referenceLongitude></referenceLongitude>
+            <referenceHeading></referenceHeading>
+            <referenceAltitude></referenceAltitude> -->
+        </plugin>
+
         <joint name="bowser2/lidar_joint" type="fixed">
             <parent>bowser2/base_link</parent>
             <child>bowser2/lidar_link</child>
@@ -380,36 +401,49 @@
                     </script>
                 </material>
             </visual>
-
+		
             <!-- LiDAR -->
             <sensor name="laser_sensor" type="ray">
                 <!-- <pose>0.01 0 0.0175 0 0 0</pose> -->
                 <ray>
                     <scan>
                         <horizontal>
-                            <samples>256</samples>
+                            <samples>1875</samples>
                             <resolution>1</resolution>
-                            <min_angle>-1.5707</min_angle>                        
-                            <max_angle>1.5707</max_angle>
+                            <min_angle>-3.14159</min_angle>                        
+                            <max_angle>3.14159</max_angle>
                         </horizontal>
+                        <vertical>
+                	     <samples>16</samples>
+                		<resolution>1</resolution>
+                		<min_angle>-0.2618</min_angle>
+                		<max_angle>0.2618</max_angle>
+              		</vertical>
                     </scan>
                     <range>
-                        <min>0.08</min>
-                        <max>30</max>
+                        <min>0.9</min>
+                        <max>130</max>
                         <resolution>0.01</resolution>
                     </range>
+                    <noise>
+              		<type>gaussian</type>
+              		<mean>0.0</mean>
+              		<stddev>0.0</stddev>
+            	    </noise>
                 </ray>
 
                 <!-- visualizing sensor rays can be resource intensive -->
                 <visualize>false</visualize>
                 
-                <plugin name='laser_plugin' filename='libgazebo_ros_laser.so'>
-                    <robotNamespace>bowser2</robotNamespace>
-                    <updateRate>30</updateRate>
-                    <topicName>/scan</topicName> <!-- NOT namespaced (/ prefix is absolute topic name) -->
-                    <frameName>bowser2/lidar_link</frameName> <!-- prepended with robotNamespace value -->
-                    <gaussianNoise>0.01</gaussianNoise>
-                </plugin>
+                <plugin name="laser_plugin" filename="libgazebo_ros_velodyne_laser.so">
+            		<topicName>/velodyne</topicName>
+            		<frameName>bowser2/lidar_link</frameName>
+            		<organize_cloud>false</organize_cloud>
+            		<min_range>0.9</min_range>
+            		<max_range>130</max_range>
+            		<gaussianNoise>.008</gaussianNoise>
+         	 </plugin>
+                
             </sensor>
         </link>
     </model>    
