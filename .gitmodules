@@ -5,7 +5,7 @@
 	path = ugv_hardware/vectornav
 	url = https://github.com/dawonn/vectornav.git
 [submodule "velodyne"]
-	path = velodyne
+	path = ugv_hardware/velodyne
 	url = https://github.com/ros-drivers/velodyne.git
 [submodule "zed-ros-wrapper"]
 	path = ugv_hardware/zed-ros-wrapper
