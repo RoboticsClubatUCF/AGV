@@ -14,7 +14,10 @@
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <!-- Other tools can request additional information be placed here -->
+    <!-- apparently this is how you're supposed to do it: https://nu-msr.github.io/me495_site/lecture10_sdf_gazebo.html -->
+    <gazebo_ros gazebo_model_path="${prefix}/models"
+                gazebo_plugin_path="${prefix}/velodyne_simulator"
+                gazebo_resource_path="${prefix}/meshes" />
   </export>
 
 </package>
