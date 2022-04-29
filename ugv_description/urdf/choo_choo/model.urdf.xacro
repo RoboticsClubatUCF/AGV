@@ -26,7 +26,7 @@
     <!-- lidar properties -->
     <xacro:property name="lidar_mass" value="0.830" />
     <xacro:property name="lidar_height" value="0.0717" />
-    <xacro:property name="lidar_radius" value="0.1033" />
+    <xacro:property name="lidar_radius" value="0.0516" />
     <!-- imu properties -->
     <xacro:property name="imu_offset_x" value="0.0" />
     <xacro:property name="imu_offset_y" value="0.0" />
