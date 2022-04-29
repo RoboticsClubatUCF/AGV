@@ -2,7 +2,8 @@
     <param name="/use_sim_time" value="true" />
 
     <!-- configuring CLI arguments -->
-    <arg name="robot_desc" default="$(find ugv_sim)/models/bowser2/model.urdf" />
+    <arg name="robot" default="choo_choo" />
+    <arg name="robot_desc" default="$(find ugv_description)/urdf/$(arg robot)/model.urdf.xacro" />
     <arg name="world" default="empty"/>
     <arg name="gazebo" default="false" />   <!-- launch the full Gazebo gui window (resource intensive)-->
     <arg name="rviz" default="false"/>   <!-- use rviz window for robot information -->
@@ -13,7 +14,7 @@
 
     <!-- launching gazebo_ros, which is just gazebo with ros integrated -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="world_name" value="$(find ugv_sim)/worlds/$(arg world).world"/> 
+        <!-- <arg name="world_name" value="$(find ugv_sim)/worlds/$(arg world).world"/>  -->
         <arg name="paused" value="false"/>
         <arg name="use_sim_time" value="true"/>
         <arg name="gui" value="$(arg gazebo)"/>
@@ -23,7 +24,11 @@
     </include>
 
     <!-- load robot description to parameter server (for robot_state_publisher) -->
-    <param name="robot_description" textfile="$(arg robot_desc)" />
+    <param name="robot_description" command="$(find xacro)/xacro $(arg robot_desc)" />
+
+     <!-- spawn our model in gazebo by building urdf from xacro-->
+    <node pkg="gazebo_ros" type="spawn_model" name="spawn_$(arg robot)"
+        args="-param robot_description -urdf -model $(arg robot)" respawn="false"/>
 
     <!-- use robot description to publish robot tf tree -->
     <!-- tf_prefix: robot tf transforms are prepended with bowser2 to match model.sdf plugin convention-->
