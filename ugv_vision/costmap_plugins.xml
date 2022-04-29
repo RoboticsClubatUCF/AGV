@@ -1,0 +1,5 @@
+<library path="lib/libcv_detection_layer">
+  <class type="cv_detection_layer_namespace::CVDetectionLayer" base_class_type="costmap_2d::Layer">
+    <description>Layer that adds computer vision detections to costmap.</description>
+  </class>
+</library>
