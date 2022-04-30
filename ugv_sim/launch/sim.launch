@@ -26,7 +26,7 @@
     <!-- load robot description to parameter server (for robot_state_publisher) -->
     <param name="robot_description" command="$(find xacro)/xacro $(arg robot_desc)" />
 
-     <!-- spawn our model in gazebo by building urdf from xacro-->
+     <!-- spawn our model in gazebo by building urdf from xacro -->
     <node pkg="gazebo_ros" type="spawn_model" name="spawn_$(arg robot)"
         args="-param robot_description -urdf -model $(arg robot)" respawn="false"/>
 
@@ -40,26 +40,20 @@
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
 
     <!-- <node pkg="robot_localization" type="ekf_localization_node" name="ekf_se" clear_params="true">
-        <rosparam command="load" file="$(find ugv_sim)/config/robot_localization/ekf.yaml" />
+        <rosparam command="load" file="$(find ugv_nav)/config/robot_localization/ekf.yaml" />
     </node> -->
 
     <!-- launches rviz with specified configuration (if CLI arg is true)-->
     <node if="$(arg rviz)" name="rviz" pkg="rviz" type="rviz" args="-d $(arg rviz_cfg)"/>
 
-    <!-- slam_toolbox generates map in real-time as robot moves around (SLAM)-->
+    <!-- slam_toolbox generates map in real-time as robot moves around (SLAM) -->
     <!-- <node if="$(arg slam)" pkg="slam_toolbox" type="async_slam_toolbox_node" name="slam_toolbox" output="screen">
-        <rosparam command="load" file="$(find ugv_sim)/config/slam.yaml" />
+        <rosparam command="load" file="$(find ugv_nav)/config/slam.yaml" />
     </node> -->
 
     <!-- publishes the pose (geometry_msgs/PoseWithCovarianceStamped) of robot from simulation plugin (nav_msgs/Odometry) -->
     <!-- <node pkg="ugv_sim" type="pose_publisher.py" name="pose_publisher" output="screen" /> -->
 
-    <node pkg="move_base" type="move_base" name="move_base" output="screen">
-        <rosparam file="$(find ugv_sim)/config/move_base/costmap_common_params.yaml" command="load" ns="global_costmap" /> 
-        <rosparam file="$(find ugv_sim)/config/move_base/costmap_common_params.yaml" command="load" ns="local_costmap" />
-        <rosparam file="$(find ugv_sim)/config/move_base/local_costmap_params.yaml" command="load" />
-        <rosparam file="$(find ugv_sim)/config/move_base/global_costmap_params.yaml" command="load" /> 
-        <rosparam file="$(find ugv_sim)/config/move_base/base_local_planner_params.yaml" command="load" />
-    </node>
+    <include file="$(find ugv_nav)/launch/nav.launch" />
 
 </launch>
