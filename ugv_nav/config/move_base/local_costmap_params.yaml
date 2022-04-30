@@ -1,0 +1,23 @@
+local_costmap:
+  global_frame: odom
+  robot_base_frame: base_link
+  update_frequency: 5.0
+  publish_frequency: 2.0
+  static_map: false
+  rolling_window: true
+  width: 10.0
+  height: 10.0
+  resolution: 0.1
+
+  # using the StaticLayer plugin, we can load external maps to be included in the costmap
+  # this is one method by which we can use costmap_2d (built into the nav stack) rather than a homebrew version
+
+  # plugins:
+  #   - {name: external_costmap,  type: "costmap_2d::StaticLayer"}
+
+  # external_costmap:
+  #   # wiki.ros.org/costmap_2d/hydro/staticmap
+  #   enabled:              true 
+  #   subscribe_to_updates: true
+  #   trinary_costmap:      false # allow for any value between unknown and lethal rather than just UNKNOWN/FREE/LETHAL
+  #   map_topic:            /elevation_map_visualization/slope_grid
