@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="choo_choo">
    
+    <xacro:property name="robot" value="choo_choo"/>
     <!-- physical parameters of robot, all in SI (meters, kg) -->
     <!-- base dimensions -->
     <xacro:property name="base_mass" value="22.67" />
@@ -9,7 +10,7 @@
     <xacro:property name="base_height" value="0.305" />     <!-- height=z -->
     <!-- wheel properties -->
     <xacro:property name="wheel_radius" value="0.10795" />
-    <xacro:property name="wheel_width" value="0.061" />
+    <xacro:property name="wheel_width" value="0.059" />
     <!-- differential properties -->
     <xacro:property name="wheel_mass" value="1.179" />
     <xacro:property name="wheelbase" value="0.5874" />
@@ -90,6 +91,16 @@
             <gazebo reference="${name}"> 
                 <material>Gazebo/Black</material>
                 <gravity>true</gravity>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>1</mu>
+                            <mu2>0</mu2>
+                            <fdir1>0 1.0 0</fdir1>
+                            <implicit_spring_damper>true</implicit_spring_damper>
+                        </ode>
+                    </friction>
+                </surface>
             </gazebo>
             <collision name="${name}_collision">
                 <origin xyz="0 0 0" rpy="-1.5707 0 0"/>
@@ -206,8 +217,9 @@
             </ray>
             <visualize>false</visualize>
             <plugin name="laser_plugin" filename="libgazebo_ros_velodyne_laser.so">
+                <robotNamespace>${robot}</robotNamespace>
                 <topicName>velodyne</topicName>
-                <frameName>lidar</frameName>
+                <frameName>/lidar</frameName>
                 <organize_cloud>false</organize_cloud>
                 <min_range>0.9</min_range>
                 <max_range>130</max_range>
@@ -228,25 +240,27 @@
     <!-- imu simulation plugin -->
     <gazebo> <!-- can't use reference because gazebo squashes fixed joints + links into base_link -->
         <plugin name="imu_plugin" filename="libgazebo_ros_imu.so">
+            <robotNamespace>${robot}</robotNamespace>
             <alwaysOn>true</alwaysOn>
             <bodyName>imu</bodyName>
-            <topicName>/imu</topicName>
+            <topicName>imu</topicName>
             <frameName>imu</frameName>
             <serviceName>imu_service</serviceName>
             <gaussianNoise>0.0</gaussianNoise>
-            <updateRate>20.0</updateRate>
+            <updateRate>50.0</updateRate>
         </plugin>
     </gazebo>
 
     <gazebo>    <!-- can't put a 'reference' on this or the GPS doesn't work. hmmmmm... -->
         <!-- http://wiki.ros.org/hector_gazebo_plugins#GazeboRosGps -->
         <plugin name="gps_controller" filename="libhector_gazebo_ros_gps.so">
+            <robotNamespace>${robot}</robotNamespace>
             <alwaysOn>true</alwaysOn>
             <rosDebugLevel>debug</rosDebugLevel>
             <updateRate>1.0</updateRate>
             <bodyName>base_link</bodyName>
-            <topicName>/fix</topicName> <!-- output topic-->
-            <velocityTopicName>/fix_velocity</velocityTopicName>
+            <topicName>fix</topicName> <!-- output topic-->
+            <velocityTopicName>fix_velocity</velocityTopicName>
             <drift>5.0 5.0 5.0</drift>
             <gaussianNoise>0.1 0.1 0.1</gaussianNoise>
             <velocityDrift>0 0 0</velocityDrift>
@@ -300,7 +314,7 @@
             <visualize>true</visualize>
             
             <plugin name="depth_cam_plugin" filename="libgazebo_ros_depth_camera.so">
-                <robotNamespace>choo_choo</robotNamespace>
+                <robotNamespace>${robot}</robotNamespace>
                 <always_on>true</always_on>
                 <updateRate>0.0</updateRate> <!-- use sensor rate -->
                 <cameraName>depth_cam</cameraName>
@@ -341,7 +355,7 @@
     <gazebo>
         <plugin name="skid_steer_drive_controller" filename="libgazebo_ros_skid_steer_drive.so">
             <updateRate>100.0</updateRate>
-            <robotNamespace>/</robotNamespace>
+            <robotNamespace>${robot}</robotNamespace>
             <leftFrontJoint>front_left_wheel_joint</leftFrontJoint>
             <rightFrontJoint>front_right_wheel_joint</rightFrontJoint>
             <leftRearJoint>back_left_wheel_joint</leftRearJoint>
@@ -349,12 +363,12 @@
             <wheelSeparation>${track_width}</wheelSeparation>
             <wheelDiameter>${wheel_radius * 2}</wheelDiameter>
             <robotBaseFrame>base_link</robotBaseFrame>
-            <torque>20</torque>
+            <torque>50</torque>
 
-            <commandTopic>cmd_vel</commandTopic>
+            <commandTopic>/cmd_vel</commandTopic>
             <odometryTopic>odom</odometryTopic>
-            <odometryFrame>odom</odometryFrame>
-            <broadcastTF>true</broadcastTF>
+            <odometryFrame>/odom</odometryFrame>
+            <broadcastTF>false</broadcastTF>
         </plugin>
     </gazebo>
 
