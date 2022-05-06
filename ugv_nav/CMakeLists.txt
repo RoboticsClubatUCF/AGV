@@ -11,7 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   robot_localization
   roscpp
   rospy
-  slam_toolbox
+  # slam_toolbox
 )
 
 ## System dependencies are found with CMake's conventions
