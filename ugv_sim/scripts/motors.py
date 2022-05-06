@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 ''' allows teleoperation of a simulation vehicle with the arrow keys
     assumes differential drive control, and that the base of the robot listens on /cmd_vel
