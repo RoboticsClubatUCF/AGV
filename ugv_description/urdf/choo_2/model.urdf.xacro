@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="choo_2">
+   
+    <xacro:property name="robot" value="choo_2"/>
+    <!-- physical parameters of robot, all in SI (meters, kg) -->
+    <!-- base dimensions -->
+    <xacro:property name="base_mass" value="45.36" />
+    <xacro:property name="base_width" value="0.5588" />     <!-- width=y -->
+    <xacro:property name="base_length" value="0.9398" />    <!-- length=x -->
+    <xacro:property name="base_height" value="0.305" />     <!-- height=z -->
+    <!-- wheel properties -->
+    <xacro:property name="wheel_radius" value="0.10795" />
+    <xacro:property name="wheel_width" value="0.059" />
+    <!-- differential properties -->
+    <xacro:property name="wheel_mass" value="1.179" />
+    <xacro:property name="wheelbase" value="0.67" />
+    <xacro:property name="track_width" value="0.67" />
+    <xacro:property name="wheel_offset_x" value="${wheelbase / 2}" />
+    <xacro:property name="wheel_offset_y" value="${track_width / 2}" />
+    <xacro:property name="wheel_offset_z" value="-0.186475" />
+    <!-- lidar stalk properties -->
+    <xacro:property name="lidar_stalk_height" value="0.330" />
+    <xacro:property name="lidar_stalk_side" value="0.020" />
+    <xacro:property name="lidar_stalk_offset_x" value="-0.1311" />
+    <xacro:property name="lidar_stalk_offset_y" value="0.0" />
+    <xacro:property name="lidar_stalk_offset_z" value="${base_height / 2}" />
+    <!-- lidar properties -->
+    <xacro:property name="lidar_mass" value="0.830" />
+    <xacro:property name="lidar_height" value="0.0717" />
+    <xacro:property name="lidar_radius" value="0.0516" />
+    <!-- imu properties -->
+    <xacro:property name="imu_offset_x" value="0.0" />
+    <xacro:property name="imu_offset_y" value="0.0" />
+    <xacro:property name="imu_offset_z" value="0.0" />
+    <!-- stereo camera properties -->
+    <xacro:property name="cam_mass" value="0.170" />
+    <xacro:property name="cam_width" value="0.175" />     <!-- width=y -->
+    <xacro:property name="cam_length" value="0.033" />    <!-- length=x -->
+    <xacro:property name="cam_height" value="0.030" />     <!-- height=z -->
+    <xacro:property name="cam_offset_x" value="${base_length / 2}" />
+    <xacro:property name="cam_offset_y" value="0.0" />
+    <xacro:property name="cam_offset_z" value="${(base_height / 2) + cam_height}" />
+
+    <!--
+        Include other xacro files for simulation plugins, Gazebo references, and macros
+    -->
+    <xacro:include filename="$(find ugv_description)/urdf/choo_2/model.gazebo" />
+    <xacro:include filename="$(find ugv_description)/urdf/choo_2/model.macro" />
+
+    <!-- 
+        objects contained within the gazebo tags are for Gazebo simulation use only, ignored otherwise.
+        They use SDF format, rather than URDF format
+    -->
+    <gazebo>
+        <static>false</static>
+    </gazebo>
+    <!-- base link (the box) -->
+    <xacro:box_total name="base_link" mass="${base_mass}" width="${base_width}" length="${base_length}" height="${base_height}"/>
+
+    <!-- front left wheel -->
+    <xacro:wheel name="front_left_wheel" wheel_radius="${wheel_radius}" wheel_width="${wheel_width}" wheel_mass="${wheel_mass}"/>
+    <xacro:wheel_joint name="front_left_wheel" x_offset="${wheel_offset_x}" y_offset="${wheel_offset_y}" z_offset="${wheel_offset_z}" reflect_x="1" reflect_y="1"/>
+    <!-- back left wheel -->
+    <!-- <xacro:wheel name="back_left_wheel" wheel_radius="${wheel_radius}" wheel_width="${wheel_width}" wheel_mass="${wheel_mass}"/>
+    <xacro:wheel_joint name="back_left_wheel" x_offset="${wheel_offset_x}" y_offset="${wheel_offset_y}" z_offset="${wheel_offset_z}" reflect_x="-1" reflect_y="1"/> -->
+    <!-- front right wheel -->
+    <xacro:wheel name="front_right_wheel" wheel_radius="${wheel_radius}" wheel_width="${wheel_width}" wheel_mass="${wheel_mass}"/>
+    <xacro:wheel_joint name="front_right_wheel" x_offset="${wheel_offset_x}" y_offset="${wheel_offset_y}" z_offset="${wheel_offset_z}" reflect_x="1" reflect_y="-1"/>
+    <!-- back right wheel-->
+    <!-- <xacro:wheel name="back_right_wheel" wheel_radius="${wheel_radius}" wheel_width="${wheel_width}" wheel_mass="${wheel_mass}"/>
+    <xacro:wheel_joint name="back_right_wheel" x_offset="${wheel_offset_x}" y_offset="${wheel_offset_y}" z_offset="${wheel_offset_z}" reflect_x="-1" reflect_y="-1"/> -->
+
+    <!-- back left caster -->
+    <xacro:caster_total name="back_left_caster" radius="${wheel_radius}" mass="${wheel_mass}" />
+    <xacro:caster_joint name="back_left_caster" x_offset="${wheel_offset_x}" y_offset="${wheel_offset_y / 2}" z_offset="${wheel_offset_z}" reflect_x="-1" reflect_y="1"/>
+    <!-- back right caster -->
+    <xacro:caster_total name="back_right_caster" radius="${wheel_radius}" mass="${wheel_mass}" />
+    <xacro:caster_joint name="back_right_caster" x_offset="${wheel_offset_x}" y_offset="${wheel_offset_y / 2}" z_offset="${wheel_offset_z}" reflect_x="-1" reflect_y="-1"/>
+
+    <!-- lidar stalk -->
+    <xacro:box_total name="lidar_stalk" mass="0.14982" width="${lidar_stalk_side}" length="${lidar_stalk_side}" height="${lidar_stalk_height}" />
+    <joint name="lidar_stalk_joint" type="fixed">
+        <gazebo reference="lidar_stalk_joint">
+        </gazebo>
+        <parent link="base_link"/>
+        <child link="lidar_stalk"/>
+        <origin xyz="${lidar_stalk_offset_x} ${lidar_stalk_offset_y} ${base_height}" rpy="0 0 0"/>
+    </joint>
+
+    <!-- lidar link -->
+    <link name="lidar">
+        <gazebo reference="lidar">
+        </gazebo>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <cylinder radius="${lidar_radius}" length="${lidar_height}"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <cylinder radius="${lidar_radius}" length="${lidar_height}"/>
+            </geometry>
+        </visual>
+        <xacro:cylinder_inertia name="lidar" height="${lidar_height}" radius="${lidar_radius}" mass="${lidar_mass}" />
+    </link>
+    <joint name="lidar_joint" type="fixed">
+        <gazebo reference="lidar_joint">
+        </gazebo>
+        <parent link="lidar_stalk" />
+        <child link="lidar" />
+        <origin xyz="0 0 ${lidar_stalk_height / 2}" />
+    </joint>
+
+
+    <!-- imu link -->
+    <xacro:box_total name="imu" mass="0.05" width="0.05" height="0.05" length="0.05"/>
+    <joint name="imu_joint" type="fixed">
+        <gazebo reference="imu_joint">
+        </gazebo>
+        <parent link="base_link"/>
+        <child link="imu"/>
+        <origin xyz="${imu_offset_x} ${imu_offset_y} ${imu_offset_z}" rpy="0 0 0" />
+    </joint>
+
+    <!-- stereo camera link -->
+    <xacro:box_total name="camera" mass="${cam_mass}" width="${cam_width}" length="${cam_length}" height="${cam_height}"/>
+    <joint name="camera_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="camera"/>
+        <origin xyz="${cam_offset_x} ${cam_offset_y} ${cam_offset_z}" rpy="0 0 0" />
+    </joint>
+    
+    <!-- a simulation workaround to fix the broken point cloud orientation -->
+    <!-- https://answers.ros.org/question/218395/libgazebo_ros_openni_kinectso-depth-pointcloud-wrong-tf/?answer=218749#post-id-218749 -->
+    <joint name="camera_depth_joint" type="fixed">
+        <parent link="camera"/>
+        <child link="camera_depth_link"/>
+        <origin xyz="0.0  0.0  0.0" rpy="-1.5708 0 -1.5708"/>
+    </joint>
+    <link name="camera_depth_link"></link>
+
+</robot>

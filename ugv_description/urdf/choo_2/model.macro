@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!--
+        This file contains xacro macros used to clean up our main URDF file.
+    -->
+
+    <xacro:macro name="box_total" params="name mass width height length">
+        <link name="${name}">
+            <gazebo reference="${name}"> 
+                <material>Gazebo/Black</material>
+                <gravity>true</gravity>
+            </gazebo>
+            <collision name="${name}_collision">
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${length} ${width} ${height}"/>
+                </geometry>
+            </collision>
+            <visual name="${name}_visual">
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${length} ${width} ${height}"/>
+                </geometry>
+            </visual>
+            <inertial name="${name}_inertial">
+                <mass value="${mass}" />
+                <!-- 3D inertia tensor from: https://en.wikipedia.org/wiki/List_of_moments_of_inertia -->
+                <inertia ixx="${mass*(height*height+length*length)/12}" ixy="0.0" ixz="0.0"
+                        iyy="${mass*(height*height+width*width)/12}" iyz="0.0"
+                        izz="${mass*(length*length+width*width)/12}" />
+            </inertial>
+        </link>
+    </xacro:macro>
+
+    <xacro:macro name="box_inertia" params="name mass width height length">
+        <inertial name="${name}_inertia">
+            <mass value="${mass}" />
+            <!-- 3D inertia tensor from: https://en.wikipedia.org/wiki/List_of_moments_of_inertia -->
+            <inertia ixx="${mass*((height*height)+(length*length))/12}" ixy="0.0" ixz="0.0"
+                     iyy="${mass*((height*height)+(width*width))/12}" iyz="0.0"
+                     izz="${mass*((length*length)+(width*width))/12}" />
+        </inertial>
+    </xacro:macro>
+
+    <xacro:macro name="caster_total" params="name mass radius">
+        <link name="${name}">
+            <gazebo reference="${name}"> 
+                <material>Gazebo/Black</material>
+                <gravity>true</gravity>
+            </gazebo>
+            <collision name="${name}_collision">
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <sphere radius="${radius}"/>
+                </geometry>
+            </collision>
+            <visual name="${name}_visual">
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <sphere radius="${radius}"/>
+                </geometry>
+            </visual>
+            <inertial name="${name}_inertial">
+                <mass value="${mass}" />
+                <!-- 3D inertia tensor from: https://en.wikipedia.org/wiki/List_of_moments_of_inertia -->
+                <inertia ixx="${(2/5)*mass*(radius*radius)}" ixy="0.0" ixz="0.0"
+                         iyy="${(2/5)*mass*(radius*radius)}" iyz="0.0"
+                         izz="${(2/5)*mass*(radius*radius)}" />
+            </inertial>
+        </link>
+    </xacro:macro>
+
+    <xacro:macro name="cylinder_inertia" params="name height radius mass">
+        <inertial name="${name}">
+            <mass value="${mass}" />
+            <!-- 3D inertia tensor from: https://en.wikipedia.org/wiki/List_of_moments_of_inertia -->
+            <inertia ixx="${mass*(height*height+3*radius*radius)/12}" ixy="0.0" ixz="0.0"
+                    iyy="${mass*((height*height)+(3*(radius*radius)))/12}" iyz="0.0"
+                    izz="${mass*(radius*radius)/2}" />
+        </inertial>
+    </xacro:macro>
+
+    <xacro:macro name="wheel" params="name wheel_radius wheel_width wheel_mass" >
+        <link name="${name}">
+            <gazebo reference="${name}"> 
+                <material>Gazebo/Black</material>
+                <gravity>true</gravity>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>1</mu>
+                            <mu2>0</mu2>
+                            <fdir1>0 1.0 0</fdir1>
+                            <implicit_spring_damper>true</implicit_spring_damper>
+                        </ode>
+                    </friction>
+                </surface>
+            </gazebo>
+            <collision name="${name}_collision">
+                <origin xyz="0 0 0" rpy="-1.5707 0 0"/>
+                <geometry>
+                    <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+                </geometry>
+            </collision>
+            <visual name="${name}_visual">
+                <origin xyz="0 0 0" rpy="-1.5707 0 0"/>
+                <geometry>
+                    <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+                </geometry>
+            </visual>
+            <xacro:cylinder_inertia name="${name}" height="${wheel_width}" radius="${wheel_radius}" mass="${wheel_mass}"/>
+        </link>
+    </xacro:macro>
+
+    <xacro:macro name="wheel_joint" params="name x_offset y_offset z_offset reflect_x reflect_y">
+        <joint name="${name}_joint" type="continuous">
+            <gazebo reference="${name}_joint">
+            </gazebo>
+            <parent link="base_link" />
+            <child link="${name}" />
+            <origin xyz="${(x_offset*reflect_x)} ${(y_offset*reflect_y)} ${z_offset}" />
+            <axis xyz="0 1 0"/>
+        </joint>
+    </xacro:macro>
+
+    <xacro:macro name="caster_joint" params="name x_offset y_offset z_offset reflect_x reflect_y">
+        <joint name="${name}_joint" type="fixed">
+            <gazebo reference="${name}_joint">
+            </gazebo>
+            <parent link="base_link" />
+            <child link="${name}" />
+            <origin xyz="${(x_offset*reflect_x)} ${(y_offset*reflect_y)} ${z_offset}" />
+            <!-- <axis xyz="0 1 0"/> -->
+        </joint>
+    </xacro:macro>
+
+</robot>

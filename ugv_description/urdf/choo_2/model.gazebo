@@ -1,0 +1,236 @@
+<?xml version="1.0"?>
+<robot>
+
+    <!--
+        This file contains Gazebo-specific information:
+            * simulation plugins
+            * physical constants used by Gazebo (but not by ROS)
+    -->
+
+    <gazebo reference="back_left_caster">
+        <!-- force caster to be frictionless
+             by default, mu is 1.0 (max friction) -->
+        <mu1>0.0</mu1>
+        <mu2>0.0</mu2>
+    </gazebo>
+
+    <gazebo reference="back_right_caster">
+        <!-- force caster to be frictionless
+             by default, mu is 1.0 (max friction) -->
+        <mu1>0.0</mu1>
+        <mu2>0.0</mu2>
+    </gazebo>
+
+    <gazebo reference="back_left_caster_joint">
+        <!--
+            We need to use the preserveFixedJoint tag to stop Gazebo smushing every fixed joint into base_link (which is default behavior)
+        -->
+        <preserveFixedJoint>true</preserveFixedJoint>
+    </gazebo>
+
+    <gazebo reference="back_right_caster_joint">
+        <!--
+            We need to use the preserveFixedJoint tag to stop Gazebo smushing every fixed joint into base_link (which is default behavior)
+        -->
+        <preserveFixedJoint>true</preserveFixedJoint>
+    </gazebo>
+
+    <gazebo>
+        <!-- differential drive plugin; publishes odom frame-->
+        <plugin filename="libgazebo_ros_diff_drive.so" name="diff_drive_controller">
+            <robotNamespace></robotNamespace>    
+            <rosDebugLevel>debug</rosDebugLevel>
+
+            <!-- 'physical' characteristics -->
+            <leftJoint>front_left_wheel_joint</leftJoint>
+            <rightJoint>front_right_wheel_joint</rightJoint>
+            <wheelSeparation>${wheelbase}</wheelSeparation>
+            <wheelDiameter>${wheel_radius * 2}</wheelDiameter>
+            <wheelTorque>4</wheelTorque>   <!-- in Nm -->
+
+            <!-- plugin characteristics -->
+            <odometrySource>world</odometrySource> 
+            <publishOdom>true</publishOdom> 
+            <updateRate>100</updateRate>
+
+            <!-- tf -->
+            <publishTf>true</publishTf> <!-- publish the transforms -->
+            <publishOdomTF>true</publishOdomTF>
+            <publishWheelTF>false</publishWheelTF>
+            <odometryFrame>/odom</odometryFrame>
+            <robotBaseFrame>base_link</robotBaseFrame>
+
+            <!-- ros messaging -->
+            <commandTopic>/cmd_vel</commandTopic> <!-- listens to -->
+            <odometryTopic>/odom</odometryTopic> <!-- publishes on -->
+
+            <!-- Set to true to swap right and left wheels, defaults to true -->
+            <legacyMode>true</legacyMode>
+        </plugin>
+    </gazebo>
+
+    <!-- stereo camera simulation plugin -->
+    <gazebo reference="camera">
+        <sensor name="depth_sensor" type="depth">
+            <!-- Set always_on only for sensor, not on plugin -->
+            <always_on>0</always_on>
+            <!-- Set update_rate only for sensor, not on plugin -->
+            <updateRate>10</updateRate>
+
+            <camera name="depth_camera">
+                <horizontal_fov>1.2</horizontal_fov>
+                <image>
+                    <width>320</width>
+                    <height>240</height>
+                </image>
+                <clip>
+                    <near>0.5</near>
+                    <far>5</far>
+                </clip>
+                <!-- no distortions: "ideal" camera -->
+                <distortion>
+                    <k1>0.0</k1>
+                    <k2>0.0</k2>
+                    <k3>0.0</k3>
+                    <p1>0.0</p1>
+                    <p2>0.0</p2>
+                    <center>0.0 0.0</center>
+                </distortion>
+            </camera>
+
+            <visualize>true</visualize>
+            
+            <plugin name="depth_cam_plugin" filename="libgazebo_ros_depth_camera.so">
+                <robotNamespace>${robot}</robotNamespace>
+                <always_on>true</always_on>
+                <updateRate>0.0</updateRate> <!-- use sensor rate -->
+                <cameraName>depth_cam</cameraName>
+
+                <baseline>0.05</baseline>
+                <pointCloudCutoff>0.05</pointCloudCutoff>
+                <pointCloudCutoffMax>5</pointCloudCutoffMax>
+
+                <!-- configure output topics; will be prepended with robotNamespace value (AKA relative names) -->
+                <imageTopicName>image/image</imageTopicName>
+                <cameraInfoTopicName>image/camera_info</cameraInfoTopicName>
+                <depthImageTopicName>depth/image</depthImageTopicName>
+                <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
+                <pointCloudTopicName>depth/points</pointCloudTopicName>
+
+                <!-- Set TF frame name. If empty, defaults to link name (i.e. "link_name") -->
+                <frameName>/camera_depth_link</frameName> <!-- namespaced -->
+                
+                <distortionK1>0.0</distortionK1>
+                <distortionK2>0.0</distortionK2>
+                <distortionK3>0.0</distortionK3>
+                <distortionT1>0.0</distortionT1>
+                <distortionT2>0.0</distortionT2>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+    <!-- GPS simulation plugin -->
+    <gazebo>    <!-- can't put a 'reference' on this or the GPS doesn't work. hmmmmm... -->
+        <!-- http://wiki.ros.org/hector_gazebo_plugins#GazeboRosGps -->
+        <plugin name="gps_controller" filename="libhector_gazebo_ros_gps.so">
+            <robotNamespace>${robot}</robotNamespace>
+            <alwaysOn>true</alwaysOn>
+            <rosDebugLevel>debug</rosDebugLevel>
+            <updateRate>1.0</updateRate>
+            <bodyName>base_link</bodyName>
+            <topicName>fix</topicName> <!-- output topic-->
+            <velocityTopicName>fix_velocity</velocityTopicName>
+            <drift>5.0 5.0 5.0</drift>
+            <gaussianNoise>0.1 0.1 0.1</gaussianNoise>
+            <velocityDrift>0 0 0</velocityDrift>
+            <velocityGaussianNoise>0.1 0.1 0.1</velocityGaussianNoise>
+            <frameId>map</frameId>
+
+            <!-- references -->
+            <!-- <referenceLatitude></referenceLatitude>
+            <referenceLongitude></referenceLongitude>
+            <referenceHeading></referenceHeading>
+            <referenceAltitude></referenceAltitude> -->
+        </plugin>
+    </gazebo>
+
+    <!-- imu simulation plugin -->
+    <gazebo> <!-- can't use reference because gazebo squashes fixed joints + links into base_link -->
+        <plugin name="imu_plugin" filename="libgazebo_ros_imu.so">
+            <robotNamespace>${robot}</robotNamespace>
+            <alwaysOn>true</alwaysOn>
+            <bodyName>imu</bodyName>
+            <topicName>imu</topicName>
+            <frameName>imu</frameName>
+            <serviceName>imu_service</serviceName>
+            <gaussianNoise>0.0</gaussianNoise>
+            <updateRate>50.0</updateRate>
+        </plugin>
+    </gazebo>
+
+    <!-- lidar simulation plugin -->
+    <gazebo reference="lidar">
+        <sensor name="laser_sensor" type="ray">
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>1875</samples>
+                        <resolution>1</resolution>
+                        <min_angle>-3.14159</min_angle>                        
+                        <max_angle>3.14159</max_angle>
+                    </horizontal>
+                    <vertical>
+                        <samples>16</samples>
+                        <resolution>1</resolution>
+                        <min_angle>-0.2618</min_angle>
+                        <max_angle>0.2618</max_angle>
+                    </vertical>
+                </scan>
+                <range>
+                    <min>0.9</min>
+                    <max>130</max>
+                    <resolution>0.01</resolution>
+                </range>
+                <noise>
+                    <type>gaussian</type>
+                    <mean>0.0</mean>
+                    <stddev>0.0</stddev>
+                </noise>
+            </ray>
+            <visualize>false</visualize>
+            <plugin name="laser_plugin" filename="libgazebo_ros_velodyne_laser.so">
+                <robotNamespace>${robot}</robotNamespace>
+                <topicName>velodyne</topicName>
+                <frameName>/lidar</frameName>
+                <organize_cloud>false</organize_cloud>
+                <min_range>0.9</min_range>
+                <max_range>130</max_range>
+                <gaussianNoise>0.008</gaussianNoise>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+    <!-- skid steer plugin -->
+    <!-- <gazebo>
+        <plugin name="skid_steer_drive_controller" filename="libgazebo_ros_skid_steer_drive.so">
+            <updateRate>100.0</updateRate>
+            <robotNamespace>${robot}</robotNamespace>
+            <leftFrontJoint>front_left_wheel_joint</leftFrontJoint>
+            <rightFrontJoint>front_right_wheel_joint</rightFrontJoint>
+            <leftRearJoint>back_left_wheel_joint</leftRearJoint>
+            <rightRearJoint>back_right_wheel_joint</rightRearJoint>
+            <wheelSeparation>${track_width}</wheelSeparation>
+            <wheelDiameter>${wheel_radius * 2}</wheelDiameter>
+            <robotBaseFrame>base_link</robotBaseFrame>
+            <torque>100</torque>
+
+            <commandTopic>/cmd_vel</commandTopic>
+            <odometryTopic>odom</odometryTopic>
+            <odometryFrame>/odom</odometryFrame>
+            <broadcastTF>false</broadcastTF>
+        </plugin>
+    </gazebo> -->
+
+
+
+</robot>
