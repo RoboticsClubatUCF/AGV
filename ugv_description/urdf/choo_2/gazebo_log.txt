@@ -1,0 +1,1927 @@
+name: "choo_2"
+id: 10
+is_static: false
+pose {
+  position {
+    x: 1.2053542904825039
+    y: 0.021451612176832589
+    z: 0.29434889585180113
+  }
+  orientation {
+    x: -8.53904923770851e-06
+    y: -9.6906977843561341e-05
+    z: -0.0038544218447334913
+    w: 0.99999256695655758
+  }
+}
+joint {
+  name: "choo_2::back_left_caster_joint"
+  id: 90057
+  type: FIXED
+  parent: "choo_2::base_link"
+  parent_id: 11
+  child: "choo_2::back_left_caster"
+  child_id: 90037
+  pose {
+    position {
+      x: 0
+      y: 0
+      z: 0
+    }
+    orientation {
+      x: 0
+      y: 0
+      z: 0
+      w: 1
+    }
+  }
+}
+joint {
+  name: "choo_2::back_right_caster_joint"
+  id: 90058
+  type: FIXED
+  parent: "choo_2::base_link"
+  parent_id: 11
+  child: "choo_2::back_right_caster"
+  child_id: 90042
+  pose {
+    position {
+      x: 0
+      y: 0
+      z: 0
+    }
+    orientation {
+      x: 0
+      y: 0
+      z: 0
+      w: 1
+    }
+  }
+}
+joint {
+  name: "choo_2::front_left_wheel_joint"
+  id: 90059
+  angle: 0.15962828991288802
+  type: REVOLUTE
+  parent: "choo_2::base_link"
+  parent_id: 11
+  child: "choo_2::front_left_wheel"
+  child_id: 90047
+  pose {
+    position {
+      x: 0
+      y: 0
+      z: 0
+    }
+    orientation {
+      x: 0
+      y: 0
+      z: 0
+      w: 1
+    }
+  }
+  axis1 {
+    xyz {
+      x: 0
+      y: 1
+      z: 0
+    }
+    limit_lower: -1e+16
+    limit_upper: 1e+16
+    limit_effort: -1
+    limit_velocity: -1
+    damping: 0
+    friction: 100
+    use_parent_model_frame: false
+    xyz_expressed_in: ""
+  }
+}
+joint {
+  name: "choo_2::front_right_wheel_joint"
+  id: 90060
+  angle: 0.16075745993482471
+  type: REVOLUTE
+  parent: "choo_2::base_link"
+  parent_id: 11
+  child: "choo_2::front_right_wheel"
+  child_id: 90052
+  pose {
+    position {
+      x: 0
+      y: 0
+      z: 0
+    }
+    orientation {
+      x: 0
+      y: 0
+      z: 0
+      w: 1
+    }
+  }
+  axis1 {
+    xyz {
+      x: 0
+      y: 1
+      z: 0
+    }
+    limit_lower: -1e+16
+    limit_upper: 1e+16
+    limit_effort: -1
+    limit_velocity: -1
+    damping: 0
+    friction: 100
+    use_parent_model_frame: false
+    xyz_expressed_in: ""
+  }
+}
+link {
+  id: 11
+  name: "choo_2::base_link"
+  self_collide: false
+  gravity: true
+  kinematic: false
+  enabled: true
+  inertial {
+    mass: 46.5598
+    pose {
+      position {
+        x: -0.001043
+        y: 0
+        z: 0.010026
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    ixx: 3.89081
+    ixy: 0
+    ixz: 0.0420671
+    iyy: 1.7873
+    iyz: 0
+    izz: 4.57483
+  }
+  pose {
+    position {
+      x: 0
+      y: 0
+      z: 0
+    }
+    orientation {
+      x: 0
+      y: 0
+      z: 0
+      w: 1
+    }
+  }
+  visual {
+    name: "choo_2::base_link"
+    id: 11
+    parent_name: "choo_2"
+    parent_id: 10
+    pose {
+      position {
+        x: 0
+        y: 0
+        z: 0
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    type: LINK
+  }
+  visual {
+    name: "choo_2::base_link::base_link_visual_visual"
+    id: 12
+    parent_name: "choo_2::base_link"
+    parent_id: 11
+    pose {
+      position {
+        x: 0
+        y: 0
+        z: 0
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    geometry {
+      type: BOX
+      box {
+        size {
+          x: 0.9398
+          y: 0.5588
+          z: 0.305
+        }
+      }
+    }
+    is_static: false
+    scale {
+      x: 1
+      y: 1
+      z: 1
+    }
+    type: VISUAL
+  }
+  visual {
+    name: "choo_2::base_link::base_link_fixed_joint_lump__camera_visual_visual_1"
+    id: 13
+    parent_name: "choo_2::base_link"
+    parent_id: 11
+    pose {
+      position {
+        x: 0.4699
+        y: 0
+        z: 0.1825
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    geometry {
+      type: BOX
+      box {
+        size {
+          x: 0.033
+          y: 0.175
+          z: 0.03
+        }
+      }
+    }
+    is_static: false
+    scale {
+      x: 1
+      y: 1
+      z: 1
+    }
+    type: VISUAL
+  }
+  visual {
+    name: "choo_2::base_link::base_link_fixed_joint_lump__imu_visual_visual_2"
+    id: 14
+    parent_name: "choo_2::base_link"
+    parent_id: 11
+    pose {
+      position {
+        x: 0
+        y: 0
+        z: 0
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    geometry {
+      type: BOX
+      box {
+        size {
+          x: 0.05
+          y: 0.05
+          z: 0.05
+        }
+      }
+    }
+    is_static: false
+    scale {
+      x: 1
+      y: 1
+      z: 1
+    }
+    type: VISUAL
+  }
+  visual {
+    name: "choo_2::base_link::base_link_fixed_joint_lump__lidar_stalk_visual_visual_3"
+    id: 15
+    parent_name: "choo_2::base_link"
+    parent_id: 11
+    pose {
+      position {
+        x: -0.1311
+        y: 0
+        z: 0.305
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    geometry {
+      type: BOX
+      box {
+        size {
+          x: 0.02
+          y: 0.02
+          z: 0.33
+        }
+      }
+    }
+    is_static: false
+    scale {
+      x: 1
+      y: 1
+      z: 1
+    }
+    type: VISUAL
+  }
+  visual {
+    name: "choo_2::base_link::base_link_fixed_joint_lump__lidar_visual_4"
+    id: 16
+    parent_name: "choo_2::base_link"
+    parent_id: 11
+    pose {
+      position {
+        x: -0.1311
+        y: 0
+        z: 0.47
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    geometry {
+      type: CYLINDER
+      cylinder {
+        radius: 0.0516
+        length: 0.0717
+      }
+    }
+    is_static: false
+    scale {
+      x: 1
+      y: 1
+      z: 1
+    }
+    type: VISUAL
+  }
+  collision {
+    id: 17
+    name: "choo_2::base_link::base_link_collision_collision"
+    laser_retro: 0
+    pose {
+      position {
+        x: 0
+        y: 0
+        z: 0
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    geometry {
+      type: BOX
+      box {
+        size {
+          x: 0.9398
+          y: 0.5588
+          z: 0.305
+        }
+      }
+    }
+    surface {
+      friction {
+        mu: 1
+        mu2: 1
+        fdir1 {
+          x: 0
+          y: 0
+          z: 0
+        }
+        slip1: 0
+        slip2: 0
+        torsional {
+          coefficient: 1
+          use_patch_radius: true
+          patch_radius: 0
+          surface_radius: 0
+          ode {
+            slip: 0
+          }
+        }
+      }
+      restitution_coefficient: 0
+      bounce_threshold: 100000
+      soft_cfm: 0
+      soft_erp: 0.2
+      kp: 1000000000000
+      kd: 1
+      max_vel: 0.01
+      min_depth: 0
+      collide_without_contact: false
+      collide_without_contact_bitmask: 1
+      collide_bitmask: 65535
+      elastic_modulus: 0
+    }
+    visual {
+      name: "choo_2::base_link::base_link_collision_collision"
+      id: 17
+      parent_name: "choo_2::base_link"
+      parent_id: 11
+      pose {
+        position {
+          x: 0
+          y: 0
+          z: 0
+        }
+        orientation {
+          x: 0
+          y: 0
+          z: 0
+          w: 1
+        }
+      }
+      type: COLLISION
+    }
+    visual {
+      name: "choo_2::base_link::base_link_collision_collision__COLLISION_VISUAL__"
+      id: 18
+      parent_name: "choo_2::base_link"
+      parent_id: 11
+      cast_shadows: false
+      pose {
+        position {
+          x: 0
+          y: 0
+          z: 0
+        }
+        orientation {
+          x: 0
+          y: 0
+          z: 0
+          w: 1
+        }
+      }
+      geometry {
+        type: BOX
+        box {
+          size {
+            x: 0.9398
+            y: 0.5588
+            z: 0.305
+          }
+        }
+      }
+      material {
+        script {
+          uri: "file://media/materials/scripts/gazebo.material"
+          name: "Gazebo/OrangeTransparent"
+        }
+      }
+      is_static: false
+      type: COLLISION
+    }
+  }
+  collision {
+    id: 20
+    name: "choo_2::base_link::base_link_fixed_joint_lump__camera_collision_collision_1"
+    laser_retro: 0
+    pose {
+      position {
+        x: 0.4699
+        y: 0
+        z: 0.1825
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    geometry {
+      type: BOX
+      box {
+        size {
+          x: 0.033
+          y: 0.175
+          z: 0.03
+        }
+      }
+    }
+    surface {
+      friction {
+        mu: 1
+        mu2: 1
+        fdir1 {
+          x: 0
+          y: 0
+          z: 0
+        }
+        slip1: 0
+        slip2: 0
+        torsional {
+          coefficient: 1
+          use_patch_radius: true
+          patch_radius: 0
+          surface_radius: 0
+          ode {
+            slip: 0
+          }
+        }
+      }
+      restitution_coefficient: 0
+      bounce_threshold: 100000
+      soft_cfm: 0
+      soft_erp: 0.2
+      kp: 1000000000000
+      kd: 1
+      max_vel: 0.01
+      min_depth: 0
+      collide_without_contact: false
+      collide_without_contact_bitmask: 1
+      collide_bitmask: 65535
+      elastic_modulus: 0
+    }
+    visual {
+      name: "choo_2::base_link::base_link_fixed_joint_lump__camera_collision_collision_1"
+      id: 20
+      parent_name: "choo_2::base_link"
+      parent_id: 11
+      pose {
+        position {
+          x: 0.4699
+          y: 0
+          z: 0.1825
+        }
+        orientation {
+          x: 0
+          y: 0
+          z: 0
+          w: 1
+        }
+      }
+      type: COLLISION
+    }
+    visual {
+      name: "choo_2::base_link::base_link_fixed_joint_lump__camera_collision_collision_1__COLLISION_VISUAL__"
+      id: 21
+      parent_name: "choo_2::base_link"
+      parent_id: 11
+      cast_shadows: false
+      pose {
+        position {
+          x: 0.4699
+          y: 0
+          z: 0.1825
+        }
+        orientation {
+          x: 0
+          y: 0
+          z: 0
+          w: 1
+        }
+      }
+      geometry {
+        type: BOX
+        box {
+          size {
+            x: 0.033
+            y: 0.175
+            z: 0.03
+          }
+        }
+      }
+      material {
+        script {
+          uri: "file://media/materials/scripts/gazebo.material"
+          name: "Gazebo/OrangeTransparent"
+        }
+      }
+      is_static: false
+      type: COLLISION
+    }
+  }
+  collision {
+    id: 23
+    name: "choo_2::base_link::base_link_fixed_joint_lump__imu_collision_collision_2"
+    laser_retro: 0
+    pose {
+      position {
+        x: 0
+        y: 0
+        z: 0
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    geometry {
+      type: BOX
+      box {
+        size {
+          x: 0.05
+          y: 0.05
+          z: 0.05
+        }
+      }
+    }
+    surface {
+      friction {
+        mu: 1
+        mu2: 1
+        fdir1 {
+          x: 0
+          y: 0
+          z: 0
+        }
+        slip1: 0
+        slip2: 0
+        torsional {
+          coefficient: 1
+          use_patch_radius: true
+          patch_radius: 0
+          surface_radius: 0
+          ode {
+            slip: 0
+          }
+        }
+      }
+      restitution_coefficient: 0
+      bounce_threshold: 100000
+      soft_cfm: 0
+      soft_erp: 0.2
+      kp: 1000000000000
+      kd: 1
+      max_vel: 0.01
+      min_depth: 0
+      collide_without_contact: false
+      collide_without_contact_bitmask: 1
+      collide_bitmask: 65535
+      elastic_modulus: 0
+    }
+    visual {
+      name: "choo_2::base_link::base_link_fixed_joint_lump__imu_collision_collision_2"
+      id: 23
+      parent_name: "choo_2::base_link"
+      parent_id: 11
+      pose {
+        position {
+          x: 0
+          y: 0
+          z: 0
+        }
+        orientation {
+          x: 0
+          y: 0
+          z: 0
+          w: 1
+        }
+      }
+      type: COLLISION
+    }
+    visual {
+      name: "choo_2::base_link::base_link_fixed_joint_lump__imu_collision_collision_2__COLLISION_VISUAL__"
+      id: 24
+      parent_name: "choo_2::base_link"
+      parent_id: 11
+      cast_shadows: false
+      pose {
+        position {
+          x: 0
+          y: 0
+          z: 0
+        }
+        orientation {
+          x: 0
+          y: 0
+          z: 0
+          w: 1
+        }
+      }
+      geometry {
+        type: BOX
+        box {
+          size {
+            x: 0.05
+            y: 0.05
+            z: 0.05
+          }
+        }
+      }
+      material {
+        script {
+          uri: "file://media/materials/scripts/gazebo.material"
+          name: "Gazebo/OrangeTransparent"
+        }
+      }
+      is_static: false
+      type: COLLISION
+    }
+  }
+  collision {
+    id: 26
+    name: "choo_2::base_link::base_link_fixed_joint_lump__lidar_stalk_collision_collision_3"
+    laser_retro: 0
+    pose {
+      position {
+        x: -0.1311
+        y: 0
+        z: 0.305
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    geometry {
+      type: BOX
+      box {
+        size {
+          x: 0.02
+          y: 0.02
+          z: 0.33
+        }
+      }
+    }
+    surface {
+      friction {
+        mu: 1
+        mu2: 1
+        fdir1 {
+          x: 0
+          y: 0
+          z: 0
+        }
+        slip1: 0
+        slip2: 0
+        torsional {
+          coefficient: 1
+          use_patch_radius: true
+          patch_radius: 0
+          surface_radius: 0
+          ode {
+            slip: 0
+          }
+        }
+      }
+      restitution_coefficient: 0
+      bounce_threshold: 100000
+      soft_cfm: 0
+      soft_erp: 0.2
+      kp: 1000000000000
+      kd: 1
+      max_vel: 0.01
+      min_depth: 0
+      collide_without_contact: false
+      collide_without_contact_bitmask: 1
+      collide_bitmask: 65535
+      elastic_modulus: 0
+    }
+    visual {
+      name: "choo_2::base_link::base_link_fixed_joint_lump__lidar_stalk_collision_collision_3"
+      id: 26
+      parent_name: "choo_2::base_link"
+      parent_id: 11
+      pose {
+        position {
+          x: -0.1311
+          y: 0
+          z: 0.305
+        }
+        orientation {
+          x: 0
+          y: 0
+          z: 0
+          w: 1
+        }
+      }
+      type: COLLISION
+    }
+    visual {
+      name: "choo_2::base_link::base_link_fixed_joint_lump__lidar_stalk_collision_collision_3__COLLISION_VISUAL__"
+      id: 27
+      parent_name: "choo_2::base_link"
+      parent_id: 11
+      cast_shadows: false
+      pose {
+        position {
+          x: -0.1311
+          y: 0
+          z: 0.305
+        }
+        orientation {
+          x: 0
+          y: 0
+          z: 0
+          w: 1
+        }
+      }
+      geometry {
+        type: BOX
+        box {
+          size {
+            x: 0.02
+            y: 0.02
+            z: 0.33
+          }
+        }
+      }
+      material {
+        script {
+          uri: "file://media/materials/scripts/gazebo.material"
+          name: "Gazebo/OrangeTransparent"
+        }
+      }
+      is_static: false
+      type: COLLISION
+    }
+  }
+  collision {
+    id: 29
+    name: "choo_2::base_link::base_link_fixed_joint_lump__lidar_collision_4"
+    laser_retro: 0
+    pose {
+      position {
+        x: -0.1311
+        y: 0
+        z: 0.47
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    geometry {
+      type: CYLINDER
+      cylinder {
+        radius: 0.0516
+        length: 0.0717
+      }
+    }
+    surface {
+      friction {
+        mu: 1
+        mu2: 1
+        fdir1 {
+          x: 0
+          y: 0
+          z: 0
+        }
+        slip1: 0
+        slip2: 0
+        torsional {
+          coefficient: 1
+          use_patch_radius: true
+          patch_radius: 0
+          surface_radius: 0
+          ode {
+            slip: 0
+          }
+        }
+      }
+      restitution_coefficient: 0
+      bounce_threshold: 100000
+      soft_cfm: 0
+      soft_erp: 0.2
+      kp: 1000000000000
+      kd: 1
+      max_vel: 0.01
+      min_depth: 0
+      collide_without_contact: false
+      collide_without_contact_bitmask: 1
+      collide_bitmask: 65535
+      elastic_modulus: 0
+    }
+    visual {
+      name: "choo_2::base_link::base_link_fixed_joint_lump__lidar_collision_4"
+      id: 29
+      parent_name: "choo_2::base_link"
+      parent_id: 11
+      pose {
+        position {
+          x: -0.1311
+          y: 0
+          z: 0.47
+        }
+        orientation {
+          x: 0
+          y: 0
+          z: 0
+          w: 1
+        }
+      }
+      type: COLLISION
+    }
+    visual {
+      name: "choo_2::base_link::base_link_fixed_joint_lump__lidar_collision_4__COLLISION_VISUAL__"
+      id: 30
+      parent_name: "choo_2::base_link"
+      parent_id: 11
+      cast_shadows: false
+      pose {
+        position {
+          x: -0.1311
+          y: 0
+          z: 0.47
+        }
+        orientation {
+          x: 0
+          y: 0
+          z: 0
+          w: 1
+        }
+      }
+      geometry {
+        type: CYLINDER
+        cylinder {
+          radius: 0.0516
+          length: 0.0717
+        }
+      }
+      material {
+        script {
+          uri: "file://media/materials/scripts/gazebo.material"
+          name: "Gazebo/OrangeTransparent"
+        }
+      }
+      is_static: false
+      type: COLLISION
+    }
+  }
+  sensor {
+    name: "depth_sensor"
+    parent: "choo_2::base_link"
+    parent_id: 11
+    type: "depth"
+    always_on: false
+    pose {
+      position {
+        x: 0.4699
+        y: 0
+        z: 0.1825
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    camera {
+      horizontal_fov: 1.2
+      image_size {
+        x: 320
+        y: 240
+      }
+      near_clip: 0.5
+      far_clip: 5
+      distortion {
+        center {
+          x: 0
+          y: 0
+        }
+        k1: 0
+        k2: 0
+        k3: 0
+        p1: 0
+        p2: 0
+      }
+    }
+    visualize: true
+  }
+  sensor {
+    name: "laser_sensor"
+    parent: "choo_2::base_link"
+    parent_id: 11
+    type: "ray"
+    pose {
+      position {
+        x: -0.1311
+        y: 0
+        z: 0.47
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    ray {
+      horizontal_samples: 1875
+      horizontal_resolution: 1
+      horizontal_min_angle: -3.14159
+      horizontal_max_angle: 3.14159
+      vertical_samples: 16
+      vertical_resolution: 1
+      vertical_min_angle: -0.2618
+      vertical_max_angle: 0.2618
+      range_min: 0.9
+      range_max: 130
+      range_resolution: 0.01
+    }
+    visualize: false
+  }
+  canonical: true
+  enable_wind: false
+}
+link {
+  id: 90037
+  name: "choo_2::back_left_caster"
+  self_collide: false
+  gravity: true
+  kinematic: false
+  enabled: true
+  inertial {
+    mass: 1.179
+    pose {
+      position {
+        x: 0
+        y: 0
+        z: 0
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    ixx: 0.00549565
+    ixy: 0
+    ixz: 0
+    iyy: 0.00549565
+    iyz: 0
+    izz: 0.00549565
+  }
+  pose {
+    position {
+      x: -0.167475659776815
+      y: 0.16747971347375248
+      z: -0.18638697216912503
+    }
+    orientation {
+      x: -5.1752215628400249e-05
+      y: -5.0127500952076238e-05
+      z: 9.527461728633254e-07
+      w: 0.99999999740401713
+    }
+  }
+  visual {
+    name: "choo_2::back_left_caster"
+    id: 90037
+    parent_name: "choo_2"
+    parent_id: 10
+    pose {
+      position {
+        x: -0.167475659776815
+        y: 0.16747971347375248
+        z: -0.18638697216912503
+      }
+      orientation {
+        x: -5.1752215628400249e-05
+        y: -5.0127500952076238e-05
+        z: 9.527461728633254e-07
+        w: 0.99999999740401713
+      }
+    }
+    type: LINK
+  }
+  visual {
+    name: "choo_2::back_left_caster::back_left_caster_visual_visual"
+    id: 90038
+    parent_name: "choo_2::back_left_caster"
+    parent_id: 90037
+    pose {
+      position {
+        x: 0
+        y: 0
+        z: 0
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    geometry {
+      type: SPHERE
+      sphere {
+        radius: 0.10795
+      }
+    }
+    is_static: false
+    scale {
+      x: 1
+      y: 1
+      z: 1
+    }
+    type: VISUAL
+  }
+  collision {
+    id: 90039
+    name: "choo_2::back_left_caster::back_left_caster_collision_collision"
+    laser_retro: 0
+    pose {
+      position {
+        x: 0
+        y: 0
+        z: 0
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    geometry {
+      type: SPHERE
+      sphere {
+        radius: 0.10795
+      }
+    }
+    surface {
+      friction {
+        mu: 0
+        mu2: 0
+        fdir1 {
+          x: 0
+          y: 0
+          z: 0
+        }
+        slip1: 0
+        slip2: 0
+        torsional {
+          coefficient: 1
+          use_patch_radius: true
+          patch_radius: 0
+          surface_radius: 0
+          ode {
+            slip: 0
+          }
+        }
+      }
+      restitution_coefficient: 0
+      bounce_threshold: 100000
+      soft_cfm: 0
+      soft_erp: 0.2
+      kp: 1000000000000
+      kd: 1
+      max_vel: 0.01
+      min_depth: 0
+      collide_without_contact: false
+      collide_without_contact_bitmask: 1
+      collide_bitmask: 65535
+      elastic_modulus: 0
+    }
+    visual {
+      name: "choo_2::back_left_caster::back_left_caster_collision_collision"
+      id: 90039
+      parent_name: "choo_2::back_left_caster"
+      parent_id: 90037
+      pose {
+        position {
+          x: 0
+          y: 0
+          z: 0
+        }
+        orientation {
+          x: 0
+          y: 0
+          z: 0
+          w: 1
+        }
+      }
+      type: COLLISION
+    }
+    visual {
+      name: "choo_2::back_left_caster::back_left_caster_collision_collision__COLLISION_VISUAL__"
+      id: 90040
+      parent_name: "choo_2::back_left_caster"
+      parent_id: 90037
+      cast_shadows: false
+      pose {
+        position {
+          x: 0
+          y: 0
+          z: 0
+        }
+        orientation {
+          x: 0
+          y: 0
+          z: 0
+          w: 1
+        }
+      }
+      geometry {
+        type: SPHERE
+        sphere {
+          radius: 0.10795
+        }
+      }
+      material {
+        script {
+          uri: "file://media/materials/scripts/gazebo.material"
+          name: "Gazebo/OrangeTransparent"
+        }
+      }
+      is_static: false
+      type: COLLISION
+    }
+  }
+  enable_wind: false
+}
+link {
+  id: 90042
+  name: "choo_2::back_right_caster"
+  self_collide: false
+  gravity: true
+  kinematic: false
+  enabled: true
+  inertial {
+    mass: 1.179
+    pose {
+      position {
+        x: 0
+        y: 0
+        z: 0
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    ixx: 0.00549565
+    ixy: 0
+    ixz: 0
+    iyy: 0.00549565
+    iyz: 0
+    izz: 0.00549565
+  }
+  pose {
+    position {
+      x: -0.16747041688600833
+      y: -0.167474816440572
+      z: -0.18636791883859738
+    }
+    orientation {
+      x: 6.2710452783430745e-05
+      y: -6.220645629039225e-05
+      z: -8.0176023208727853e-07
+      w: 0.99999999609855661
+    }
+  }
+  visual {
+    name: "choo_2::back_right_caster"
+    id: 90042
+    parent_name: "choo_2"
+    parent_id: 10
+    pose {
+      position {
+        x: -0.16747041688600833
+        y: -0.167474816440572
+        z: -0.18636791883859738
+      }
+      orientation {
+        x: 6.2710452783430745e-05
+        y: -6.220645629039225e-05
+        z: -8.0176023208727853e-07
+        w: 0.99999999609855661
+      }
+    }
+    type: LINK
+  }
+  visual {
+    name: "choo_2::back_right_caster::back_right_caster_visual_visual"
+    id: 90043
+    parent_name: "choo_2::back_right_caster"
+    parent_id: 90042
+    pose {
+      position {
+        x: 0
+        y: 0
+        z: 0
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    geometry {
+      type: SPHERE
+      sphere {
+        radius: 0.10795
+      }
+    }
+    is_static: false
+    scale {
+      x: 1
+      y: 1
+      z: 1
+    }
+    type: VISUAL
+  }
+  collision {
+    id: 90044
+    name: "choo_2::back_right_caster::back_right_caster_collision_collision"
+    laser_retro: 0
+    pose {
+      position {
+        x: 0
+        y: 0
+        z: 0
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    geometry {
+      type: SPHERE
+      sphere {
+        radius: 0.10795
+      }
+    }
+    surface {
+      friction {
+        mu: 0
+        mu2: 0
+        fdir1 {
+          x: 0
+          y: 0
+          z: 0
+        }
+        slip1: 0
+        slip2: 0
+        torsional {
+          coefficient: 1
+          use_patch_radius: true
+          patch_radius: 0
+          surface_radius: 0
+          ode {
+            slip: 0
+          }
+        }
+      }
+      restitution_coefficient: 0
+      bounce_threshold: 100000
+      soft_cfm: 0
+      soft_erp: 0.2
+      kp: 1000000000000
+      kd: 1
+      max_vel: 0.01
+      min_depth: 0
+      collide_without_contact: false
+      collide_without_contact_bitmask: 1
+      collide_bitmask: 65535
+      elastic_modulus: 0
+    }
+    visual {
+      name: "choo_2::back_right_caster::back_right_caster_collision_collision"
+      id: 90044
+      parent_name: "choo_2::back_right_caster"
+      parent_id: 90042
+      pose {
+        position {
+          x: 0
+          y: 0
+          z: 0
+        }
+        orientation {
+          x: 0
+          y: 0
+          z: 0
+          w: 1
+        }
+      }
+      type: COLLISION
+    }
+    visual {
+      name: "choo_2::back_right_caster::back_right_caster_collision_collision__COLLISION_VISUAL__"
+      id: 90045
+      parent_name: "choo_2::back_right_caster"
+      parent_id: 90042
+      cast_shadows: false
+      pose {
+        position {
+          x: 0
+          y: 0
+          z: 0
+        }
+        orientation {
+          x: 0
+          y: 0
+          z: 0
+          w: 1
+        }
+      }
+      geometry {
+        type: SPHERE
+        sphere {
+          radius: 0.10795
+        }
+      }
+      material {
+        script {
+          uri: "file://media/materials/scripts/gazebo.material"
+          name: "Gazebo/OrangeTransparent"
+        }
+      }
+      is_static: false
+      type: COLLISION
+    }
+  }
+  enable_wind: false
+}
+link {
+  id: 90047
+  name: "choo_2::front_left_wheel"
+  self_collide: false
+  gravity: true
+  kinematic: false
+  enabled: true
+  inertial {
+    mass: 1.179
+    pose {
+      position {
+        x: 0
+        y: 0
+        z: 0
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    ixx: 0.00377679
+    ixy: 0
+    ixz: 0
+    iyy: 0.00377679
+    iyz: 0
+    izz: 0.00686956
+  }
+  pose {
+    position {
+      x: 0.33500105535864544
+      y: 0.33499942338844763
+      z: -0.1864735065916058
+    }
+    orientation {
+      x: -1.5350353059646155e-05
+      y: 0.079729430468053641
+      z: 1.7736239079379525e-06
+      w: 0.99681654163565159
+    }
+  }
+  visual {
+    name: "choo_2::front_left_wheel"
+    id: 90047
+    parent_name: "choo_2"
+    parent_id: 10
+    pose {
+      position {
+        x: 0.33500105535864544
+        y: 0.33499942338844763
+        z: -0.1864735065916058
+      }
+      orientation {
+        x: -1.5350353059646155e-05
+        y: 0.079729430468053641
+        z: 1.7736239079379525e-06
+        w: 0.99681654163565159
+      }
+    }
+    type: LINK
+  }
+  visual {
+    name: "choo_2::front_left_wheel::front_left_wheel_visual_visual"
+    id: 90048
+    parent_name: "choo_2::front_left_wheel"
+    parent_id: 90047
+    pose {
+      position {
+        x: 0
+        y: 0
+        z: 0
+      }
+      orientation {
+        x: -0.70707272370147767
+        y: 0
+        z: 0
+        w: 0.70714083703133268
+      }
+    }
+    geometry {
+      type: CYLINDER
+      cylinder {
+        radius: 0.10795
+        length: 0.059
+      }
+    }
+    is_static: false
+    scale {
+      x: 1
+      y: 1
+      z: 1
+    }
+    type: VISUAL
+  }
+  collision {
+    id: 90049
+    name: "choo_2::front_left_wheel::front_left_wheel_collision_collision"
+    laser_retro: 0
+    pose {
+      position {
+        x: 0
+        y: 0
+        z: 0
+      }
+      orientation {
+        x: -0.70707272370147767
+        y: 0
+        z: 0
+        w: 0.70714083703133268
+      }
+    }
+    geometry {
+      type: CYLINDER
+      cylinder {
+        radius: 0.10795
+        length: 0.059
+      }
+    }
+    surface {
+      friction {
+        mu: 1
+        mu2: 1
+        fdir1 {
+          x: 0
+          y: 0
+          z: 0
+        }
+        slip1: 0
+        slip2: 0
+        torsional {
+          coefficient: 1
+          use_patch_radius: true
+          patch_radius: 0
+          surface_radius: 0
+          ode {
+            slip: 0
+          }
+        }
+      }
+      restitution_coefficient: 0
+      bounce_threshold: 100000
+      soft_cfm: 0
+      soft_erp: 0.2
+      kp: 1000000000000
+      kd: 1
+      max_vel: 0.01
+      min_depth: 0
+      collide_without_contact: false
+      collide_without_contact_bitmask: 1
+      collide_bitmask: 65535
+      elastic_modulus: 0
+    }
+    visual {
+      name: "choo_2::front_left_wheel::front_left_wheel_collision_collision"
+      id: 90049
+      parent_name: "choo_2::front_left_wheel"
+      parent_id: 90047
+      pose {
+        position {
+          x: 0
+          y: 0
+          z: 0
+        }
+        orientation {
+          x: -0.70707272370147767
+          y: 0
+          z: 0
+          w: 0.70714083703133268
+        }
+      }
+      type: COLLISION
+    }
+    visual {
+      name: "choo_2::front_left_wheel::front_left_wheel_collision_collision__COLLISION_VISUAL__"
+      id: 90050
+      parent_name: "choo_2::front_left_wheel"
+      parent_id: 90047
+      cast_shadows: false
+      pose {
+        position {
+          x: 0
+          y: 0
+          z: 0
+        }
+        orientation {
+          x: -0.70707272370147767
+          y: 0
+          z: 0
+          w: 0.70714083703133268
+        }
+      }
+      geometry {
+        type: CYLINDER
+        cylinder {
+          radius: 0.10795
+          length: 0.059
+        }
+      }
+      material {
+        script {
+          uri: "file://media/materials/scripts/gazebo.material"
+          name: "Gazebo/OrangeTransparent"
+        }
+      }
+      is_static: false
+      type: COLLISION
+    }
+  }
+  enable_wind: false
+}
+link {
+  id: 90052
+  name: "choo_2::front_right_wheel"
+  self_collide: false
+  gravity: true
+  kinematic: false
+  enabled: true
+  inertial {
+    mass: 1.179
+    pose {
+      position {
+        x: 0
+        y: 0
+        z: 0
+      }
+      orientation {
+        x: 0
+        y: 0
+        z: 0
+        w: 1
+      }
+    }
+    ixx: 0.00377679
+    ixy: 0
+    ixz: 0
+    iyy: 0.00377679
+    iyz: 0
+    izz: 0.00686956
+  }
+  pose {
+    position {
+      x: 0.3350018698610272
+      y: -0.33500035055928878
+      z: -0.18647447710938886
+    }
+    orientation {
+      x: -9.2534846254387673e-06
+      y: 0.080292206276267833
+      z: 3.9480891364180115e-06
+      w: 0.99677136872508276
+    }
+  }
+  visual {
+    name: "choo_2::front_right_wheel"
+    id: 90052
+    parent_name: "choo_2"
+    parent_id: 10
+    pose {
+      position {
+        x: 0.3350018698610272
+        y: -0.33500035055928878
+        z: -0.18647447710938886
+      }
+      orientation {
+        x: -9.2534846254387673e-06
+        y: 0.080292206276267833
+        z: 3.9480891364180115e-06
+        w: 0.99677136872508276
+      }
+    }
+    type: LINK
+  }
+  visual {
+    name: "choo_2::front_right_wheel::front_right_wheel_visual_visual"
+    id: 90053
+    parent_name: "choo_2::front_right_wheel"
+    parent_id: 90052
+    pose {
+      position {
+        x: 0
+        y: 0
+        z: 0
+      }
+      orientation {
+        x: -0.70707272370147767
+        y: 0
+        z: 0
+        w: 0.70714083703133268
+      }
+    }
+    geometry {
+      type: CYLINDER
+      cylinder {
+        radius: 0.10795
+        length: 0.059
+      }
+    }
+    is_static: false
+    scale {
+      x: 1
+      y: 1
+      z: 1
+    }
+    type: VISUAL
+  }
+  collision {
+    id: 90054
+    name: "choo_2::front_right_wheel::front_right_wheel_collision_collision"
+    laser_retro: 0
+    pose {
+      position {
+        x: 0
+        y: 0
+        z: 0
+      }
+      orientation {
+        x: -0.70707272370147767
+        y: 0
+        z: 0
+        w: 0.70714083703133268
+      }
+    }
+    geometry {
+      type: CYLINDER
+      cylinder {
+        radius: 0.10795
+        length: 0.059
+      }
+    }
+    surface {
+      friction {
+        mu: 1
+        mu2: 1
+        fdir1 {
+          x: 0
+          y: 0
+          z: 0
+        }
+        slip1: 0
+        slip2: 0
+        torsional {
+          coefficient: 1
+          use_patch_radius: true
+          patch_radius: 0
+          surface_radius: 0
+          ode {
+            slip: 0
+          }
+        }
+      }
+      restitution_coefficient: 0
+      bounce_threshold: 100000
+      soft_cfm: 0
+      soft_erp: 0.2
+      kp: 1000000000000
+      kd: 1
+      max_vel: 0.01
+      min_depth: 0
+      collide_without_contact: false
+      collide_without_contact_bitmask: 1
+      collide_bitmask: 65535
+      elastic_modulus: 0
+    }
+    visual {
+      name: "choo_2::front_right_wheel::front_right_wheel_collision_collision"
+      id: 90054
+      parent_name: "choo_2::front_right_wheel"
+      parent_id: 90052
+      pose {
+        position {
+          x: 0
+          y: 0
+          z: 0
+        }
+        orientation {
+          x: -0.70707272370147767
+          y: 0
+          z: 0
+          w: 0.70714083703133268
+        }
+      }
+      type: COLLISION
+    }
+    visual {
+      name: "choo_2::front_right_wheel::front_right_wheel_collision_collision__COLLISION_VISUAL__"
+      id: 90055
+      parent_name: "choo_2::front_right_wheel"
+      parent_id: 90052
+      cast_shadows: false
+      pose {
+        position {
+          x: 0
+          y: 0
+          z: 0
+        }
+        orientation {
+          x: -0.70707272370147767
+          y: 0
+          z: 0
+          w: 0.70714083703133268
+        }
+      }
+      geometry {
+        type: CYLINDER
+        cylinder {
+          radius: 0.10795
+          length: 0.059
+        }
+      }
+      material {
+        script {
+          uri: "file://media/materials/scripts/gazebo.material"
+          name: "Gazebo/OrangeTransparent"
+        }
+      }
+      is_static: false
+      type: COLLISION
+    }
+  }
+  enable_wind: false
+}
+visual {
+  name: "choo_2"
+  id: 10
+  parent_name: "default"
+  parent_id: 1
+  pose {
+    position {
+      x: 1.2053542904825039
+      y: 0.021451612176832589
+      z: 0.29434889585180113
+    }
+    orientation {
+      x: -8.53904923770851e-06
+      y: -9.6906977843561341e-05
+      z: -0.0038544218447334913
+      w: 0.99999256695655758
+    }
+  }
+  type: MODEL
+}
+scale {
+  x: 1
+  y: 1
+  z: 1
+}
+self_collide: false
+enable_wind: false
+plugin {
+  name: "diff_drive_controller"
+  filename: "libgazebo_ros_diff_drive.so"
+  innerxml: "<robotNamespace/>\n<rosDebugLevel>debug</rosDebugLevel>\n<leftJoint>front_left_wheel_joint</leftJoint>\n<rightJoint>front_right_wheel_joint</rightJoint>\n<wheelSeparation>0.67</wheelSeparation>\n<wheelDiameter>0.2159</wheelDiameter>\n<wheelTorque>100</wheelTorque>\n<odometrySource>world</odometrySource>\n<publishOdom>1</publishOdom>\n<updateRate>100</updateRate>\n<publishTf>1</publishTf>\n<publishOdomTF>1</publishOdomTF>\n<publishWheelTF>0</publishWheelTF>\n<odometryFrame>/odom</odometryFrame>\n<robotBaseFrame>base_link</robotBaseFrame>\n<commandTopic>/cmd_vel</commandTopic>\n<odometryTopic>/odom</odometryTopic>\n<legacyMode>1</legacyMode>\n"
+}
+plugin {
+  name: "gps_controller"
+  filename: "libhector_gazebo_ros_gps.so"
+  innerxml: "<robotNamespace>choo_2</robotNamespace>\n<alwaysOn>1</alwaysOn>\n<rosDebugLevel>debug</rosDebugLevel>\n<updateRate>1.0</updateRate>\n<bodyName>base_link</bodyName>\n<topicName>fix</topicName>\n<velocityTopicName>fix_velocity</velocityTopicName>\n<drift>5.0 5.0 5.0</drift>\n<gaussianNoise>0.1 0.1 0.1</gaussianNoise>\n<velocityDrift>0 0 0</velocityDrift>\n<velocityGaussianNoise>0.1 0.1 0.1</velocityGaussianNoise>\n<frameId>map</frameId>\n"
+}
+plugin {
+  name: "imu_plugin"
+  filename: "libgazebo_ros_imu.so"
+  innerxml: "<robotNamespace>choo_2</robotNamespace>\n<alwaysOn>1</alwaysOn>\n<topicName>imu</topicName>\n<serviceName>imu_service</serviceName>\n<gaussianNoise>0.0</gaussianNoise>\n<updateRate>50.0</updateRate>\n<bodyName>base_link</bodyName>\n<frameName>base_link</frameName>\n<xyzOffset>0 0 0</xyzOffset>\n<rpyOffset>0 -0 0</rpyOffset>\n"
+}
+
