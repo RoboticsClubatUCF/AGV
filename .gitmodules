@@ -10,3 +10,9 @@
 [submodule "zed-ros-wrapper"]
 	path = ugv_hardware/zed-ros-wrapper
 	url = https://github.com/stereolabs/zed-ros-wrapper.git
+[submodule "gps_umd"]
+	path = gps_umd
+	url = https://github.com/swri-robotics/gps_umd.git
+[submodule "ugv_hardware/advanced_navigation_driver"]
+	path = ugv_hardware/advanced_navigation_driver
+	url = https://github.com/ros-drivers/advanced_navigation_driver

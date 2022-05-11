@@ -1,8 +1,24 @@
 <launch>
 
     <!-- VECTORNAV IMU-->
-    <include file="$(find vectornav)/launch/vn100_imu.launch">
-        <!-- put PARAMS here-->
+    <include file="$(find vectornav)/launch/vectornav.launch">
     </include>
+
+    <!-- Velodyne -->
+    <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch">
+    </include>
+
+    <!-- Depth Camera -->
+    <include file = "$(find zed_wrapper)/launch/zed.launch">
+    </include>
+
+    <!-- GPS -->
+    <node pkg = "gps_common" type="utm_odometry_node" name = "gps_common"/>
+    
+    <node pkg = "advanced_navigation_driver" type = "advanced_navigation_driver" name = "gps_data" args = "/dev/gps 1000000">
+        <remap from = "/an_device/NavSatFix" to = "/fix"/>
+        <remap from = "/an_device/Imu" to = "/imu_data"/>
+    </node>
+    
 
 </launch>
