@@ -1,7 +1,7 @@
 # parameters here aren't namespaced, and will apply to all costmaps
 obstacle_range: 20
 raytrace_range: 3.0
-footprint: [[0.47,-0.43], [0.47,0.43], [-0.47,0.43], [-0.47,-0.43]] 
+footprint: [[0.47,-0.43], [0.47,0.43], [-0.47,0.43], [-0.47,-0.43]] # TODO: update to match choo_2
 # footprint_padding: 0.01
 inflation_radius: 0.55
 
@@ -28,7 +28,7 @@ obstacles_3d:
   observation_sources:   depth_camera velodyne
   depth_camera:
     data_type: PointCloud2
-    topic: /choo_choo/depth_cam/depth/points
+    topic: /choo_2/depth_cam/depth/points
     sensor_frame: camera
     marking: true
     clearing: true
@@ -36,7 +36,7 @@ obstacles_3d:
     # min_obstacle_height: 0.08
   velodyne:
     data_type: PointCloud2
-    topic: /choo_choo/velodyne
+    topic: /choo_2/velodyne
     sensor_frame: lidar
     marking: true
     clearing: true
