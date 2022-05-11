@@ -14,12 +14,12 @@
         <mu2>0.0</mu2>
     </gazebo>
 
-    <gazebo reference="back_right_caster">
+    <!-- <gazebo reference="back_right_caster"> -->
         <!-- force caster to be frictionless
              by default, mu is 1.0 (max friction) -->
-        <mu1>0.0</mu1>
+        <!-- <mu1>0.0</mu1>
         <mu2>0.0</mu2>
-    </gazebo>
+    </gazebo> -->
 
     <gazebo reference="back_left_caster_joint">
         <!--
@@ -28,17 +28,17 @@
         <preserveFixedJoint>true</preserveFixedJoint>
     </gazebo>
 
-    <gazebo reference="back_right_caster_joint">
+    <!-- <gazebo reference="back_right_caster_joint"> -->
         <!--
             We need to use the preserveFixedJoint tag to stop Gazebo smushing every fixed joint into base_link (which is default behavior)
         -->
-        <preserveFixedJoint>true</preserveFixedJoint>
-    </gazebo>
+        <!-- <preserveFixedJoint>true</preserveFixedJoint>
+    </gazebo> -->
 
     <gazebo>
         <!-- differential drive plugin; publishes odom frame-->
         <plugin filename="libgazebo_ros_diff_drive.so" name="diff_drive_controller">
-            <robotNamespace></robotNamespace>    
+            <robotNamespace>${robot}</robotNamespace>    
             <rosDebugLevel>debug</rosDebugLevel>
 
             <!-- 'physical' characteristics -->
@@ -55,14 +55,14 @@
 
             <!-- tf -->
             <publishTf>true</publishTf> <!-- publish the transforms -->
-            <publishOdomTF>true</publishOdomTF>
+            <publishOdomTF>false</publishOdomTF>
             <publishWheelTF>false</publishWheelTF>
             <odometryFrame>/odom</odometryFrame>
             <robotBaseFrame>base_link</robotBaseFrame>
 
             <!-- ros messaging -->
             <commandTopic>/cmd_vel</commandTopic> <!-- listens to -->
-            <odometryTopic>/odom</odometryTopic> <!-- publishes on -->
+            <odometryTopic>odom</odometryTopic> <!-- publishes on -->
 
             <!-- Set to true to swap right and left wheels, defaults to true -->
             <legacyMode>true</legacyMode>

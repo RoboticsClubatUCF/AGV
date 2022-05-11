@@ -72,10 +72,10 @@
 
     <!-- back left caster -->
     <xacro:caster_total name="back_left_caster" radius="${wheel_radius}" mass="${wheel_mass}" />
-    <xacro:caster_joint name="back_left_caster" x_offset="${wheel_offset_x}" y_offset="${wheel_offset_y / 2}" z_offset="${wheel_offset_z}" reflect_x="-1" reflect_y="1"/>
+    <xacro:caster_joint name="back_left_caster" x_offset="${wheel_offset_x}" y_offset="0" z_offset="${wheel_offset_z}" reflect_x="-1" reflect_y="1"/>
     <!-- back right caster -->
-    <xacro:caster_total name="back_right_caster" radius="${wheel_radius}" mass="${wheel_mass}" />
-    <xacro:caster_joint name="back_right_caster" x_offset="${wheel_offset_x}" y_offset="${wheel_offset_y / 2}" z_offset="${wheel_offset_z}" reflect_x="-1" reflect_y="-1"/>
+    <!-- <xacro:caster_total name="back_right_caster" radius="${wheel_radius}" mass="${wheel_mass}" />
+    <xacro:caster_joint name="back_right_caster" x_offset="${wheel_offset_x}" y_offset="${wheel_offset_y / 2}" z_offset="${wheel_offset_z}" reflect_x="-1" reflect_y="-1"/> -->
 
     <!-- lidar stalk -->
     <xacro:box_total name="lidar_stalk" mass="0.14982" width="${lidar_stalk_side}" length="${lidar_stalk_side}" height="${lidar_stalk_height}" />
