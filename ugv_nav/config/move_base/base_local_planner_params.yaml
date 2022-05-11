@@ -1,11 +1,35 @@
 TrajectoryPlannerROS:
-  max_vel_x: 0.45
-  min_vel_x: 0.1
-  max_vel_theta: 1.0
-  min_in_place_vel_theta: 0.4
+  # http://wiki.ros.org/base_local_planner
 
+  # robot configuration parameters
+  holonomic_robot: false  # holonomic = "can strafe", which our robot cannot
+  # velocities
+  max_vel_x: 1.78816 # 4mph
+  min_vel_x: 0.5     # TODO: set to minimum speed necessary to overcome friction
+  max_vel_theta: 1.0
+  min_vel_theta: -1.0
+  min_in_place_vel_theta: 0.4
+  escape_vel: -0.5
+  # TODO: accelerations
   acc_lim_theta: 3.2
   acc_lim_x: 2.5
   acc_lim_y: 2.5
 
-  holonomic_robot: false
+  # goal tolerance parameters
+  yaw_goal_tolerance: 0.5     # radians
+  xy_goal_tolerance: 0.5      # meters; this is way too relaxed
+  latch_xy_goal_tolerance: false
+
+  # trajectory scoring parameters
+  dwa: true
+  meter_scoring: false
+  pdist_scale: 0.6
+  gdist_scale: 0.8
+  occdist_scale: 0.01
+  heading_lookahead: 0.325
+  heading_scoring: false
+  heading_scoring_timestep: 0.8
+  global_frame_id: odom
+
+  # oscillation prevention parameters
+  oscillation_reset_dist: 0.05
