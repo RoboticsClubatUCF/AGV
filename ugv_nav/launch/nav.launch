@@ -9,7 +9,6 @@
         <rosparam file="$(find ugv_nav)/config/move_base/base_local_planner_params.yaml" command="load" />
     </node>
     
-    
     <!-- ROBOT_LOCALIZATION-->
     <!--
      This launch file (dual_ekf_navsat_example.launch) provides an example of how to work with GPS data using robot_localization. It runs three nodes:
@@ -48,8 +47,8 @@
     -->
     <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform" clear_params="true">
         <remap from="odometry/filtered" to="odometry/filtered/map" />
-        <remap from="imu/data" to="/choo_choo/imu" />
-        <remap from="gps/fix" to="/choo_choo/fix" />
+        <remap from="imu/data" to="/choo_2/imu" />
+        <remap from="gps/fix" to="/choo_2/fix" />
     </node>
 
 </launch>
