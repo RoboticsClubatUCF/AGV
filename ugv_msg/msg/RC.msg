@@ -1,6 +1,8 @@
 # sticks
-int8 cmd_x # fwd/rev
-int8 cmd_theta	# left (positive) / right (negative)
+int16 right_y # fwd/rev
+int16 right_x
+int16 left_y
+int16 left_x
 # switches
 bool switch_a
 bool switch_b
