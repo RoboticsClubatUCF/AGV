@@ -2,7 +2,7 @@ import serial
 import serial.tools.list_ports
 
 # variables
-PORT = "/dev/ttyUSB0"
+PORT = "/dev/ttyUSB1"
 inputs = {
     "RJ_x": 0,
     "RJ_y": 0,
@@ -26,10 +26,7 @@ def read_serial():
     # used to determine how much of the input we should read
     is_short = False
     bytes_read = 0
-    cut_with = {
-        True: 4,
-        False: 5
-    }
+    cut_at = 0
     
     while(1):
         bytes_read = 0
@@ -39,35 +36,35 @@ def read_serial():
             pass
 
         # read each of the 6 controller inputs 
-        while(bytes_read != 30):
+        while(bytes_read != 24):
             # read serial values
-            input = ser.read(size = 5)
-            bytes_read += 5
+            input = ser.read(size = 4)
+            bytes_read += 4
             
             # decode the input
             input = input.decode()
-
-            print(input[0])
             
-            # find the marker that's added if the value < 1000
-            if input[4] == "_": # has filler marker
-                is_short = True
+            # find the marker that's added if the value is short
+            if input[2] == "_": # has filler marker at the second index
+                cut_at = 2
+            elif input[3] == "_":
+                cut_at = 3
             else:
-                is_short = False
-                
+                cut_at = 4
+            
             # determine what input the value belongs to
             if input[0] == "A":
-                inputs["RJ_x"] = input[1:cut_with[is_short]]
+                inputs["RJ_x"] = input[1:cut_at]
             elif input[0] == "B":
-                inputs["RJ_y"] = input[1:cut_with[is_short]]
+                inputs["RJ_y"] = input[1:cut_at]
             elif input[0] == "C":
-                inputs["LJ_y"] = input[1:cut_with[is_short]]
+                inputs["LJ_y"] = input[1:cut_at]
             elif input[0] == "D":
-                inputs["LJ_x"] = input[1:cut_with[is_short]]
+                inputs["LJ_x"] = input[1:cut_at]
             elif input[0] == "E":
-                inputs["ESTOP"] = input[1:cut_with[is_short]]
+                inputs["ESTOP"] = input[1:cut_at]
             elif input[0] == "F":
-                inputs["DIAL"] = input[1:cut_with[is_short]]
+                inputs["DIAL"] = input[1:cut_at]
                 
             print(inputs["RJ_x"], inputs["RJ_y"], inputs["LJ_x"], inputs["LJ_y"], inputs["ESTOP"], inputs["DIAL"], sep = " ")
     
