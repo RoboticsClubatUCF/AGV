@@ -5,7 +5,7 @@
     <!-- physical parameters of robot, all in SI (meters, kg) -->
     <!-- base dimensions -->
     <xacro:property name="base_mass" value="45.36" />
-    <xacro:property name="base_width" value="0.5588" />     <!-- width=y -->
+    <xacro:property name="base_width" value="0.4" />     <!-- width=y -->
     <xacro:property name="base_length" value="0.9398" />    <!-- length=x -->
     <xacro:property name="base_height" value="0.305" />     <!-- height=z -->
     <!-- wheel properties -->
@@ -13,8 +13,9 @@
     <xacro:property name="wheel_width" value="0.059" />
     <!-- differential properties -->
     <xacro:property name="wheel_mass" value="1.179" />
-    <xacro:property name="wheelbase" value="0.67" />
-    <xacro:property name="track_width" value="0.67" />
+    <!-- <xacro:property name="wheelbase" value="0.67" /> -->
+    <xacro:property name="wheelbase" value="0.40" />
+    <xacro:property name="track_width" value="0.54" />
     <xacro:property name="wheel_offset_x" value="${wheelbase / 2}" />
     <xacro:property name="wheel_offset_y" value="${track_width / 2}" />
     <xacro:property name="wheel_offset_z" value="-0.186475" />
@@ -363,7 +364,7 @@
             <wheelSeparation>${track_width}</wheelSeparation>
             <wheelDiameter>${wheel_radius * 2}</wheelDiameter>
             <robotBaseFrame>base_link</robotBaseFrame>
-            <torque>100</torque>
+            <torque>4</torque>
 
             <commandTopic>/cmd_vel</commandTopic>
             <odometryTopic>odom</odometryTopic>
