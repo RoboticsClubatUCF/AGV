@@ -1,6 +1,6 @@
 # parameters here aren't namespaced, and will apply to all costmaps
 obstacle_range: 20
-raytrace_range: 3.0
+raytrace_range: 20
 footprint: [[0.47,-0.43], [0.47,0.43], [-0.47,0.43], [-0.47,-0.43]] # TODO: update to match choo_2
 # footprint_padding: 0.01
 inflation_radius: 0.55
@@ -25,19 +25,19 @@ obstacles_3d:
   obstacle_range:         20    # meters
   raytrace_range:         20
   publish_voxel_map:      true
-  observation_sources:   depth_camera velodyne
+  observation_sources:   velodyne
   depth_camera:
     data_type: PointCloud2
-    topic: /choo_2/depth_cam/depth/points
-    sensor_frame: camera
+    topic: /zed/zed_node/point_cloud/cloud_registered
+    sensor_frame: zed_left_camera_frame
     marking: true
     clearing: true
     # max_obstacle_height: 2.0
     # min_obstacle_height: 0.08
   velodyne:
     data_type: PointCloud2
-    topic: /choo_2/velodyne
-    sensor_frame: lidar
+    topic: /velodyne_points
+    sensor_frame: velodyne
     marking: true
     clearing: true
     # max_obstacle_height: 2.0
