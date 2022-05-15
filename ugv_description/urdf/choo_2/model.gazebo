@@ -115,7 +115,7 @@
                 <cameraInfoTopicName>image/camera_info</cameraInfoTopicName>
                 <depthImageTopicName>depth/image</depthImageTopicName>
                 <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
-                <pointCloudTopicName>depth/points</pointCloudTopicName>
+                <pointCloudTopicName>/zed/zed_node/point_cloud/cloud_registered</pointCloudTopicName>
 
                 <!-- Set TF frame name. If empty, defaults to link name (i.e. "link_name") -->
                 <frameName>/camera_depth_link</frameName> <!-- namespaced -->
@@ -159,8 +159,8 @@
         <plugin name="imu_plugin" filename="libgazebo_ros_imu.so">
             <robotNamespace>${robot}</robotNamespace>
             <alwaysOn>true</alwaysOn>
-            <bodyName>imu</bodyName>
-            <topicName>imu</topicName>
+            <bodyName>vectornav</bodyName>
+            <topicName>/vectornav/IMU</topicName>
             <frameName>vectornav</frameName>
             <serviceName>imu_service</serviceName>
             <gaussianNoise>0.0</gaussianNoise>
@@ -169,7 +169,7 @@
     </gazebo>
 
     <!-- lidar simulation plugin -->
-    <gazebo reference="lidar">
+    <gazebo reference="velodyne">
         <sensor name="laser_sensor" type="ray">
             <ray>
                 <scan>
