@@ -4,7 +4,7 @@
     <!-- configuring CLI arguments -->
     <arg name="robot" default="choo_2" />
     <arg name="robot_desc" default="$(find ugv_description)/urdf/$(arg robot)/model.urdf.xacro" />
-    <arg name="world" default="empty"/>
+    <arg name="world" default="course"/>
     <arg name="gazebo" default="false" />   <!-- launch the full Gazebo gui window (resource intensive)-->
     <arg name="rviz" default="false"/>   <!-- use rviz window for robot information -->
     <arg name="rviz_cfg" default="$(find ugv_sim)/rviz/bowser2.rviz" />
@@ -12,9 +12,13 @@
     <arg name="debug" default="false" />
     <arg name="no_costmap_2d" default="false" />
 
+    <arg name="sim_pos_X" default="0.0" />
+    <arg name="sim_pos_Y" default="0.0" />
+    <arg name="sim_pos_Z" default="0.0" />
+
     <!-- launching gazebo_ros, which is just gazebo with ros integrated -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <!-- <arg name="world_name" value="$(find ugv_sim)/worlds/$(arg world).world"/>  -->
+        <arg name="world_name" value="$(find ugv_sim)/worlds/$(arg world).world"/> 
         <arg name="paused" value="false"/>
         <arg name="use_sim_time" value="true"/>
         <arg name="gui" value="$(arg gazebo)"/>
@@ -26,9 +30,17 @@
     <!-- load robot description to parameter server (for robot_state_publisher) -->
     <param name="robot_description" command="$(find xacro)/xacro $(arg robot_desc)" />
 
-     <!-- spawn our model in gazebo by building urdf from xacro -->
-    <node pkg="gazebo_ros" type="spawn_model" name="spawn_$(arg robot)"
-        args="-param robot_description -urdf -model $(arg robot)" respawn="false"/>
+    <!-- spawn our model in gazebo by building urdf from xacro -->
+    <group if="$(eval arg('world') == 'course')">
+        <node pkg="gazebo_ros" type="spawn_model" name="spawn_$(arg robot)"
+            args="-param robot_description -urdf -model $(arg robot)
+                -x -34.0 -y 18.5 -z 0.0 -Y 2.168162" respawn="false"/>
+    </group>
+    <group if="$(eval arg('world') != 'course')">
+        <node pkg="gazebo_ros" type="spawn_model" name="spawn_$(arg robot)"
+            args="-param robot_description -urdf -model $(arg robot)
+                -x $(arg sim_pos_X) -y $(arg sim_pos_X) -z $(arg sim_pos_X)" respawn="false"/>
+    </group>
 
     <!-- use robot description to publish robot tf tree -->
     <!-- tf_prefix: robot tf transforms are prepended with bowser2 to match model.sdf plugin convention-->
