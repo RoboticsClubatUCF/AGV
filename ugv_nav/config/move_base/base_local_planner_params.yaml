@@ -23,8 +23,8 @@ TrajectoryPlannerROS:
   # trajectory scoring parameters
   dwa: true
   meter_scoring: false
-  pdist_scale: 0.6
-  gdist_scale: 0.8
+  path_distance_scale: 0.6
+  goal_distance_scale: 0.8
   occdist_scale: 0.01
   heading_lookahead: 0.325
   heading_scoring: false
