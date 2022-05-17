@@ -14,7 +14,7 @@
 
     <arg name="sim_pos_X" default="0.0" />
     <arg name="sim_pos_Y" default="0.0" />
-    <arg name="sim_pos_Z" default="0.0" />
+    <arg name="sim_pos_Z" default="0.5" />
 
     <!-- launching gazebo_ros, which is just gazebo with ros integrated -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">

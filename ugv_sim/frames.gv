@@ -1,0 +1,13 @@
+digraph G {
+"map" -> "bowser2/odom"[label="Broadcaster: /slam_toolbox\nAverage rate: 50.204 Hz\nMost recent transform: 207.520 ( -0.185 sec old)\nBuffer length: 4.900 sec\n"];
+"bowser2/base_link" -> "bowser2/lidar_link"[label="Broadcaster: /robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 207.335 sec old)\nBuffer length: 0.000 sec\n"];
+"bowser2/odom" -> "bowser2/base_link"[label="Broadcaster: /gazebo\nAverage rate: 100.000 Hz\nMost recent transform: 207.330 ( 0.005 sec old)\nBuffer length: 4.900 sec\n"];
+"bowser2/base_link" -> "bowser2/camera_link"[label="Broadcaster: /robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 207.335 sec old)\nBuffer length: 0.000 sec\n"];
+"bowser2/base_link" -> "bowser2/imu_link"[label="Broadcaster: /robot_state_publisher\nAverage rate: 10000.000 Hz\nMost recent transform: 0.000 ( 207.335 sec old)\nBuffer length: 0.000 sec\n"];
+"bowser2/base_link" -> "bowser2/front_right_wheel"[label="Broadcaster: /gazebo\nAverage rate: 100.000 Hz\nMost recent transform: 207.331 ( 0.004 sec old)\nBuffer length: 4.900 sec\n"];
+"bowser2/base_link" -> "bowser2/front_left_wheel"[label="Broadcaster: /gazebo\nAverage rate: 100.000 Hz\nMost recent transform: 207.331 ( 0.004 sec old)\nBuffer length: 4.900 sec\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 207.335"[ shape=plaintext ] ;
+ }->"map";
+}
