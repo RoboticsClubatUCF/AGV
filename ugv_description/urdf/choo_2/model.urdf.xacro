@@ -88,8 +88,8 @@
     </joint>
 
     <!-- lidar link -->
-    <link name="lidar">
-        <gazebo reference="lidar">
+    <link name="velodyne">
+        <gazebo reference="velodyne">
         </gazebo>
         <collision>
             <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -103,24 +103,24 @@
                 <cylinder radius="${lidar_radius}" length="${lidar_height}"/>
             </geometry>
         </visual>
-        <xacro:cylinder_inertia name="lidar" height="${lidar_height}" radius="${lidar_radius}" mass="${lidar_mass}" />
+        <xacro:cylinder_inertia name="velodyne" height="${lidar_height}" radius="${lidar_radius}" mass="${lidar_mass}" />
     </link>
     <joint name="lidar_joint" type="fixed">
         <gazebo reference="lidar_joint">
         </gazebo>
         <parent link="lidar_stalk" />
-        <child link="lidar" />
-        <origin xyz="0 0 ${lidar_stalk_height / 2}" />
+        <child link="velodyne" />
+        <origin xyz="0 0 ${lidar_stalk_height / 2}" rpy="0 0 1.5708" />
     </joint>
 
 
     <!-- imu link -->
-    <xacro:box_total name="imu" mass="0.05" width="0.05" height="0.05" length="0.05"/>
+    <xacro:box_total name="vectornav" mass="0.05" width="0.05" height="0.05" length="0.05"/>
     <joint name="imu_joint" type="fixed">
         <gazebo reference="imu_joint">
         </gazebo>
         <parent link="base_link"/>
-        <child link="imu"/>
+        <child link="vectornav"/>
         <origin xyz="${imu_offset_x} ${imu_offset_y} ${imu_offset_z}" rpy="0 0 0" />
     </joint>
 
@@ -131,7 +131,19 @@
         <child link="camera"/>
         <origin xyz="${cam_offset_x} ${cam_offset_y} ${cam_offset_z}" rpy="0 0 0" />
     </joint>
-    
+    <link name="zed_left_camera_frame"></link>
+    <link name="zed_right_camera_frame"></link>
+    <joint name="zed_left_joint" type="fixed">
+        <parent link="camera"/>
+        <child link="zed_left_camera_frame"/>
+        <origin xyz="0.0  0.0  0.0" rpy="0 0 0"/>
+    </joint>
+    <joint name="zed_right_joint" type="fixed">
+        <parent link="camera"/>
+        <child link="zed_right_camera_frame"/>
+        <origin xyz="0.0  0.0  0.0" rpy="0 0 0"/>
+    </joint>
+
     <!-- a simulation workaround to fix the broken point cloud orientation -->
     <!-- https://answers.ros.org/question/218395/libgazebo_ros_openni_kinectso-depth-pointcloud-wrong-tf/?answer=218749#post-id-218749 -->
     <joint name="camera_depth_joint" type="fixed">

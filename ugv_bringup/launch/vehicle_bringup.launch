@@ -1,8 +1,53 @@
 <launch>
 
+    <!-- CLI Args for testing --> 
+    <arg name = "robot_descr" default = "false"/>  <!-- Launches robot state publisher --> 
+    <arg name = "robot" default = "choo_2"/>
+    <arg name="robot_desc" default="$(find ugv_description)/urdf/$(arg robot)/model.urdf.xacro" />
+    <arg name="rviz" default="false"/>   <!-- use rviz window for robot information -->
+    <arg name="rviz_cfg" default="$(find ugv_sim)/rviz/bowser2.rviz" />
+
+    <!-- load robot description to parameter server (for robot_state_publisher) -->
+    <param name="robot_description" command="$(find xacro)/xacro $(arg robot_desc)" />
+
+    <!-- Robot state publisher --> 
+    <node if="$(arg robot_descr)" pkg = "robot_state_publisher" type = "robot_state_publisher" name = "robot_state_publisher" >
+	  <param name = "tf_prefix" type = "string" value = ""/>
+    </node>
+
+    <!-- publishes tf transforms between joints -->
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+
+    <!-- launches rviz with specified configuration (if CLI arg is true)-->
+    <node if="$(arg rviz)" name="rviz" pkg="rviz" type="rviz" args="-d $(arg rviz_cfg)"/>
+
+    <!-- Note: For this to work, there needs to be a symlink from whatever USB 
+         port the gps and imu are on to /dev/gps and /dev/imu. I edited the vn100 
+         parameter file to reflect the imu symlink -->
+
     <!-- VECTORNAV IMU-->
-    <include file="$(find vectornav)/launch/vn100_imu.launch">
-        <!-- put PARAMS here-->
+    <include file="$(find vectornav)/launch/vectornav.launch">
     </include>
+
+    <!-- Velodyne -->
+    <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch">
+    </include>
+
+    <!-- Depth Camera -->
+    <include file = "$(find zed_wrapper)/launch/zed.launch">
+    </include>
+
+    <!-- GPS -->   
+    <node pkg = "advanced_navigation_driver" type = "advanced_navigation_driver" name = "gps_data" args = "/dev/gps 1000000">
+        <remap from = "/an_device/NavSatFix" to = "/fix"/>
+        <remap from = "/an_device/Imu" to = "/imu_data"/>
+    </node>
+
+    <!-- <node pkg = "gps_common" type="utm_odometry_node" name = "gps_common"/> -->
+
+    <!-- Nav stack -->
+    <include file="$(find ugv_nav)/launch/nav.launch">
+    </include>  
+    
 
 </launch>
