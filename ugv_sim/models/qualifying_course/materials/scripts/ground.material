@@ -1,0 +1,18 @@
+material vrc/Image
+{
+  receive_shadows on
+  technique
+  {
+    pass
+    {
+      ambient 0.8 1.0 0.8 1.0
+      diffuse 0.8 1.0 0.8 1.0
+      specular 0.1 0.1 0.1 1.0 12.5
+
+      texture_unit
+      {
+        texture ../textures/qualifying_course.png
+      }
+    }
+  }
+}
