@@ -26,8 +26,8 @@
             <inertial name="${name}_inertial">
                 <mass value="${mass}" />
                 <!-- 3D inertia tensor from: https://en.wikipedia.org/wiki/List_of_moments_of_inertia -->
-                <inertia ixx="${mass*(height*height+length*length)/12}" ixy="0.0" ixz="0.0"
-                        iyy="${mass*(height*height+width*width)/12}" iyz="0.0"
+                <inertia ixx="${mass*(height*height+width*width)/12}" ixy="0.0" ixz="0.0"
+                        iyy="${mass*(height*height+length*length)/12}" iyz="0.0"
                         izz="${mass*(length*length+width*width)/12}" />
             </inertial>
         </link>
