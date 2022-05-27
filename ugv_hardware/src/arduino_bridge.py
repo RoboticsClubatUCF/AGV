@@ -123,8 +123,8 @@ def main():
     err_pub = rospy.Publisher('/choo_2/arduino_bridge/errors', std.String, queue_size=1)
     rc_pub = rospy.Publisher('/choo_2/rc', ugv.RC, queue_size=1)
 
-    # attempt to establish serial connection with the pico
-    _port = '/dev/ttyACM0'
+    # attempt to establish serial connection with the board
+    _port = '/dev/arduino'
     ser = serial.Serial(
         port=_port,
         baudrate=115200,
