@@ -89,25 +89,29 @@ def tlm_cb(tlm: rov.Telemetry, ser: serial.Serial) -> None:
 
     ''' when we receive telemetry messages, pass them through to the pico to be transmitted '''
 
-    tlm_dict = [tlm.state.data,
-                "{:.2f}".format(tlm.pose.pose.position.x),
-                "{:.2f}".format(tlm.pose.pose.position.y),
-                "{:.2f}".format(tlm.pose.pose.position.z),
-                "{:.6f}".format(tlm.fix.latitude),
-                "{:.6f}".format(tlm.fix.longitude),
-                "{:.3f}".format(tlm.fix.altitude)]
+def str_to_RC_message(rc_list):
+    """
+    Converts strings in RC format to RC messages.
+    format: $RCX <RJ_X> <RJ_Y> <LJ_Y> <LJ_X> <ESTOP> <DIAL> <AUTO>
+    """
 
-    # cast all items to str and join
-    msg_string = ''.join((str(e) + " ") for e in tlm_dict)
-    # create $MTR string and send
-    tlm_string = "$TLM " + msg_string + '\n'
+    rc_msg = ugv.RC()
 
-    rospy.logdebug(tlm_string)
-    encoded = tlm_string.encode('utf-8')
-    ser.write(encoded)
+    # populate header
+    rc_msg.header = std.Header()
+    rc_msg.header.stamp = rospy.Time.now()
+    rc_msg.header.frame_id = "" # frame is meaningless in this context
+    # populate the sticks
+    rc_msg.right_x = int(rc_list[0])
+    rc_msg.right_y = int(rc_list[1])
+    rc_msg.left_y = int(rc_list[2])
+    rc_msg.left_x = int(rc_list[3])
+    # populate the switches
+    rc_msg.switch_e = (int(rc_list[4]) >= 1500)
+    rc_msg.switch_g = int(rc_list[5])
+    rc_msg.switch_d = (int(rc_list[6]) >= 1500)
 
-def cmd_vel_cb():
-    pass
+    return rc_msg
 
 def main():
 
@@ -163,7 +167,8 @@ def main():
 
         # RC receiver data
         if prefix == '$RCX':
-            pass
+            rc_msg = str_to_RC_message(input_split[1:])
+            rc_pub.publish(rc_msg)
         # serial data from either motor controller
         elif prefix == '$MC1' or prefix == '%MC2':
             pass
