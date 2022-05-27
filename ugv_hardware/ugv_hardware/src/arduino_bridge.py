@@ -75,9 +75,9 @@ def str_to_RC_message(rc_list):
     rc_msg.left_y = int(rc_list[2])
     rc_msg.left_x = int(rc_list[3])
     # populate the switches
-    rc_msg.switch_e = (int(rc_list[4]) >= 1500)
+    rc_msg.switch_e = (int(rc_list[4]) <= 1500) # E-STOP
     rc_msg.switch_g = int(rc_list[5])
-    rc_msg.switch_d = (int(rc_list[6]) >= 1500)
+    rc_msg.switch_d = (int(rc_list[6]) >= 1500) # AUTO
 
     return rc_msg
 
