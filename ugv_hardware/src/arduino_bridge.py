@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 ''' Acts as a serial bridge to the RPi Pico
 '''
@@ -8,6 +8,7 @@ from rospy_message_converter import json_message_converter
 
 # python imports
 import serial
+import math
 from typing import Tuple
 
 # message imports
@@ -16,78 +17,45 @@ import geometry_msgs.msg as geom
 import nmea_msgs.msg as nmea
 import ugv_msg.msg as ugv
 
-def str_to_command(input: list) -> rov.Cmd:
+# Wheel radius (meters)
+WHEEL_RADIUS = 0.10795
+METERS_PER_REV = WHEEL_RADIUS * math.pi * 2
+REVS_PER_METER = 1 / METERS_PER_REV
 
+def ticks_to_message(input):
+    # type: (list[str]) -> Tuple[std.Int64, std.int64]
     """
-    Input format: X Y Z start cancel shutdown rc_preempt pose_preempt
+    Converts strings in the encoder format to two encoder (Int64) messages.
+    Format: format: $ENC <encoder1> <encoder2>
     """
-
-    cmd = rov.Cmd()
-
-    cmd.target = geom.Point()
-    try:
-        cmd.target.x = float(input[0])
-        cmd.target.y = float(input[1])
-        cmd.target.z = float(input[2])
-    except ValueError as e:
-        rospy.logerr(e)
-        return None
-
-    # flags (TODO: need to be cast?)
-    cmd.start.data          = (input[3] == 'True')
-    cmd.cancel.data         = (input[4] == 'True')
-    cmd.shutdown.data       = (input[5] == 'True')
-    cmd.rc_preempt.data     = (input[6] == 'True')
-    cmd.pose_preempt.data   = (input[7] == 'True')
-
-    return cmd
-
-def str_to_rc_command(input: list) -> rov.Cmd:
-
-    """
-    Converts "rc burst" style strings into Cmd messages
-    """
-
-    cmd = rov.Cmd()
-
-    # rc fields
-    cmd.rc.forward  = int(input[0])
-    cmd.rc.reverse  = int(input[1])
-    cmd.rc.left     = int(input[2])
-    cmd.rc.right    = int(input[3])
-
-    # "burst" messages always throw this flag to set state machine to MANUAL
-    cmd.rc_preempt.data = True
-    # all other flags are false
-    cmd.start.data          = False
-    cmd.cancel.data         = False
-    cmd.shutdown.data       = False
-    cmd.pose_preempt.data   = False
-    
-    return cmd    
-
-def str_to_rc_message(input):
-
-    rc = ugv.RC()
-
-def ticks_to_message(input: list) -> Tuple[std.Int64, std.Int64]:
 
     l_ticks = std.Int64()
     r_ticks = std.Int64()
 
     # ticks are reported strangely
     try:
-        l_ticks.data = int(input[3])    # encoder 2 on PICO
-        r_ticks.data = int(input[1])    # encoder 1 on PICO
+        l_ticks.data = int(input[1])    # encoder 2 on PICO
+        r_ticks.data = int(input[0])    # encoder 1 on PICO
     except ValueError as e:
         rospy.log_err('Invalid ticks data')
         return None
 
     return (l_ticks, r_ticks)
 
-def tlm_cb(tlm: rov.Telemetry, ser: serial.Serial) -> None:
+def cmd_vel_cb(cmd_vel):
 
-    ''' when we receive telemetry messages, pass them through to the pico to be transmitted '''
+    rpm_1 = 0
+    rpm_2 = 0
+
+    # convert m/s to RPM
+    x_rpm = cmd_vel.linear.x * REVS_PER_METER * 60
+    if cmd_vel.angular.z == 0.0:
+        rpm_1 = x_rpm
+        rpm_2 = x_rpm
+
+    msg_dict = []
+
+    pass
 
 def str_to_RC_message(rc_list):
     """
@@ -117,7 +85,7 @@ def main():
 
     rospy.init_node('arduino_bridge', anonymous=True, log_level=rospy.DEBUG)
 
-    # publishers for data streams FROM the pico
+    # publishers for data streams FROM the board
     l_tick_pub = rospy.Publisher('/choo_2/left_ticks', std.Int64, queue_size=1)
     r_tick_pub = rospy.Publisher('/choo_2/right_ticks', std.Int64, queue_size=1)
     err_pub = rospy.Publisher('/choo_2/arduino_bridge/errors', std.String, queue_size=1)
@@ -136,8 +104,6 @@ def main():
 
     # subscribers
     # TODO: pass each of these the serial queue, not the actual serial connection
-    tlm_sub = rospy.Subscriber('/telemetry', rov.Telemetry, callback=tlm_cb, callback_args=(ser))
-    pwm_sub = rospy.Subscriber('/motors', rov.Motors, callback=pwm_cb, callback_args=(ser))
     cmd_vel_sub = rospy.Subscriber('/cmd_vel', geom.Twist, callback=cmd_vel_cb, callback_args=(ser))
 
     if not ser.is_open:
@@ -170,7 +136,7 @@ def main():
             rc_msg = str_to_RC_message(input_split[1:])
             rc_pub.publish(rc_msg)
         # serial data from either motor controller
-        elif prefix == '$MC1' or prefix == '%MC2':
+        elif prefix == '$MC1' or prefix == '$MC2':
             pass
         # encoder ticks to be published
         elif prefix == '$ENC':
