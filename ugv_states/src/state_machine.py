@@ -11,33 +11,37 @@ import nav_msgs.msg as nav
 import sensor_msgs.msg as sens
 import geometry_msgs.msg as geom
 import move_base_msgs.msg as move_base
+import ugv_msg.msg as ugv
+
+class DataStream():
+
+    def __init__(self, label, msg_type, topic, hz=None):
+
+        self.label = label
+        self.msg_type = msg_type
+        self.topic = topic
+        self.hz = hz if hz else None
+
+        self.flag = False        
 
 class Boot(smach.State):
+    """
+    BOOT ensures that we have all necessary data streams (from sensors/rc control/whatever) before passing us to STANDBY.
+    """
 
     def __init__(self):
         smach.State.__init__(self, outcomes=['boot_success', 'None'])
 
-        # TODO: define message callbacks for topics to watch and throw flags
-        # what needs to be verified before we can begin?
+        # define all required data streams
+        self.streams = [DataStream('RC', ugv.RC, '/choo_2/rc'),
+                        DataStream('ODOM', nav.Odometry, '/choo_2/odom'),
+                        DataStream('LIDAR', sens.PointCloud2, '/velodyne_points'),
+                        DataStream('IMU', sens.Imu, '/vectornav/IMU'),
+                        DataStream('GPS', sens.NavSatFix, '/choo_2/fix')]
 
-        self._velodyne_flag = False 
-        self._odom_flag = False
-        self._cam_flag = True   # TODO: we shouldn't need to hard-code a true here
-        self._imu_flag= False
-        self._gps_flag = False
-
-        # Odom subscriber
-        rospy.Subscriber('/bowser2/odom', nav.Odometry, callback=self.odom_callback)
-        # Lidar subscriber
-        rospy.Subscriber('/velodyne', sens.PointCloud2, callback=self.velodyne_callback)
-        # Depth camera
-        rospy.Subscriber('/bowser2/bowser2_dc/depth/camera_info', sens.CameraInfo, callback=self.cam_callback)
-        # Imu Subscriber
-        rospy.Subscriber('/bowser2/imu', sens.Imu, callback=self.imu_callback)
-        # GPS Subscriber
-        rospy.Subscriber('/fix', sens.NavSatFix, callback=self.gps_callback)
-
-        # received ACK from all software modules (define list in XML/YAML format?)
+        # create subscriber for each data stream
+        for stream in self.streams:
+            rospy.Subscriber(stream.topic, stream.msg_type, callback=self.stream_callback, callback_args=(stream, stream.topic))
 
     def execute(self, userdata):
 
@@ -48,7 +52,7 @@ class Boot(smach.State):
 
         while not rospy.is_shutdown():
 
-            if self._velodyne_flag and self._odom_flag and self._cam_flag and self._imu_flag and self._gps_flag:
+            if all(stream.flag == True for stream in self.streams):
                 rospy.logdebug("All sources up. Transitioning to STANDBY.")
                 # end the status timer
                 status_timer.shutdown()
@@ -58,35 +62,19 @@ class Boot(smach.State):
 
     def timer_status_callback(self, event):
 
-        rospy.logdebug(
-            "\nODOM: \t\t{}\n".format(self._odom_flag) + \
-            "LIDAR: \t\t{}\n".format(self._velodyne_flag) + \
-            "CAMERA: \t\t{}\n".format(self._cam_flag) + \
-            "IMU: \t\t{}\n".format(self._imu_flag) + \
-            "GPS: \t\t{}\n".format(self._gps_flag)
-        )
+        rospy.logdebug("Sensor stream status:")
+        for stream in self.streams:
+            rospy.logdebug("{}\t({}):\t\t{} ".format(stream.label, stream.topic, stream.flag))
+        rospy.logdebug("---------------------------------------")
 
-    def cam_callback(self, data):
-        
-        self._cam_flag = True
+    def stream_callback(self, msg, args):
 
-    def velodyne_callback(self, data):
+        # unpack args tuple
+        stream = args[0]
+        topic = args[1]
 
-        self._velodyne_flag = True
-
-    def odom_callback(self, data):
-
-        # rospy.logdebug("ODOM CALLBACK")
-
-        self._odom_flag = True
-
-    def imu_callback(self, data):
-
-        self._imu_flag = True
-
-    def gps_callback(self, data):
-
-        self._gps_flag = True
+        if msg._type == stream.msg_type._type and topic == stream.topic:
+            stream.flag = True
 
 class Standby(smach.State):
 
