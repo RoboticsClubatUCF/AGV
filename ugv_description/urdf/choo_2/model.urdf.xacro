@@ -71,7 +71,7 @@
     <xacro:wheel_joint name="back_right_wheel" x_offset="${wheel_offset_x}" y_offset="${wheel_offset_y}" z_offset="${wheel_offset_z}" reflect_x="-1" reflect_y="-1"/> -->
 
     <!-- back left caster -->
-    <xacro:caster_total name="back_left_caster" radius="${wheel_radius}" mass="${wheel_mass}" />
+    <xacro:caster_total name="back_left_caster" radius="0.294425" mass="5" />
     <xacro:caster_joint name="back_left_caster" x_offset="${wheel_offset_x}" y_offset="0" z_offset="0" reflect_x="-1" reflect_y="1"/>
     <!-- back right caster -->
     <!-- <xacro:caster_total name="back_right_caster" radius="${wheel_radius}" mass="${wheel_mass}" />
@@ -112,7 +112,6 @@
         <child link="velodyne" />
         <origin xyz="0 0 ${lidar_stalk_height / 2}" rpy="0 0 1.5708" />
     </joint>
-
 
     <!-- imu link -->
     <xacro:box_total name="vectornav" mass="0.05" width="0.05" height="0.05" length="0.05"/>
