@@ -52,6 +52,7 @@ class Boot(smach.State):
 
         while not rospy.is_shutdown():
 
+            # transition to STANDBY if all sensor streams are up
             if all(stream.flag == True for stream in self.streams):
                 rospy.logdebug("All sources up. Transitioning to STANDBY.")
                 # end the status timer
