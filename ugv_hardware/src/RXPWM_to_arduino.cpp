@@ -192,7 +192,7 @@ int handle_input(char *incoming)
 
 /**
  * @brief Print the current value of RC pins to Jetson.
- *        format: $RCX <RJ_X> <RJ_Y> <LJ_Y> <LJ_X> <ESTOP> <DIAL>
+ *        format: $RCX <RJ_X> <RJ_Y> <LJ_Y> <LJ_X> <ESTOP> <DIAL> <AUTO>
  * 
  */
 void print_rc_inputs()
