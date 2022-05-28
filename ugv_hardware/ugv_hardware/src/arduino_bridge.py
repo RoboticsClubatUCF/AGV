@@ -81,6 +81,20 @@ def str_to_RC_message(rc_list):
 
     return rc_msg
 
+# TODO: send a message to activate lights
+def rc_callback(message, serial):
+    if message.switch_e == True:
+        estp="$STP\n"
+        encoded = estp.encode('utf-8')
+        serial.write(encoded)
+    if message.switch_e == False:
+        estp="$GO\n"
+        encoded = estp.encode('utf-8')
+        serial.write(encoded)
+    
+
+
+
 def main():
 
     rospy.init_node('arduino_bridge', anonymous=True, log_level=rospy.DEBUG)
@@ -105,6 +119,7 @@ def main():
     # subscribers
     # TODO: pass each of these the serial queue, not the actual serial connection
     cmd_vel_sub = rospy.Subscriber('/cmd_vel', geom.Twist, callback=cmd_vel_cb, callback_args=(ser))
+    rc_sub = rospy.Subscriber("/choo_2/rc", ugv.RC, callback=rc_callback,callback_args=(ser))
 
     if not ser.is_open:
         rospy.logerr("Couldn't open serial port.")
@@ -118,8 +133,8 @@ def main():
         except serial.SerialException as e:
             rospy.logerr_once("Issue with serial read: {}".format(e))
             continue
-        
         # attempt to decode input, strip whitespace
+        print(input)
         try:
             input = input.decode().strip()
         except UnicodeDecodeError as e:
