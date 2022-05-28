@@ -110,8 +110,8 @@ def main():
     # cmd_vel_sub = rospy.Subscriber('/cmd_vel', geom.Twist, callback=cmd_vel_cb, callback_args=(ser1,ser2))
     
     # Subscribers
-    rc_sub = rospy.Subscriber("/choo_2/rc", ugv.RC, callback=rc_callback,callback_args=(ser1,ser2,AUTO_SWITCH))
-    cmd_vel_sub = rospy.Subscriber('/cmd_vel', geom.Twist, callback=cmd_vel_cb, callback_args=(ser1,ser2, AUTO_SWITCH))
+    rc_sub = rospy.Subscriber("/choo_2/rc", ugv.RC, callback=rc_callback,callback_args=[ser1,ser2,AUTO_SWITCH])
+    cmd_vel_sub = rospy.Subscriber('/cmd_vel', geom.Twist, callback=cmd_vel_cb, callback_args=[ser1,ser2, AUTO_SWITCH])
 
     rate = rospy.Rate(20)
     while not rospy.is_shutdown():
