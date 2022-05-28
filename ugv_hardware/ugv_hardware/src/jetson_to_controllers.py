@@ -31,6 +31,8 @@ def write_string(input, serials):
 prev_estop = False
 def rc_callback(message, args):
 
+    global prev_estop
+
     ser1 = args[0]
     ser2 = args[1]
 

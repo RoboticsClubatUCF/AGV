@@ -85,6 +85,8 @@ prev_estop = False
 # TODO: send a message to activate lights
 def rc_callback(message, serial):
 
+    global prev_estop
+    
     # E-STOP thrown when it wasn't before
     if message.switch_e and not prev_estop:
         estp = "$STP\n"
@@ -97,7 +99,7 @@ def rc_callback(message, serial):
         serial.write(encoded)
     
     prev_estop = message.switch_e
-    
+
 def main():
 
     rospy.init_node('arduino_bridge', anonymous=True, log_level=rospy.DEBUG)
