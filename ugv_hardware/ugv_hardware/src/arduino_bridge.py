@@ -97,6 +97,7 @@ def rc_callback(message, serial):
         serial.write(encoded)
     
     prev_estop = message.switch_e
+    
 def main():
 
     rospy.init_node('arduino_bridge', anonymous=True, log_level=rospy.DEBUG)
