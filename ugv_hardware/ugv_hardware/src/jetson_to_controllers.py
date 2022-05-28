@@ -15,20 +15,32 @@ import std_msgs.msg as std
 import geometry_msgs.msg as geom
 import ugv_msg.msg as ugv
 
+def write_string(input, serials):
+    """
+    Writes a given string to the motor controllers.
+    """
+    for serial in serials:
+        encoded = input.encode('utf-8')
+        serial.write(encoded)
 
+prev_estop = False
 def rc_callback(message, serialargs):
-    # Auto-nav mode
-    if message.switch_d == True:
+
+    # if the e-stop is cleared
+    if not message.switch_e and prev_estop:
+        rospy.logdebug("Clearing E-STOP!")
+        write_string("!MG\n\r", serialargs)
+    # Auto-nav mode; do nothing with these messages
+    elif message.switch_d:
         return
 
-    left_rpm =int((message.right_x  - 1500)*(0.4))
-    right_rpm =int((message.left_x  - 1500)*(0.4))
-
-    string = "!M " + str(right_rpm) + " " + str(left_rpm) + "\r"
-    print(string)
-    encoded = string.encode('utf-8')
-    serialargs[0].write(encoded)
-    serialargs[1].write(encoded)
+    prev_estop = message.switch_e
+    # # handle joystick inputs
+    # else:
+    #     left_rpm = int((message.right_x  - 1500)*(0.4))
+    #     right_rpm = int((message.left_x  - 1500)*(0.4))
+    #     string = "!M " + str(right_rpm) + " " + str(left_rpm) + "\n\r"
+    #     write_string(string, serialargs)
     
 def cmd_vel_cb(cmd_vel):
 
@@ -44,8 +56,6 @@ def cmd_vel_cb(cmd_vel):
     msg_dict = []
 
     pass
-
-
 
 def main():     
 
@@ -74,9 +84,10 @@ def main():
     rc_sub = rospy.Subscriber("/choo_2/rc", ugv.RC, callback=rc_callback,callback_args=(ser1,ser2))
     cmd_vel_sub = rospy.Subscriber('/cmd_vel', geom.Twist, callback=cmd_vel_cb, callback_args=(ser1,ser2))
     
-    
+    rate = rospy.Rate(20)
     while not rospy.is_shutdown():
-        x = 1
+
+        rate.sleep()
 
 if __name__=='__main__':
     main()

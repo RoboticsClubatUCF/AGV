@@ -81,20 +81,22 @@ def str_to_RC_message(rc_list):
 
     return rc_msg
 
+prev_estop = False
 # TODO: send a message to activate lights
 def rc_callback(message, serial):
-    if message.switch_e == True:
-        estp="$STP\n"
+
+    # E-STOP thrown when it wasn't before
+    if message.switch_e and not prev_estop:
+        estp = "$STP\n"
         encoded = estp.encode('utf-8')
         serial.write(encoded)
-    if message.switch_e == False:
-        estp="$GO\n"
+    # E-STOP not thrown when it was before
+    if not message.switch_e and prev_estop:
+        estp = "$GO\n"
         encoded = estp.encode('utf-8')
         serial.write(encoded)
     
-
-
-
+    prev_estop = message.switch_e
 def main():
 
     rospy.init_node('arduino_bridge', anonymous=True, log_level=rospy.DEBUG)
