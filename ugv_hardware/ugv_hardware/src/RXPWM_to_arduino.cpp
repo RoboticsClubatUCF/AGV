@@ -1,6 +1,6 @@
 /**
  * @file RXPWM_to_arduino.cpp
- * @author Wesley Fletcher, Tevin Mukudi
+ * @author Wesley Fletcher, Tevin Mukudi, Marc Simmonds
  * @brief 
  * @version 0.1
  * @date 2022-05-12
@@ -14,11 +14,12 @@
 
 // RC Receiver
 #define RC_RJ_x   2  // right joystick, x-axis - pin 6 on receiver
-#define RC_RJ_y   3  // right joystick, y-axis
-#define RC_LJ_y   4  // left joystick, y-axis
-#define RC_LJ_x   5  // left joystick, x-axis
+#define RC_RJ_y   3  // right joystick, y-axis - pin # on receiver
+#define RC_LJ_y   4  // left joystick, y-axis - pin # on receiver
+#define RC_LJ_x   5  // left joystick, x-axis - pin # on receiver
 #define RC_ESTOP  6  // e-stop switch
 #define RC_DIAL   7  // dial
+#define RC_AUTO   8  // Auto-nav switch - pin 7 on receiver 
 // Encoders
 #define ENC_1_A   18
 #define ENC_1_B   19
@@ -32,11 +33,19 @@
 #define ENDSTDIN    255 // NULL
 #define NL          10  // NEWLINE
 #define CR          13  // CARRIAGE RETURN
+
+// Pins for relays 
+#define R1        10
+#define R2        11
+#define R3        12
+#define R4        13
+ 
 // Jetson<-->Arduino message definitions
 static const char * MSG_MOTORS = "$MTR\0";      // command for motor controller
 static const char * MSG_CMD    = "$CMD\0";      // generic command, passed to SBC through serial
 static const char * MSG_ACK    = "$ACK\0";      // an acknowledgement that a message was received
-static const char * MSG_ESTOP  = "$STP\0";      // throw the motor controller E-STOP
+static const char * MSG_ESTOP_ON  = "$STP\0";      // throw the motor controller E-STOP
+static const char * MSG_ESTOP_OFF = "$GO\0";
 static const char * MSG_LIGHTS = "$LIT\0";      // TODO: control the lights
 
 // function prototypes
@@ -44,7 +53,8 @@ int handle_input(char *incoming);
 int get_input(int pin);
 void print_rc_inputs();
 void print_encoders();
-void send_command_ESTOP();
+void throw_ESTOP();
+void release_ESTOP();
 void send_command_SET_RPM(int channel, int RPM);
 void send_command_SAFETY_STOP(int channel);
 
@@ -52,7 +62,7 @@ void send_command_SAFETY_STOP(int channel);
 ///// Globals ////////
 //////////////////////
 
-int hz = 100;  // max/ideal loop rate
+int hz = 30;  // max/ideal loop rate
 
 // encoder set up
 Encoder enc1(ENC_1_A, ENC_1_B);
@@ -84,6 +94,17 @@ void setup()
   pinMode(RC_LJ_x, INPUT);
   pinMode(RC_ESTOP, INPUT);
   pinMode(RC_DIAL, INPUT);
+  pinMode(MC_TX, OUTPUT);
+  pinMode(MC_RX, INPUT);
+  pinMode(R1, OUTPUT);
+  pinMode(R2, OUTPUT);
+  pinMode(R3, OUTPUT);
+  pinMode(R4, OUTPUT);
+  Serial3.print("!EX\n\r");
+  digitalWrite(R1,HIGH);
+  digitalWrite(R2,HIGH);
+  digitalWrite(R3,HIGH);
+  digitalWrite(R4,HIGH);
 }
 
 /**
@@ -96,6 +117,7 @@ void loop()
    
   // print RC inputs to the Jetson
   print_rc_inputs();
+//  Serial3.print("!EX\r");
 
   // read encoders
   newPos1 = enc1.read();  // Encoder::read() returns counts, there are 4 counts / rev
@@ -108,7 +130,7 @@ void loop()
   {
     pos2 = newPos2;  
   }
-  print_encoders();
+//  print_encoders();
 
   // read input from USB
   bytes_available = Serial.available();
@@ -157,6 +179,9 @@ int handle_input(char *incoming)
 
   int rpm1, rpm2;
 
+  Serial3.print(incoming);
+  Serial3.print("\n\r");
+
   // tokenize string (strtok modifies the original string)
   token = strtok(incoming, delim);
 
@@ -175,9 +200,15 @@ int handle_input(char *incoming)
     
     return EXIT_SUCCESS;
   }
-  else if (strcmp(token, MSG_ESTOP) == 0) // ESTOP == "$STP"
+  else if (strcmp(token, MSG_ESTOP_ON) == 0) // ESTOP == "$STP"
   {
-    send_command_ESTOP();
+    throw_ESTOP();
+
+    return EXIT_SUCCESS;
+  }
+  else if (strcmp(token, MSG_ESTOP_OFF) == 0) // ESTOP == "$GO"
+  {
+    release_ESTOP();
 
     return EXIT_SUCCESS;
   }
@@ -192,7 +223,7 @@ int handle_input(char *incoming)
 
 /**
  * @brief Print the current value of RC pins to Jetson.
- *        format: $RCX <RJ_X> <RJ_Y> <LJ_Y> <LJ_X> <ESTOP> <DIAL> <AUTO>
+ *        format: $RCX <RJ_X> <RJ_Y> <LJ_Y> <LJ_X> <ESTOP> <DIAL>
  * 
  */
 void print_rc_inputs()
@@ -210,7 +241,9 @@ void print_rc_inputs()
   Serial.print(get_input(RC_ESTOP));
   Serial.print(" ");
   Serial.print(get_input(RC_DIAL));
-  Serial.print("\n");
+  Serial.print(" ");
+  Serial.print(get_input(RC_AUTO));
+  Serial.print("\n\r");
 }
 
 /**
@@ -225,7 +258,7 @@ void print_encoders()
   Serial.print(pos1 / 4); // convert counts to pulses; pulses = counts / 4
   Serial.print(" ");
   Serial.print(pos2 / 4); // convert counts to pulses; pulses = counts / 4
-  Serial.print("\n");  
+  Serial.print("\n\r");  
 }
 
 /**
@@ -243,15 +276,21 @@ int get_input(int pin)
 }
 
 /**
- * @brief Send E-STOP command to motor controller.
+ * @brief Activate relay to stop the motors.
  * 
  */
-void send_command_ESTOP()
+void throw_ESTOP()
 {
-  Serial3.println("!EX");
-  // status = wait_for_response("expected response")
-  // if (status)
-  //  error handling
+  digitalWrite(R4,LOW); 
+}
+
+/**
+ * @brief Deactivate relays to stop the motors.
+ * 
+ */
+void release_ESTOP()
+{
+  digitalWrite(R4,HIGH); 
 }
 
 /**
@@ -268,7 +307,7 @@ void send_command_SET_RPM(int channel, int RPM)
   Serial3.print(channel);
   Serial3.print(" ");
   Serial3.print(RPM);
-  Serial3.print("\n");
+  Serial3.print("\n\r");
 }
 
 /**
@@ -281,5 +320,6 @@ void send_command_SAFETY_STOP(int channel)
   Serial3.print("!SFT");
   Serial3.print(" ");
   Serial3.print(channel);
-  Serial3.print("\n");
+  Serial3.print("\n\r");
+  
 }
