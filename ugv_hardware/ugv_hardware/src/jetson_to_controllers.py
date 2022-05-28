@@ -3,6 +3,7 @@
 """ Allows us to send commands directly to the motor controllers """
 
 # ros imports
+import copy
 import rospy
 
 # python imports
@@ -67,7 +68,6 @@ def cmd_vel_cb(cmd_vel, args):
     left_velocity =  cmd_vel.linear.x - 0.5*cmd_vel.angular.z*wheel_base
     right_velocity = cmd_vel.linear.x + 0.5*cmd_vel.angular.z*wheel_base
 
-
     # convert m/s to RPM
     left_rpm = left_velocity * REVS_PER_METER * 60
     right_rpm = right_velocity * REVS_PER_METER * 60
@@ -107,7 +107,7 @@ def main():
     # rc_sub = rospy.Subscriber("/choo_2/rc", ugv.RC, callback=rc_callback,callback_args=(ser1,ser2))
     # cmd_vel_sub = rospy.Subscriber('/cmd_vel', geom.Twist, callback=cmd_vel_cb, callback_args=(ser1,ser2))
     
-        # Subscribers
+    # Subscribers
     rc_sub = rospy.Subscriber("/choo_2/rc", ugv.RC, callback=rc_callback,callback_args=(ser1,ser2,AUTO_SWITCH))
     cmd_vel_sub = rospy.Subscriber('/cmd_vel', geom.Twist, callback=cmd_vel_cb, callback_args=(ser1,ser2, AUTO_SWITCH))
 
