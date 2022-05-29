@@ -74,13 +74,13 @@ def str_to_RC_message(rc_list):
     left_x = int(rc_list[3])
 
     if right_x < 1000:
-        right_X = 1000
+        right_x = 1000
     elif right_x > 2000:
-        right_X = 2000
+        right_x = 2000
     if left_x < 1000:
-        left_X = 1000
+        left_x = 1000
     elif left_x > 2000:
-        left_X = 2000
+        left_x = 2000
 
     rc_msg.right_x = right_x
     rc_msg.left_x = left_x
