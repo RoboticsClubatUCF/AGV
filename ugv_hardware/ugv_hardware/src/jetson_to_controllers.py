@@ -86,7 +86,7 @@ def cmd_vel_cb(cmd_vel, args):
 def main():     
 
     rospy.init_node('motor_controller_bridge', anonymous=True, log_level=rospy.DEBUG)
-    _port = '/dev/ttyACM2'
+    _port = '/dev/ttyACM0'
     ser1 = serial.Serial(
         port=_port,
         baudrate=115200,
@@ -96,7 +96,7 @@ def main():
     )
     rospy.logdebug("Serial Connection established on {}".format(_port))
 
-    _port = '/dev/ttyACM3'
+    _port = '/dev/ttyACM1'
     ser2 = serial.Serial(
         port=_port,
         baudrate=115200,
