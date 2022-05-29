@@ -28,16 +28,17 @@ def write_string(input, serials):
         encoded = input.encode('utf-8')
         serial.write(encoded)
 
+AUTO_SWITCH
 prev_estop = False
 def rc_callback(message, args):
 
+    global AUTO_SWITCH
     global prev_estop
 
     ser1 = args[0]
     ser2 = args[1]
 
     AUTO_SWITCH = message.switch_d
-    args[2] = AUTO_SWITCH
 
     # if the e-stop is cleared
     if not message.switch_e and prev_estop:
@@ -57,11 +58,12 @@ def rc_callback(message, args):
     
 def cmd_vel_cb(cmd_vel, args):
 
+    global AUTO_SWITCH
+
     rospy.logdebug("1 CALLBACK")
 
     ser1 = args[0]
     ser2 = args[1]
-    AUTO_SWITCH = args[2]
 
     rospy.logdebug("2 AUTO_SWITCH: {}".format(AUTO_SWITCH))
     # Auto-nav mode is off
@@ -116,8 +118,8 @@ def main():
     # cmd_vel_sub = rospy.Subscriber('/cmd_vel', geom.Twist, callback=cmd_vel_cb, callback_args=(ser1,ser2))
     
     # Subscribers
-    rc_sub = rospy.Subscriber("/choo_2/rc", ugv.RC, callback=rc_callback,callback_args=[ser1,ser2,AUTO_SWITCH])
-    cmd_vel_sub = rospy.Subscriber('/cmd_vel', geom.Twist, callback=cmd_vel_cb, callback_args=[ser1,ser2, AUTO_SWITCH])
+    rc_sub = rospy.Subscriber("/choo_2/rc", ugv.RC, callback=rc_callback,callback_args=(ser1,ser2))
+    cmd_vel_sub = rospy.Subscriber('/cmd_vel', geom.Twist, callback=cmd_vel_cb, callback_args=(ser1,ser2))
 
     rate = rospy.Rate(20)
     while not rospy.is_shutdown():
