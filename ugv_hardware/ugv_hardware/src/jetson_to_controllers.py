@@ -57,6 +57,8 @@ def rc_callback(message, args):
 
     prev_estop = message.switch_e
     
+    rospy.logdebug("3 message right_x: {} left_x: {}".format(message.right_x, message.left_x))
+    rospy.logdebug("3.5 MYSTERY BOX: {}".format(MAX_MOTOR_RPM / MAX_RPM_VALUE))
     # handle joystick inputs
     left_rpm = int((message.right_x  - 1500)*(MAX_MOTOR_RPM / MAX_RPM_VALUE))
     right_rpm = int((message.left_x  - 1500)*(MAX_MOTOR_RPM / MAX_RPM_VALUE))
