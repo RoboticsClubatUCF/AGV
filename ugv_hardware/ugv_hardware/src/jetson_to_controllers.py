@@ -84,10 +84,10 @@ def cmd_vel_cb(cmd_vel, args):
     # Serial Write
     string = "!M " + str(right_rpm) + " " + str(left_rpm) + "\r"
     rospy.logdebug("5 TO MOTOR CONTROLLER {}".format(string))
-    write_string(string, (ser1, ser2))
-    # encoded = string.encode('utf-8')
-    # args[0].write(encoded)
-    # args[1].write(encoded)
+    # write_string(string, (ser1, ser2))
+    encoded = string.encode('utf-8')
+    args[0].write(encoded)
+    args[1].write(encoded)
 
 def main():     
 
