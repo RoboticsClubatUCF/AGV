@@ -28,7 +28,7 @@ def write_string(input, serials):
         encoded = input.encode('utf-8')
         serial.write(encoded)
 
-AUTO_SWITCH
+AUTO_SWITCH = False
 prev_estop = False
 def rc_callback(message, args):
 
@@ -112,7 +112,6 @@ def main():
     )
     rospy.logdebug("Serial Connection established on {}".format(_port))
 
-    AUTO_SWITCH = False
     # Subscribers
     # rc_sub = rospy.Subscriber("/choo_2/rc", ugv.RC, callback=rc_callback,callback_args=(ser1,ser2))
     # cmd_vel_sub = rospy.Subscriber('/cmd_vel', geom.Twist, callback=cmd_vel_cb, callback_args=(ser1,ser2))
