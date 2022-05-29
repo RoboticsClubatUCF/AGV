@@ -116,6 +116,25 @@ def main():
     rate = rospy.Rate(20)
     while not rospy.is_shutdown():
 
+        # read input lines
+        try:
+            input = ser1.readline()
+        except serial.SerialException as e:
+            rospy.logerr_once("Issue with serial read: {}".format(e))
+            continue
+        # attempt to decode input, strip whitespace
+        rospy.logdebug("MC1 says: {}".format(input))
+
+        # read input lines
+        try:
+            input = ser1.readline()
+        except serial.SerialException as e:
+            rospy.logerr_once("Issue with serial read: {}".format(e))
+            continue
+        # attempt to decode input, strip whitespace
+        rospy.logdebug("MC2 says: {}".format(input))
+
+
         rate.sleep()
 
 if __name__=='__main__':
