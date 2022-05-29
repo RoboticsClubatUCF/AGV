@@ -81,7 +81,7 @@ class Boot(smach.State):
 class Standby(smach.State):
 
     def __init__(self):
-        smach.State.__init__(self, outcomes=['got_pose', 'rc_preempt', 'ESTOP', 'WAYPOINT'],
+        smach.State.__init__(self, outcomes=['got_pose', 'rc_preempt', 'ESTOP', 'AUTO'],
                                    output_keys=['frame_id', 'gps_x', 'gps_y', 'gps_z', 'gps_x0', 'gps_y0', 'gps_z0', 'gps_w0'])
 
         self.got_pose = False
@@ -120,7 +120,7 @@ class Standby(smach.State):
                 return 'ESTOP'
             if self.AUTO:
                 self.AUTO = False
-                return 'WAYPOINT'
+                return 'AUTO'
 
             rate.sleep()
 
