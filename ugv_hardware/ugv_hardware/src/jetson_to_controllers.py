@@ -59,7 +59,7 @@ def cmd_vel_cb(cmd_vel, args):
 
     ser1 = args[0]
     ser2 = args[1]
-    AUTO_SWITCH = copy(args[2])
+    AUTO_SWITCH = args[2]
 
     # Auto-nav mode is off
     if not AUTO_SWITCH:
