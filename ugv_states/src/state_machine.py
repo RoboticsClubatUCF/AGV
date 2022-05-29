@@ -27,6 +27,7 @@ class DataStream():
 class Boot(smach.State):
     """
     BOOT ensures that we have all necessary data streams (from sensors/rc control/whatever) before passing us to STANDBY.
+    Any other 'preflight' checks should be done here, as well.
     """
 
     def __init__(self):
@@ -36,7 +37,7 @@ class Boot(smach.State):
         self.streams = [DataStream('RC', ugv.RC, '/choo_2/rc'),
                         DataStream('ODOM', nav.Odometry, '/choo_2/odom'),
                         DataStream('LIDAR', sens.PointCloud2, '/velodyne_points'),
-                        DataStream('IMU', sens.Imu, '/vectornav/IMU'),
+                        # DataStream('IMU', sens.Imu, '/vectornav/IMU'),
                         DataStream('GPS', sens.NavSatFix, '/choo_2/fix')]
 
         # create subscriber for each data stream
@@ -80,18 +81,21 @@ class Boot(smach.State):
 class Standby(smach.State):
 
     def __init__(self):
-        smach.State.__init__(self, outcomes=['got_pose', 'rc_preempt'],
+        smach.State.__init__(self, outcomes=['got_pose', 'rc_preempt', 'ESTOP', 'WAYPOINT'],
                                    output_keys=['frame_id', 'gps_x', 'gps_y', 'gps_z', 'gps_x0', 'gps_y0', 'gps_z0', 'gps_w0'])
 
         self.got_pose = False
         self.data_copy = None
 
+        self.AUTO = False
+        self.ESTOP = False
         # cmd_sub = rospy.Subscriber('/cmd_pose', geom.PoseStamped, callback = self.cmd_callback)
 
     def execute(self, userdata):
 
         # wait until execute to initialize subscribers so that multiple states can listen to same topic names without clashing
-        cmd_sub = rospy.Subscriber('/cmd_pose', geom.PoseStamped, callback = self.cmd_callback)
+        # cmd_sub = rospy.Subscriber('/cmd_pose', geom.PoseStamped, callback = self.cmd_callback)
+        rc_sub = rospy.Subscriber("/choo_2/rc", ugv.RC, callback=self.rc_callback)
 
         rate = rospy.Rate(20)
 
@@ -109,10 +113,23 @@ class Standby(smach.State):
                 userdata.gps_y0 = self.data_copy.pose.orientation.y
                 userdata.gps_z0 = self.data_copy.pose.orientation.z
                 userdata.gps_w0 = self.data_copy.pose.orientation.w
-
                 return 'got_pose'
 
+            if self.ESTOP:
+                self.ESTOP = False
+                return 'ESTOP'
+            if self.AUTO:
+                self.AUTO = False
+                return 'WAYPOINT'
+
             rate.sleep()
+
+    def rc_callback(self, msg):
+
+        if msg.switch_e:
+            self.ESTOP = True
+        if msg.switch_d:
+            self.AUTO = True
 
     # Called when movement data is received
     def cmd_callback(self, data):
@@ -259,7 +276,7 @@ def main():
             remapping={})
         smach.StateMachine.add('STANDBY',
             Standby(),
-            transitions={'got_pose':'WAYPOINT', 'rc_preempt':'MANUAL'},
+            transitions={'got_pose':'WAYPOINT', 'rc_preempt':'MANUAL', 'ESTOP':'END', 'AUTO':'WAYPOINT'},
             remapping={ 'frame_id':'frame_id',
                         'gps_x':'x_pos',
                         'gps_y':'y_pos',
