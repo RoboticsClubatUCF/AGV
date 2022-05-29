@@ -133,7 +133,7 @@ def main():
 
     # subscribers
     # TODO: pass each of these the serial queue, not the actual serial connection
-    cmd_vel_sub = rospy.Subscriber('/cmd_vel', geom.Twist, callback=cmd_vel_cb, callback_args=(ser))
+    # cmd_vel_sub = rospy.Subscriber('/cmd_vel', geom.Twist, callback=cmd_vel_cb, callback_args=(ser))
     rc_sub = rospy.Subscriber("/choo_2/rc", ugv.RC, callback=rc_callback,callback_args=(ser))
 
     if not ser.is_open:
