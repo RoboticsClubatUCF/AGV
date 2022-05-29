@@ -55,17 +55,16 @@ def rc_callback(message, args):
     elif message.switch_d:
         return
 
-    rospy.logdebug("4 asdljfn;alskdfdf")
-
     prev_estop = message.switch_e
     
     # handle joystick inputs
     left_rpm = int((message.right_x  - 1500)*(MAX_MOTOR_RPM / MAX_RPM_VALUE))
     right_rpm = int((message.left_x  - 1500)*(MAX_MOTOR_RPM / MAX_RPM_VALUE))
+    rospy.logdebug("4 LEFT_RPM: {} RIGHT_RPM: {}".format(left_rpm, right_rpm))
+
     string = "!M " + str(right_rpm) + " " + str(left_rpm) + "\n\r"
 
     rospy.logdebug("5 String: {}".format(string))
-
 
     # write_string(string, (ser1, ser2))
     encoded = string.encode('utf-8')
