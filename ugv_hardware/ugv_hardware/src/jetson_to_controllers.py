@@ -49,12 +49,11 @@ def rc_callback(message, args):
         return
 
     prev_estop = message.switch_e
-    # # handle joystick inputs
-    # else:
-    #     left_rpm = int((message.right_x  - 1500)*(0.4))
-    #     right_rpm = int((message.left_x  - 1500)*(0.4))
-    #     string = "!M " + str(right_rpm) + " " + str(left_rpm) + "\n\r"
-    #     write_string(string, serialargs)
+    # handle joystick inputs
+    left_rpm = int((message.right_x  - 1500)*(0.4))
+    right_rpm = int((message.left_x  - 1500)*(0.4))
+    string = "!M " + str(right_rpm) + " " + str(left_rpm) + "\n\r"
+    write_string(string, args)
     
 def cmd_vel_cb(cmd_vel, args):
 
