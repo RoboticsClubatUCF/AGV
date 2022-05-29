@@ -70,10 +70,18 @@ def str_to_RC_message(rc_list):
     rc_msg.header.stamp = rospy.Time.now()
     rc_msg.header.frame_id = "" # frame is meaningless in this context
     # populate the sticks
-    rc_msg.right_x = min(1000, int(rc_list[0]))
-    rc_msg.right_x = max(2000, int(rc_list[0]))
-    rc_msg.left_x = min(1000, int(rc_list[3]))
-    rc_msg.left_x = max(2000, int(rc_list[3]))
+    right_x = int(rc_list[0])
+    left_x = int(rc_list[3])
+
+    if right_x < 1000:
+        right_X = 1000
+    elif right_x > 2000:
+        right_X = 2000
+    if left_x < 1000:
+        left_X = 1000
+    elif left_x > 2000:
+        left_X = 2000
+
     # populate the switches
     rc_msg.switch_e = (int(rc_list[4]) <= 1500) # E-STOP
     rc_msg.switch_g = int(rc_list[5])
