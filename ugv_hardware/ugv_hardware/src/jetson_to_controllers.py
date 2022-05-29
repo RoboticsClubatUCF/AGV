@@ -57,10 +57,13 @@ def rc_callback(message, args):
     
 def cmd_vel_cb(cmd_vel, args):
 
+    rospy.logdebug("1 CALLBACK")
+
     ser1 = args[0]
     ser2 = args[1]
     AUTO_SWITCH = args[2]
 
+    rospy.logdebug("2 AUTO_SWITCH: {}".format(AUTO_SWITCH))
     # Auto-nav mode is off
     if not AUTO_SWITCH:
         AUTO_SWITCH = False
@@ -69,13 +72,16 @@ def cmd_vel_cb(cmd_vel, args):
     wheel_base = 0.67
     left_velocity =  cmd_vel.linear.x - 0.5*cmd_vel.angular.z*wheel_base
     right_velocity = cmd_vel.linear.x + 0.5*cmd_vel.angular.z*wheel_base
+    rospy.logdebug("3 LEFT_VEL {} RIGHT_VEL {}".format(left_velocity, right_velocity))
 
     # convert m/s to RPM
     left_rpm = left_velocity * REVS_PER_METER * 60
     right_rpm = right_velocity * REVS_PER_METER * 60
+    rospy.logdebug("4 LEFT_RPM {} RIGHT_RPM {}".format(left_rpm, right_rpm))
 
     # Serial Write
     string = "!M " + str(right_rpm) + " " + str(left_rpm) + "\r"
+    rospy.logdebug("5 TO MOTOR CONTROLLER {}".format(string))
     write_string(string, (ser1, ser2))
     # encoded = string.encode('utf-8')
     # args[0].write(encoded)
