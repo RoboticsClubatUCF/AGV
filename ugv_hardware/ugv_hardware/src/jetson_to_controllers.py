@@ -35,8 +35,6 @@ AUTO_SWITCH = False
 prev_estop = False
 def rc_callback(message, args):
 
-    rospy.logdebug("1 START CALLBACK")
-
     global AUTO_SWITCH
     global prev_estop
 
@@ -45,35 +43,23 @@ def rc_callback(message, args):
 
     AUTO_SWITCH = message.switch_d
 
-    rospy.logdebug("2 AUTO_SWITCH: {}".format(AUTO_SWITCH))
-
     # if the e-stop is cleared
     if not message.switch_e and prev_estop:
-        rospy.logdebug("3 Clearing E-STOP!")
+        rospy.logdebug("Clearing E-STOP!")
         write_string("!MG\n\r", (ser1, ser2))
     # Auto-nav mode; do nothing with these messages
     elif message.switch_d:
         return
 
     prev_estop = message.switch_e
-    
-    rospy.logdebug("3 message right_x: {} left_x: {}".format(message.right_x, message.left_x))
-    rospy.logdebug("3.5 MYSTERY BOX: {}".format(MAX_MOTOR_RPM / MAX_RPM_VALUE))
+
     # handle joystick inputs
-    left_rpm = int((message.right_x  - 1500)*(MAX_MOTOR_RPM / MAX_RPM_VALUE))
-    right_rpm = int((message.left_x  - 1500)*(MAX_MOTOR_RPM / MAX_RPM_VALUE))
-    rospy.logdebug("4 LEFT_RPM: {} RIGHT_RPM: {}".format(left_rpm, right_rpm))
+    left_rpm = int((message.left_x - 1500)*(MAX_MOTOR_RPM / MAX_RPM_VALUE))
+    right_rpm = int((message.right_x - 1500)*(MAX_MOTOR_RPM / MAX_RPM_VALUE))
+    string = "!M " + str(right_rpm) + " " + str(left_rpm) + "\r"
 
-    string = "!M " + str(right_rpm) + " " + str(left_rpm) + "\n\r"
+    write_string(string, (ser1, ser2))
 
-    rospy.logdebug("5 String: {}".format(string))
-
-    # write_string(string, (ser1, ser2))
-    encoded = string.encode('utf-8')
-    args[0].write(encoded)
-    args[1].write(encoded)
-
-    rospy.logdebug("6 END")
 
 def cmd_vel_cb(cmd_vel, args):
 
