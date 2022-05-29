@@ -82,6 +82,8 @@ def str_to_RC_message(rc_list):
     elif left_x > 2000:
         left_X = 2000
 
+    rc_msg.right_x = right_x
+    rc_msg.left_x = left_x
     # populate the switches
     rc_msg.switch_e = (int(rc_list[4]) <= 1500) # E-STOP
     rc_msg.switch_g = int(rc_list[5])
