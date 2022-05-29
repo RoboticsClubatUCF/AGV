@@ -16,9 +16,12 @@ import std_msgs.msg as std
 import geometry_msgs.msg as geom
 import ugv_msg.msg as ugv
 
+WHEEL_BASE = 0.67
 WHEEL_RADIUS = 0.10795
 METERS_PER_REV = WHEEL_RADIUS * math.pi * 2
 REVS_PER_METER = 1 / METERS_PER_REV
+MAX_MOTOR_RPM = 375
+MAX_RPM_VALUE = 1000
 
 def write_string(input, serials):
     """
@@ -50,8 +53,8 @@ def rc_callback(message, args):
 
     prev_estop = message.switch_e
     # handle joystick inputs
-    left_rpm = int((message.right_x  - 1500)*(0.4))
-    right_rpm = int((message.left_x  - 1500)*(0.4))
+    left_rpm = int((message.right_x  - 1500)*(MAX_MOTOR_RPM / MAX_RPM_VALUE))
+    right_rpm = int((message.left_x  - 1500)*(MAX_MOTOR_RPM / MAX_RPM_VALUE))
     string = "!M " + str(right_rpm) + " " + str(left_rpm) + "\n\r"
     write_string(string, args)
     
@@ -59,20 +62,13 @@ def cmd_vel_cb(cmd_vel, args):
 
     global AUTO_SWITCH
 
-    rospy.logdebug("1 CALLBACK")
-
-    ser1 = args[0]
-    ser2 = args[1]
-
-    rospy.logdebug("2 AUTO_SWITCH: {}".format(AUTO_SWITCH))
     # Auto-nav mode is off
     if not AUTO_SWITCH:
         AUTO_SWITCH = False
         return
 
-    wheel_base = 0.67
-    left_velocity =  cmd_vel.linear.x - 0.5*cmd_vel.angular.z*wheel_base
-    right_velocity = cmd_vel.linear.x + 0.5*cmd_vel.angular.z*wheel_base
+    left_velocity =  cmd_vel.linear.x - (0.5 * cmd_vel.angular.z * WHEEL_BASE)
+    right_velocity = cmd_vel.linear.x + (0.5 * cmd_vel.angular.z * WHEEL_BASE)
     rospy.logdebug("3 LEFT_VEL {} RIGHT_VEL {}".format(left_velocity, right_velocity))
 
     # convert m/s to RPM
@@ -82,7 +78,6 @@ def cmd_vel_cb(cmd_vel, args):
 
     # Serial Write
     string = "!M " + str(right_rpm) + " " + str(left_rpm) + "\r"
-    rospy.logdebug("5 TO MOTOR CONTROLLER {}".format(string))
     # write_string(string, (ser1, ser2))
     encoded = string.encode('utf-8')
     args[0].write(encoded)
