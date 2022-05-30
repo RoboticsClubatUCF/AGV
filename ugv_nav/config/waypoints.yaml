@@ -1,0 +1,22 @@
+# [lat, long]
+waypoints:
+  # [lat, long]
+  # start: [1.000, 2.0000]
+  # end: [0.0000, 0.0000]
+
+  wp_0: 
+    label: "start"
+    frame_id: map
+    coords: [0.0, 0.0]
+  wp_1: 
+    label: ""
+    frame_id: map
+    coords: [1.0, 0.0]
+  wp_2: 
+    label: ""
+    frame_id: map
+    coords: [2.0, 0.0]
+  wp_3: 
+    label: "end"
+    frame_id: map
+    coords: [3.0, 0.0]
