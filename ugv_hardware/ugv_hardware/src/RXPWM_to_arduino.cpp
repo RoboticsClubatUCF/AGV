@@ -99,7 +99,9 @@ void setup()
   Serial3.begin(115200);  // to motor controller
 
   FastLED.addLEDs<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
-  
+  fill_solid(leds, NUM_LEDS, CRGB(0, 255, 13)); // turn LED's back to STANDBY color
+  fastLED.show();
+
   // configure RC pins as inputs
   pinMode(RC_RJ_x, INPUT);
   pinMode(RC_RJ_y, INPUT);
