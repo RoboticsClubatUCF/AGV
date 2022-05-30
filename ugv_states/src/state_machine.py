@@ -36,6 +36,8 @@ class Boot(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes=['boot_success', 'None'])
 
+        self.state_pub = rospy.Publisher('/choo_2/state', std.String, queue_size=1)
+
         # define all required data streams
         self.streams = [DataStream('RC', ugv.RC, '/choo_2/rc'),
                         DataStream('ODOM', nav.Odometry, '/choo_2/odom'),
@@ -48,6 +50,8 @@ class Boot(smach.State):
             rospy.Subscriber(stream.topic, stream.msg_type, callback=self.stream_callback, callback_args=(stream, stream.topic))
 
     def execute(self, userdata):
+
+        self.state_pub.publish("BOOT")
 
         # configure timer to output status of subscribers every 2 secs
         status_timer = rospy.Timer(rospy.Duration(2), self.timer_status_callback)
@@ -87,6 +91,8 @@ class Standby(smach.State):
         smach.State.__init__(self, outcomes=['got_pose', 'rc_preempt', 'ESTOP', 'AUTO'],
                                    output_keys=['frame_id', 'gps_x', 'gps_y', 'gps_z', 'gps_x0', 'gps_y0', 'gps_z0', 'gps_w0'])
 
+        self.state_pub = rospy.Publisher('/choo_2/state', std.String, queue_size=1)
+
         self.got_pose = False
         self.data_copy = None
 
@@ -94,6 +100,8 @@ class Standby(smach.State):
         self.ESTOP = False
 
     def execute(self, userdata):
+
+        self.state_pub.publish("STANDBY")
 
         # wait until execute to initialize subscribers so that multiple states can listen to same topic names without clashing
         rc_sub = rospy.Subscriber("/choo_2/rc", ugv.RC, callback=self.rc_callback)
@@ -150,7 +158,11 @@ class Waypoint(smach.State):
                                    input_keys=['frame_id', 'way_x', 'way_y', 'way_z', 'way_x0', 'way_y0', 'way_z0', 'way_w0'],
                                    output_keys=[])
 
+        self.state_pub = rospy.Publisher('/choo_2/state', std.String, queue_size=1)
+
     def execute(self, userdata):
+
+        self.state_pub.publish("WAYPOINT")
 
         # wait until execute to initialize subscribers so that multiple states can listen to same topic names without clashing
         cmd_sub = rospy.Subscriber('/cmd_pose', geom.PoseStamped, callback = self.pose_callback)
@@ -205,6 +217,8 @@ class Manual(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes=['rc_un_preempt', 'resume_waypoint', 'error'])
 
+        self.state_pub = rospy.Publisher('/choo_2/state', std.String, queue_size=1)
+
         # subscribe to RC commands
         # TODO: make/find an RC channels message
         rospy.Subscriber('/choo_2/rc', std.String, callback=self.rc_callback)
@@ -213,6 +227,8 @@ class Manual(smach.State):
         self.motor_pub = rospy.Publisher('/cmd_vel', geom.Twist, queue_size=10)
     
     def execute(self, userdata):
+
+        self.state_pub.publish("MANUAL")
 
         while not rospy.is_shutdown():
             pass
@@ -230,7 +246,12 @@ class Warn(smach.State):
         smach.State.__init__(self, outcomes=['reset', 'standby', 'end'],
                                    output_keys=['end_status', 'end_reason'])
 
+        self.state_pub = rospy.Publisher('/choo_2/state', std.String, queue_size=1)
+
     def execute(self, userdata):
+
+        self.state_pub.publish("WARN")
+
         pass
 
 class Estop(smach.State):
@@ -239,7 +260,12 @@ class Estop(smach.State):
         smach.State.__init__(self, outcomes=['reset', 'end'],
                                    output_keys=[])
 
+        self.state_pub = rospy.Publisher('/choo_2/state', std.String, queue_size=1)
+
     def execute(self, userdata):
+
+        self.state_pub.publish("ESTOP")
+
         pass
 
 class End(smach.State):
@@ -247,9 +273,12 @@ class End(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes=['success', 'err', 'end'],
                                    input_keys=['reason'])
+        
+        self.state_pub = rospy.Publisher('/choo_2/state', std.String, queue_size=1)
 
     def execute(self, userdata):
 
+        self.state_pub.publish("END")
         # kill the ROS node
         # http://wiki.ros.org/rospy/Overview/Initialization%20and%20Shutdown
 

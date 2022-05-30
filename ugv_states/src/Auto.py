@@ -141,6 +141,8 @@ class Auto(smach.State):
         self.AUTO = True
         self.ESTOP = False
 
+        self.state_pub = rospy.Publisher('/choo_2/state', std.String, queue_size=1)
+
         # load waypoints from parameter server
         self.waypoints = WaypointList(frame_id='map', namespace='waypoints')
         self.waypoints.read_waypoint_params(namespace='waypoints')
@@ -149,6 +151,8 @@ class Auto(smach.State):
         self.client = actionlib.SimpleActionClient('/move_base', MoveBaseAction)
 
     def execute(self, userdata):
+
+        self.state_pub.publish("AUTO")
 
         rospy.Subscriber('/choo_2/rc', ugv.RC, callback=self.rc_callback)
 
