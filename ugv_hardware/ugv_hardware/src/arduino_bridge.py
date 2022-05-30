@@ -92,7 +92,6 @@ def str_to_RC_message(rc_list):
     return rc_msg
 
 prev_estop = False
-# TODO: send a message to activate lights
 def rc_callback(message, serial):
 
     global prev_estop
@@ -110,6 +109,21 @@ def rc_callback(message, serial):
     
     prev_estop = message.switch_e
 
+def state_callback(message, serial):
+
+    if message.data == "AUTO":
+        msg = "$LIT X_X\n"
+    elif message.data == "STANDBY":
+        msg = "$LIT XXX\n"
+    else:
+        return
+    
+    try:
+        encode = msg.encode('utf-8', errors="strict")
+        serial.write(msg)
+    except UnicodeEncodeError:
+        rospy.logerr("Failed to encode $LIT message for Arduino.")
+        
 def main():
 
     rospy.init_node('arduino_bridge', anonymous=True, log_level=rospy.DEBUG)
@@ -134,7 +148,8 @@ def main():
     # subscribers
     # TODO: pass each of these the serial queue, not the actual serial connection
     # cmd_vel_sub = rospy.Subscriber('/cmd_vel', geom.Twist, callback=cmd_vel_cb, callback_args=(ser))
-    rc_sub = rospy.Subscriber("/choo_2/rc", ugv.RC, callback=rc_callback,callback_args=(ser))
+    rc_sub = rospy.Subscriber("/choo_2/rc", ugv.RC, callback=rc_callback, callback_args=(ser))
+    state_sub = rospy.Subscriber("/choo_2/state", std.String, callback=state_callback, callback_args=(ser))
 
     if not ser.is_open:
         rospy.logerr("Couldn't open serial port.")
