@@ -4,6 +4,7 @@
 import rospy
 import actionlib
 import smach, smach_ros
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal, MoveBaseActionGoal
 
 # ROS messages
 import std_msgs.msg as std
@@ -12,6 +13,8 @@ import sensor_msgs.msg as sens
 import geometry_msgs.msg as geom
 import move_base_msgs.msg as move_base
 import ugv_msg.msg as ugv
+
+from Auto import Auto
 
 class DataStream():
 
@@ -89,18 +92,17 @@ class Standby(smach.State):
 
         self.AUTO = False
         self.ESTOP = False
-        # cmd_sub = rospy.Subscriber('/cmd_pose', geom.PoseStamped, callback = self.cmd_callback)
 
     def execute(self, userdata):
 
         # wait until execute to initialize subscribers so that multiple states can listen to same topic names without clashing
-        # cmd_sub = rospy.Subscriber('/cmd_pose', geom.PoseStamped, callback = self.cmd_callback)
         rc_sub = rospy.Subscriber("/choo_2/rc", ugv.RC, callback=self.rc_callback)
 
         rate = rospy.Rate(20)
 
         while not rospy.is_shutdown():
 
+            # transition to pose, fill userdata with pose
             if self.got_pose:
                 # fill header fields
                 userdata.frame_id = self.data_copy.header.frame_id
@@ -136,6 +138,7 @@ class Standby(smach.State):
         self.data_copy = data
         self.got_pose = True
         return None
+
 
 class Waypoint(smach.State):
 
@@ -178,7 +181,6 @@ class Waypoint(smach.State):
         rate = rospy.Rate(20)
         while not rospy.is_shutdown():
 
-
             current_state = self.client.get_state()
             if current_state == actionlib.GoalStatus.SUCCEEDED:
                 rospy.loginfo("Goal Succeeded.\n {}".format(self.client.get_goal_status_text()))
@@ -205,7 +207,7 @@ class Manual(smach.State):
 
         # subscribe to RC commands
         # TODO: make/find an RC channels message
-        rospy.Subscriber('/rc', std.String, callback=self.rc_callback)
+        rospy.Subscriber('/choo_2/rc', std.String, callback=self.rc_callback)
 
         # publish motor commands for the base_controller to actuate
         self.motor_pub = rospy.Publisher('/cmd_vel', geom.Twist, queue_size=10)
@@ -243,14 +245,17 @@ class Estop(smach.State):
 class End(smach.State):
 
     def __init__(self):
-        smach.State.__init__(self, outcomes=[],
+        smach.State.__init__(self, outcomes=['success', 'err', 'end'],
                                    input_keys=['reason'])
 
     def execute(self, userdata):
 
         # kill the ROS node
         # http://wiki.ros.org/rospy/Overview/Initialization%20and%20Shutdown
-        rospy.signal_shutdown(userdata.reason)
+
+        return 'end'
+
+        # rospy.signal_shutdown(userdata.reason)
 
         # if userdata.end_status == 'success':
         #     return 'end_success'
@@ -263,7 +268,7 @@ def main():
     rospy.init_node('rover_sm', anonymous=True, log_level=rospy.DEBUG)
 
     # create state machine with outcomes
-    sm = smach.StateMachine(outcomes = ['success', 'err'])
+    sm = smach.StateMachine(outcomes = ['success', 'err', 'end'])
 
     # declare userdata
     sm.userdata.x_pos = 0
@@ -327,11 +332,12 @@ def main():
             remapping={'reason': 'end_reason'})
 
 
-    # create an introspection server for debugging transitions
+    # Create and start the introspection server
+    sis = smach_ros.IntrospectionServer('ugv_states', sm, '/SM_ROOT')
+    sis.start()
 
     outcome = sm.execute()
-
-    rospy.spin()
+    sis.stop()
 
 if __name__ == '__main__':
     main()
