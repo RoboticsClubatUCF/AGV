@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <Arduino.h>
 #include <Encoder.h>
+#include <FastLED.h>
 
 // RC Receiver
 #define RC_RJ_x   2  // right joystick, x-axis - pin 6 on receiver
@@ -33,12 +34,16 @@
 #define ENDSTDIN    255 // NULL
 #define NL          10  // NEWLINE
 #define CR          13  // CARRIAGE RETURN
-
 // Pins for relays 
 #define R1        10
 #define R2        11
 #define R3        12
 #define R4        13
+// for LEDs
+#define LED_PIN   9
+#define NUM_LEDS  5
+static const char * LIT_FLASH = "X_X\0";
+static const char * LIT_SOLID = "XXX\0";
  
 // Jetson<-->Arduino message definitions
 static const char * MSG_MOTORS = "$MTR\0";      // command for motor controller
@@ -77,6 +82,12 @@ char incoming[256];
 int idx = 0;
 char ch;
 
+// LEDs
+CRGB leds[NUM_LEDS];
+bool flash = False;
+int light_freq = hz / 4;
+int light_count = 0;
+
 /**
  * @brief Run once.
  * 
@@ -87,6 +98,8 @@ void setup()
   Serial.begin(115200);   // USB-to-Jetson
   Serial3.begin(115200);  // to motor controller
 
+  FastLED.addLEDs<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
+  
   // configure RC pins as inputs
   pinMode(RC_RJ_x, INPUT);
   pinMode(RC_RJ_y, INPUT);
@@ -119,7 +132,7 @@ void loop()
   print_rc_inputs();
 //  Serial3.print("!EX\r");
 
-  // read encoders
+  // read encoders, print to Jetson
   newPos1 = enc1.read();  // Encoder::read() returns counts, there are 4 counts / rev
   newPos2 = enc2.read();
   if (newPos1 != pos1)
@@ -159,6 +172,21 @@ void loop()
       }
       ch = Serial.read();
     }
+  }
+
+  // if lights are set to flash
+  if (flash)
+  {
+    light_count++;
+    if ((light_count % (light_freq * 2)) == 0)
+    {
+      fill_solid(leds, NUM_LEDS, CRGB::Black);
+    }
+    else if ((light_count % light_freq) == 0)
+    {
+      fill_solid(leds, NUM_LEDS, CRGB(255, 98, 0));
+    }
+    fastLED.show();
   }
 
   // attempt to maintain loop rate
@@ -203,6 +231,10 @@ int handle_input(char *incoming)
   else if (strcmp(token, MSG_ESTOP_ON) == 0) // ESTOP == "$STP"
   {
     throw_ESTOP();
+    
+    // set lights
+    fill_solid(leds, NUM_LEDS, CRGB::Red); // turn E-STOP LEDs on
+    fastLED.show();
 
     return EXIT_SUCCESS;
   }
@@ -210,11 +242,25 @@ int handle_input(char *incoming)
   {
     release_ESTOP();
 
+    // set lights
+    fill_solid(leds, NUM_LEDS, CRGB::Black); // turn E-STOP LEDs on
+    fastLED.show();
+
     return EXIT_SUCCESS;
   }
-  else if (strcmp(token, MSG_LIGHTS) == 0) // LIGHTS == "$????"
+  else if (strcmp(token, MSG_LIGHTS) == 0) // LIGHTS == "$LIT <XXX (solid)/X_X (blink>"
   {
-    // ????????
+    token = strtok(NULL, delim);
+    if (strcmp(token, LIT_SOLID) == 0)
+    {
+      flash = false;
+      fill_solid(leds, NUM_LEDS, CRGB(0, 255, 13)); // turn LEDs on
+      fastLED.show();
+    }
+    else if (strcmp(token, LIT_FLASH) == 0)
+    {
+      flash = true;
+    }
     return EXIT_SUCCESS;
   }
   
