@@ -11,6 +11,8 @@ rc.right_x = 0
 rc.left_x = 0
 rc.right_y = 0
 rc.left_y = 0
+rc.switch_e = False
+rc.switch_d = False
 
 # tells us when the Twist message needs to be published again
 change_flag = False
@@ -32,6 +34,11 @@ def on_press(key):
     if k == 'd':
         rc.switch_d = (rc.switch_d == False)    # invert
         rospy.logdebug("AUTO: {}".format(rc.switch_d))
+
+    # if Escape is pressed, exit keyboard listener
+    if key == keyboard.Key.esc:
+        # Stop listener
+        return False    
 
     publish()
 
