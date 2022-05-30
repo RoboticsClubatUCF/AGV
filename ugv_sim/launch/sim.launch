@@ -48,6 +48,8 @@
         <param name="tf_prefix" type="string" value=""/>
     </node>
 
+    <rosparam command="load" file="$(find ugv_nav)/config/waypoints.yaml" />
+    
     <!-- publishes tf transforms between joints -->
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
 
