@@ -1,5 +1,5 @@
 local_costmap:
-  global_frame: odom
+  global_frame: map # https://answers.ros.org/question/304537/could-not-transform-the-global-plan-to-the-frame-of-the-controller/?answer=307377#post-id-307377
   robot_base_frame: base_link
   update_frequency: 3.0
   publish_frequency: 2.0
