@@ -118,7 +118,7 @@ class Standby(smach.State):
             if self.ESTOP:
                 self.ESTOP = False
                 return 'ESTOP'
-            if self.AUTO:
+            elif self.AUTO:
                 self.AUTO = False
                 return 'AUTO'
 
@@ -127,9 +127,9 @@ class Standby(smach.State):
     def rc_callback(self, msg):
 
         if msg.switch_e:
-            self.ESTOP = True
+            self.ESTOP = msg.switch_e
         if msg.switch_d:
-            self.AUTO = True
+            self.AUTO = msg.switch_d
 
     # Called when movement data is received
     def cmd_callback(self, data):
@@ -231,6 +231,15 @@ class Warn(smach.State):
     def execute(self, userdata):
         pass
 
+class Estop(smach.State):
+
+    def __init__(self):
+        smach.State.__init__(self, outcomes=['reset', 'end'],
+                                   output_keys=[])
+
+    def execute(self, userdata):
+        pass
+
 class End(smach.State):
 
     def __init__(self):
@@ -276,7 +285,7 @@ def main():
             remapping={})
         smach.StateMachine.add('STANDBY',
             Standby(),
-            transitions={'got_pose':'WAYPOINT', 'rc_preempt':'MANUAL', 'ESTOP':'END', 'AUTO':'WAYPOINT'},
+            transitions={'got_pose':'WAYPOINT', 'rc_preempt':'MANUAL', 'ESTOP':'END', 'AUTO':'AUTO'},
             remapping={ 'frame_id':'frame_id',
                         'gps_x':'x_pos',
                         'gps_y':'y_pos',
@@ -304,6 +313,14 @@ def main():
         #     Warn(),
         #     transitions={'reset':'BOOT', 'standby':'STANDBY', 'end':'END'},
         #     remapping={})
+        smach.StateMachine.add('ESTOP',
+            Estop(),
+            transitions={'reset':'STANDBY', 'end':'END'},
+            remapping={})
+        smach.StateMachine.add('AUTO',
+            Auto(),
+            transitions={'standby':"STANDBY", 'ESTOP':"ESTOP", 'error':"END"},
+            remapping={})
         smach.StateMachine.add('END',
             End(),
             transitions={},
