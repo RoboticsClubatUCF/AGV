@@ -14,6 +14,7 @@ rc.left_y = 0
 rc.switch_e = False
 rc.switch_d = False
 
+
 # tells us when the Twist message needs to be published again
 change_flag = False
 
@@ -55,8 +56,9 @@ def main():
     # TODO: add CTRL+C signal handler. 
 
     rospy.init_node('rc_controller', anonymous=True, log_level=rospy.DEBUG) # node that will handle sending commands
-    listener = keyboard.Listener()  # pynput keyboard listener for catching arrow key input
+    rc_pub.publish(rc)  # publish a first message for state machine
 
+    listener = keyboard.Listener()  # pynput keyboard listener for catching arrow key input
     # when key is pressed, run on_press(), when a key is released, run on_release()
     with keyboard.Listener(
         on_press=on_press,  
