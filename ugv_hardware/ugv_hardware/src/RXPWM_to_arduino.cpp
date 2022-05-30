@@ -243,7 +243,7 @@ int handle_input(char *incoming)
     release_ESTOP();
 
     // set lights
-    fill_solid(leds, NUM_LEDS, CRGB::Black); // turn E-STOP LEDs on
+    fill_solid(leds, NUM_LEDS, CRGB(0, 255, 13)); // turn LED's back to STANDBY color
     fastLED.show();
 
     return EXIT_SUCCESS;
