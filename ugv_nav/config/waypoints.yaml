@@ -1,8 +1,9 @@
-# [lat, long]
 waypoints:
-  # [lat, long]
-  # start: [1.000, 2.0000]
-  # end: [0.0000, 0.0000]
+  # waypoints should be named wp_0, wp_1, wp_2....
+  # all waypoints need to have a label (even if it's empty), frame_id, and a coordinate pair coords
+  # the state machine will run these IN ORDER, so make sure they're numbered IN_ORDER
+  #   (only the number matters, their actual order in this file doesn't)
+  # there's no upper limit on the number of waypoints, but if there aren't ANY, the AUTO state won't do anything.
 
   wp_0: 
     label: "start"
