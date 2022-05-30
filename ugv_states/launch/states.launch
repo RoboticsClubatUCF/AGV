@@ -1,0 +1,12 @@
+<launch>
+
+    <arg name="bypass_boot" default="true"/>
+
+    <!-- Load waypoints to parameter server -->
+    <rosparam command="load" file="$(find ugv_nav)/config/waypoints.yaml" />
+
+    <node name="sm" pkg="ugv_states" type="state_machine.py" output="screen" />
+
+    <node if="$(arg bypass_boot)" name="bypass_boot" pkg="ugv_states" type="bypass_boot.py"/>
+
+</launch>
