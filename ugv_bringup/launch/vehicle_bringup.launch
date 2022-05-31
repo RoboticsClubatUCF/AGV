@@ -1,8 +1,8 @@
 <launch>
 
     <!-- CLI Args for testing --> 
-    <arg name = "robot_descr" default = "false"/>  <!-- Launches robot state publisher --> 
-    <arg name = "robot" default = "choo_2"/>
+    <arg name="robot_descr" default="true"/>  <!-- Launches robot state publisher --> 
+    <arg name="robot" default = "choo_2"/>
     <arg name="robot_desc" default="$(find ugv_description)/urdf/$(arg robot)/model.urdf.xacro" />
     <arg name="rviz" default="false"/>   <!-- use rviz window for robot information -->
     <arg name="rviz_cfg" default="$(find ugv_sim)/rviz/bowser2.rviz" />
@@ -12,7 +12,7 @@
 
     <!-- Robot state publisher --> 
     <node if="$(arg robot_descr)" pkg = "robot_state_publisher" type = "robot_state_publisher" name = "robot_state_publisher" >
-	  <param name = "tf_prefix" type = "string" value = ""/>
+	  <param name="tf_prefix" type="string" value=""/>
     </node>
 
     <!-- publishes tf transforms between joints -->
@@ -26,7 +26,8 @@
          parameter file to reflect the imu symlink -->
 
     <!-- VECTORNAV IMU-->
-    <include file="$(find vectornav)/launch/vectornav.launch">
+    <include file="$(find vehice_bringup)/launch/vn100_imu.launch">
+        <arg name="frame_id" value="vectornav"/>
     </include>
 
     <!-- Velodyne -->
@@ -38,9 +39,9 @@
     </include>
 
     <!-- GPS -->   
-    <node pkg = "advanced_navigation_driver" type = "advanced_navigation_driver" name = "gps_data" args = "/dev/gps 1000000">
-        <remap from = "/an_device/NavSatFix" to = "/fix"/>
-        <remap from = "/an_device/Imu" to = "/imu_data"/>
+    <node pkg="advanced_navigation_driver" type="advanced_navigation_driver" name="gps_data" args ="/dev/gps 1000000">
+        <remap from="/an_device/NavSatFix" to="/fix"/>
+        <remap from="/an_device/Imu" to="/imu_data"/>
     </node>
 
     <!-- <node pkg = "gps_common" type="utm_odometry_node" name = "gps_common"/> -->
