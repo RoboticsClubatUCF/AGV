@@ -98,9 +98,9 @@ void setup()
   Serial.begin(115200);   // USB-to-Jetson
   Serial3.begin(115200);  // to motor controller
 
-  FastLED.addLEDs<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
+  FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
   fill_solid(leds, NUM_LEDS, CRGB(0, 255, 13)); // turn LED's back to STANDBY color
-  fastLED.show();
+  FastLED.show();
 
   // configure RC pins as inputs
   pinMode(RC_RJ_x, INPUT);
@@ -188,7 +188,7 @@ void loop()
     {
       fill_solid(leds, NUM_LEDS, CRGB(255, 98, 0));
     }
-    fastLED.show();
+    FastLED.show();
   }
 
   // attempt to maintain loop rate
@@ -236,7 +236,7 @@ int handle_input(char *incoming)
     
     // set lights
     fill_solid(leds, NUM_LEDS, CRGB::Red); // turn E-STOP LEDs on
-    fastLED.show();
+    FastLED.show();
 
     return EXIT_SUCCESS;
   }
@@ -246,7 +246,7 @@ int handle_input(char *incoming)
 
     // set lights
     fill_solid(leds, NUM_LEDS, CRGB(0, 255, 13)); // turn LED's back to STANDBY color
-    fastLED.show();
+    FastLED.show();
 
     return EXIT_SUCCESS;
   }
@@ -257,7 +257,7 @@ int handle_input(char *incoming)
     {
       flash = false;
       fill_solid(leds, NUM_LEDS, CRGB(0, 255, 13)); // turn LEDs on
-      fastLED.show();
+      FastLED.show();
     }
     else if (strcmp(token, LIT_FLASH) == 0)
     {
