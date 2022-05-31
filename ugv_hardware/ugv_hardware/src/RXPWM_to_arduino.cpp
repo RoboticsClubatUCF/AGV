@@ -84,7 +84,7 @@ char ch;
 
 // LEDs
 CRGB leds[NUM_LEDS];
-bool flash = False;
+bool flash = false;
 int light_freq = hz / 4;
 int light_count = 0;
 
