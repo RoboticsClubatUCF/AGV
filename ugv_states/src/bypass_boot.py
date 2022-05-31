@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 # ROS system imports
-import queue
 import rospy
 import actionlib
 import smach, smach_ros
@@ -19,7 +18,7 @@ def main():
     rospy.init_node('bypass_boot', anonymous=True, log_level=rospy.DEBUG)
 
     rc_pub = rospy.Publisher('/choo_2/rc', ugv.RC, queue_size=1)
-    odom_pub = rospy.Publisher('/zed/zed_node/odom', nav.Odometry, queue_size=1)
+    odom_pub = rospy.Publisher('/choo_2/odom', nav.Odometry, queue_size=1)
     vel_pub = rospy.Publisher('/velodyne_points', sens.PointCloud2, queue_size=1)
     fix_pub = rospy.Publisher('/choo_2/fix', sens.NavSatFix, queue_size=1)
 
