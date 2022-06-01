@@ -1,0 +1,7 @@
+<launch>
+
+    <node pkg="ugv_hardware" type="arduino_bridge.py" name="arduino_bridge" output="screen" />
+
+    <node pkg="ugv_hardware" type="jetson_to_controllers.py" name="jetson_to_controllers" output="screen" />
+
+</launch>
