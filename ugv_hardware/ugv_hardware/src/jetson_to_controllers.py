@@ -108,10 +108,6 @@ def main():
         bytesize=serial.EIGHTBITS
     )
     rospy.logdebug("Serial Connection established on {}".format(_port))
-
-    # Subscribers
-    # rc_sub = rospy.Subscriber("/choo_2/rc", ugv.RC, callback=rc_callback,callback_args=(ser1,ser2))
-    # cmd_vel_sub = rospy.Subscriber('/cmd_vel', geom.Twist, callback=cmd_vel_cb, callback_args=(ser1,ser2))
     
     # Subscribers
     rc_sub = rospy.Subscriber("/choo_2/rc", ugv.RC, callback=rc_callback, callback_args=(ser1,ser2))
@@ -131,7 +127,7 @@ def main():
 
         # read input lines
         try:
-            input = ser1.readline()
+            input = ser2.readline()
         except serial.SerialException as e:
             rospy.logerr_once("Issue with serial read: {}".format(e))
             continue

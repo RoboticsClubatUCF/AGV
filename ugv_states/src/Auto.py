@@ -25,7 +25,7 @@ class WaypointStatus(Enum):
 
 class Waypoint():
 
-    def __init__(self, id, coords, frame_id="map", label=""):
+    def __init__(self, id, coords, frame_id, label=""):
 
         self.id = id
         self.frame_id = frame_id
@@ -131,12 +131,13 @@ class WaypointList():
         
     def reset(self):
 
-        self.id = -1
+        self.progress = -1
 
 class Auto(smach.State):
 
     def __init__(self):
-        smach.State.__init__(self, outcomes=['standby', 'ESTOP', 'error'])
+        smach.State.__init__(self, outcomes=['standby', 'ESTOP', 'error'],
+                                   output_keys=['auto_success'])
 
         self.AUTO = True
         self.ESTOP = False
@@ -154,6 +155,8 @@ class Auto(smach.State):
 
         self.state_pub.publish("AUTO")
 
+        self.ESTOP = False  # reset ESTOP flag
+
         rospy.Subscriber('/choo_2/rc', ugv.RC, callback=self.rc_callback)
 
         # make sure we have connection to client server before continuing, timeout after 10s (return to standby)
@@ -164,28 +167,32 @@ class Auto(smach.State):
         
         # send first waypoint to move_base to start navigation
         goal = self.waypoints.get_next_goal()
-        rospy.logdebug("Starting AUTO state at WP {}".format(self.waypoints.current_WP.id))
+        rospy.logdebug("Starting AUTO state at WP {}{}".format(self.waypoints.current_WP.id, self.waypoints.current_WP))
         self.client.send_goal(goal)
 
+        rate = rospy.Rate(10)
         while not rospy.is_shutdown():
 
             # check flags
             if not self.AUTO:
                 rospy.logdebug("AUTO switch disengaged. Cancelling current goal, resetting waypoints.")
                 self.client.cancel_all_goals()
-                self.waypoints.reset()
                 return 'standby'
-            if self.ESTOP:
+            if self.ESTOP == True:
                 rospy.logdebug("ESTOP switch thrown. Cancelling all goals.")
                 self.client.cancel_all_goals()
+                self.waypoints.reset()
                 return 'ESTOP'
 
             # check current state of goal (rosmsg show move_base_msgs/MoveBaseActionResult for ENUM definitions)
             current_state = self.client.get_state()
-            if current_state == 1: # ACTIVE
+            rospy.logdebug("Current State: {}".format(current_state))
+            if current_state == 0: # PENDING
+                pass
+            elif current_state == 1: # ACTIVE
 
                 # label current waypoint as in progress
-                if self.waypoints.current_WP.status is not WaypointStatus.IN_PROGRESS:
+                if self.waypoints.current_WP.status != WaypointStatus.IN_PROGRESS:
                     self.waypoints.current_WP.status = WaypointStatus.IN_PROGRESS
                 continue
 
@@ -239,6 +246,8 @@ class Auto(smach.State):
 
                 rospy.logdebug("All WPs completed. Returning to STANDBY")
                 return 'standby'
+
+            rate.sleep()
 
     def rc_callback(self, msg):
 

@@ -25,7 +25,7 @@ obstacles_3d:
   obstacle_range:         20    # meters
   raytrace_range:         20
   publish_voxel_map:      true
-  observation_sources:   depth_camera velodyne
+  observation_sources:   depth_camera
   depth_camera:
     data_type: PointCloud2
     topic: /zed/zed_node/point_cloud/cloud_registered

@@ -55,5 +55,9 @@
     <!-- start controllers -->
     <include file="$(find ugv_bringup)/launch/control.launch">
     </include>
-    
+
+    <!-- launch state machine -->
+    <!-- <include file="$(find ugv_states)/launch/states.launch">
+    </include> -->
+
 </launch>

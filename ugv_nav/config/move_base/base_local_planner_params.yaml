@@ -5,10 +5,10 @@ TrajectoryPlannerROS:
   holonomic_robot: false  # holonomic = "can strafe", which our robot cannot
   # velocities
   max_vel_x: 1.78816 # 4mph
-  min_vel_x: 0.5     # TODO: set to minimum speed necessary to overcome friction
-  max_vel_theta: 1.0
-  min_vel_theta: -1.0
-  min_in_place_vel_theta: 0.4
+  min_vel_x: 1.0     # TODO: set to minimum speed necessary to overcome friction
+  max_vel_theta: 1.0  # radians/sec
+  min_vel_theta: -1.0 # radians/sec
+  min_in_place_vel_theta: 1.0
   escape_vel: -0.5
   # TODO: accelerations
   acc_lim_theta: 3.2
@@ -17,7 +17,7 @@ TrajectoryPlannerROS:
 
   # goal tolerance parameters
   yaw_goal_tolerance: 0.5     # radians
-  xy_goal_tolerance: 0.5      # meters; this is way too relaxed
+  xy_goal_tolerance: 0.25      # meters; this is way too relaxed
   latch_xy_goal_tolerance: false
 
   # trajectory scoring parameters

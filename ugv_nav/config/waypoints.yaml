@@ -5,19 +5,24 @@ waypoints:
   #   (only the number matters, their actual order in this file doesn't)
   # there's no upper limit on the number of waypoints, but if there aren't ANY, the AUTO state won't do anything.
 
+  # frames--
+  #   odom: coords are in reference to starting position of robot
+  #   map: coords are in reference to an absolute position 
+  #   utm: coords are GPS lat-long pair
+
   wp_0: 
     label: "start"
-    frame_id: map
-    coords: [0.0, 0.0]
+    frame_id: odom
+    coords: [2.0, 0.0]
   wp_1: 
     label: ""
-    frame_id: map
-    coords: [1.0, 0.0]
+    frame_id: odom
+    coords: [3.0, 0.0]
   wp_2: 
     label: ""
-    frame_id: map
-    coords: [2.0, 0.0]
+    frame_id: odom
+    coords: [4.0, 0.0]
   wp_3: 
     label: "end"
-    frame_id: map
-    coords: [3.0, 0.0]
+    frame_id: odom
+    coords: [5.0, 0.0]

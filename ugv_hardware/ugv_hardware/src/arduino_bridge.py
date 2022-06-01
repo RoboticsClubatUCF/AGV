@@ -85,7 +85,7 @@ def str_to_RC_message(rc_list):
     rc_msg.right_x = right_x
     rc_msg.left_x = left_x
     # populate the switches
-    rc_msg.switch_e = (int(rc_list[4]) <= 1500) # E-STOP
+    rc_msg.switch_e = (int(rc_list[4]) <= 1200) # E-STOP
     rc_msg.switch_g = int(rc_list[5])
     rc_msg.switch_d = (int(rc_list[6]) >= 1500) # AUTO
 
@@ -102,7 +102,7 @@ def rc_callback(message, serial):
         encoded = estp.encode('utf-8')
         serial.write(encoded)
     # E-STOP not thrown when it was before
-    if not message.switch_e and prev_estop:
+    elif not message.switch_e and prev_estop:
         estp = "$GO\n"
         encoded = estp.encode('utf-8')
         serial.write(encoded)
@@ -164,7 +164,7 @@ def main():
             rospy.logerr_once("Issue with serial read: {}".format(e))
             continue
         # attempt to decode input, strip whitespace
-        # print(input)
+        rospy.logdebug(input)
         try:
             input = input.decode().strip()
         except UnicodeDecodeError as e:

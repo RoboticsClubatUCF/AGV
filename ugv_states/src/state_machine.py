@@ -40,10 +40,10 @@ class Boot(smach.State):
 
         # define all required data streams
         self.streams = [DataStream('RC', ugv.RC, '/choo_2/rc'),
-                        DataStream('ODOM', nav.Odometry, '/choo_2/odom'),
+                        DataStream('ODOM', nav.Odometry, '/zed/zed_node/odom'),
                         DataStream('LIDAR', sens.PointCloud2, '/velodyne_points'),
-                        # DataStream('IMU', sens.Imu, '/vectornav/IMU'),
-                        DataStream('GPS', sens.NavSatFix, '/choo_2/fix')]
+                        DataStream('IMU', sens.Imu, '/vectornav/IMU'),
+                        DataStream('GPS', sens.NavSatFix, '/fix')]
 
         # create subscriber for each data stream
         for stream in self.streams:
@@ -140,13 +140,6 @@ class Standby(smach.State):
             self.ESTOP = msg.switch_e
         if msg.switch_d:
             self.AUTO = msg.switch_d
-
-    # Called when movement data is received
-    def cmd_callback(self, data):
-        self.data_copy = data
-        self.got_pose = True
-        return None
-
 
 class Waypoint(smach.State):
 
@@ -257,16 +250,32 @@ class Warn(smach.State):
 class Estop(smach.State):
 
     def __init__(self):
-        smach.State.__init__(self, outcomes=['reset', 'end'],
+        smach.State.__init__(self, outcomes=['end', 'standby'],
                                    output_keys=[])
 
         self.state_pub = rospy.Publisher('/choo_2/state', std.String, queue_size=1)
 
+        self.ESTOP = True
+
     def execute(self, userdata):
 
         self.state_pub.publish("ESTOP")
+        self.ESTOP = True
 
-        pass
+        # wait until execute to initialize subscribers so that multiple states can listen to same topic names without clashing
+        rc_sub = rospy.Subscriber("/choo_2/rc", ugv.RC, callback=self.rc_callback)
+
+        while not rospy.is_shutdown():
+
+            if self.ESTOP == False:
+                rospy.logdebug("ESTOP cleared, returning to STANDBY.")
+                return 'standby'
+            
+    def rc_callback(self, msg):
+
+        if msg.switch_e is not None:
+            self.ESTOP = msg.switch_e
+    
 
 class End(smach.State):
 
@@ -305,6 +314,7 @@ def main():
     sm.userdata.z_pos = 0
 
     sm.userdata.end_reason = 'success'
+    sm.userdata.auto_success = None
 
     sm.userdata.x_ori = 0
     sm.userdata.y_ori = 0
@@ -319,7 +329,7 @@ def main():
             remapping={})
         smach.StateMachine.add('STANDBY',
             Standby(),
-            transitions={'got_pose':'WAYPOINT', 'rc_preempt':'MANUAL', 'ESTOP':'END', 'AUTO':'AUTO'},
+            transitions={'got_pose':'WAYPOINT', 'rc_preempt':'MANUAL', 'ESTOP':'ESTOP', 'AUTO':'AUTO'},
             remapping={ 'frame_id':'frame_id',
                         'gps_x':'x_pos',
                         'gps_y':'y_pos',
@@ -349,12 +359,12 @@ def main():
         #     remapping={})
         smach.StateMachine.add('ESTOP',
             Estop(),
-            transitions={'reset':'STANDBY', 'end':'END'},
+            transitions={'standby':'STANDBY', 'end':'END'},
             remapping={})
         smach.StateMachine.add('AUTO',
             Auto(),
-            transitions={'standby':"STANDBY", 'ESTOP':"ESTOP", 'error':"END"},
-            remapping={})
+            transitions={'standby':'STANDBY', 'ESTOP':'ESTOP', 'error':'END'},
+            remapping={'auto_success':'auto_success'})
         smach.StateMachine.add('END',
             End(),
             transitions={},

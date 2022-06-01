@@ -41,7 +41,7 @@
 #define R4        13
 // for LEDs
 #define LED_PIN   9
-#define NUM_LEDS  5
+#define NUM_LEDS  8
 static const char * LIT_FLASH = "X_X\0";
 static const char * LIT_SOLID = "XXX\0";
  

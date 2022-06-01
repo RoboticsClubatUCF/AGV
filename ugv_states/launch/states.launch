@@ -1,6 +1,6 @@
 <launch>
 
-    <arg name="bypass_boot" default="true"/>
+    <arg name="bypass_boot" default="false"/>
 
     <!-- Load waypoints to parameter server -->
     <rosparam command="load" file="$(find ugv_nav)/config/waypoints.yaml" />
