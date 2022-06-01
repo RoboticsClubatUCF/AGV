@@ -3,7 +3,7 @@
     <arg name="target_frame" default="base_link"/>
     <arg name="frame_id" default="imu_link"/>
 
-    <include file="$(find vehicle_bringup)/launch/vectornav.launch">
+    <include file="$(find ugv_bringup)/launch/vectornav.launch">
         <arg name="frame_id" value="$(arg frame_id)"/>
     </include>
 
@@ -23,4 +23,5 @@
     <node pkg="nodelet" type="nodelet" name="imu_filter" args="load imu_filter_madgwick/ImuFilterNodelet imu_manager">
         <rosparam command="load" file="$(find vectornav)/params/imu_filter_madgwick.yaml" />
     </node>
+    
 </launch>
