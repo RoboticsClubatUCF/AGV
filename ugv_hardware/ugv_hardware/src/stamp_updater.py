@@ -17,10 +17,14 @@ import geometry_msgs.msg as geom
 import move_base_msgs.msg as move_base
 import ugv_msg.msg as ugv
 
-def callback(msg, publisher):
+def callback(msg, args):
+
+    publisher = args[0]
+    frame_id = args[1]
 
     try:
         msg.header.stamp = rospy.Time.now()
+        msg.header.frame_id = frame_id
         publisher.publish(msg)
     except AttributeError:
         rospy.logerr("This message doesn't have a stamp.")
@@ -42,13 +46,14 @@ def main():
 
     msg_type = sys.argv[1]
     topic = sys.argv[2]
+    frame_id = sys.argv[3]
     pub_topic = topic + "/updated"
 
     rospy.logdebug("Subscribing to message of type {} from topic {}".format(msg_type, topic))
     rospy.logdebug("Publishing on topic {}".format(pub_topic))
 
     pub = rospy.Publisher(pub_topic, types[msg_type], queue_size=1)
-    rospy.Subscriber(topic, types[msg_type], callback=callback, callback_args=(pub))
+    rospy.Subscriber(topic, types[msg_type], callback=callback, callback_args=(pub, frame_id))
 
     rospy.spin()
 
