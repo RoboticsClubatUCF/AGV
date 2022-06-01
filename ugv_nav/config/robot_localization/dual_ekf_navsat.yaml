@@ -5,7 +5,7 @@ ekf_se_odom:
   transform_time_offset: 0.2
   transform_timeout: 0.0
   print_diagnostics: true
-  debug: false
+  debug: true
   publish_tf: true
   publish_acceleration: false
   permit_corrected_publication: false
@@ -15,35 +15,35 @@ ekf_se_odom:
   base_link_frame: base_link  # Defaults to "base_link" if unspecified
   world_frame: odom           # Defaults to the value of odom_frame if unspecified
 
-  odom0: /choo_2/odom
-  odom0_config: [true,  true,  false,    # x, y, z
-                 false, false, true,   # r, p, y
-                 true, true, false,   # vx, vy, vz
-                 false, false, true,   # vr, vp, vy
+  # odom0: /choo_2/odom
+  # odom0_config: [true,  true,  false,    # x, y, z
+  #                false, false, true,   # r, p, y
+  #                true, true, false,   # vx, vy, vz
+  #                false, false, true,   # vr, vp, vy
+  #                false, false, false]   # ax, ay, az
+  # odom0_queue_size: 10
+  # odom0_nodelay: true
+  # odom0_differential: false
+  # odom0_relative: false
+
+  # visual odometry from ZED camera
+  odom0: /zed/zed_node/odom
+  odom0_config: [true,  true,  true,    # x, y, z
+                 true, true, true,      # r, p, y
+                 false, false, false,   # vx, vy, vz
+                 false, false, false,   # vr, vp, vy
                  false, false, false]   # ax, ay, az
   odom0_queue_size: 10
   odom0_nodelay: true
   odom0_differential: false
   odom0_relative: false
 
-  # visual odometry from ZED camera
-  odom1: /zed/zed_node/odom
-  odom1_config: [true,  true,  true,    # x, y, z
-                 true, true, true,   # r, p, y
-                 false, false, false,   # vx, vy, vz
-                 false, false, false,   # vr, vp, vy
-                 false, false, false]   # ax, ay, az
-  odom1_queue_size: 10
-  odom1_nodelay: true
-  odom1_differential: false
-  odom1_relative: false
-
   imu0: /vectornav/IMU
-  imu0_config: [false, false, false,
-              true,  true,  false,
-              false, false, false,
-              true,  true,  true,
-              true,  true,  true]
+  imu0_config: [false, false, false,  # x, y, z
+                true,  true,  true,   # r, p, y
+                false, false, false,  # vx, vy, vz
+                true,  true,  true,   # vr, vp, vy
+                false, false, false]  # ax, ay, az
   imu0_nodelay: false
   imu0_differential: false
   imu0_relative: false
@@ -53,7 +53,22 @@ ekf_se_odom:
   imu0_linear_acceleration_rejection_threshold: 0.8  #
   imu0_remove_gravitational_acceleration: true
 
-  use_control: true       # listen on /cmd_vel for geometry_msgs/Twist, fuse into prediction phase
+  imu1: /imu_data/updated
+  imu1_config: [false, false, false,  # x, y, z
+                true,  true,  true,   # r, p, y
+                false, false, false,  # vx, vy, vz
+                true,  true,  true,   # vr, vp, vy
+                false, false, false]  # ax, ay, az
+  imu1_nodelay: false
+  imu1_differential: false
+  imu1_relative: false
+  imu1_queue_size: 10
+  imu1_pose_rejection_threshold: 0.8                 # Note the difference in parameter names
+  imu1_twist_rejection_threshold: 0.8                #
+  imu1_linear_acceleration_rejection_threshold: 0.8  #
+  imu1_remove_gravitational_acceleration: true
+
+  use_control: false       # listen on /cmd_vel for geometry_msgs/Twist, fuse into prediction phase
   stamped_control: false  # look for geometry_msgs/TwistStamped instead
   # configures which fields of control we use
   control_config: [true, false, false,    # x_vel, y_vel, z_vel
@@ -84,23 +99,24 @@ ekf_se_map:
   odom0_differential: false
   odom0_relative: false
 
-  odom1: /odometry/filtered/local
-  odom1_config: [true,  true,  false,
-                 false, false, false,
-                 true,  true,  true,
-                 false, false, false,
-                 false, false, false]
+# visual odometry from ZED camera
+  odom1: /zed/zed_node/odom
+  odom1_config: [true,  true,  true,    # x, y, z
+                 true, true, true,      # r, p, y
+                 false, false, false,   # vx, vy, vz
+                 false, false, false,   # vr, vp, vy
+                 false, false, false]   # ax, ay, az
   odom1_queue_size: 10
   odom1_nodelay: true
   odom1_differential: false
   odom1_relative: false
 
   imu0: /vectornav/IMU
-  imu0_config: [false, false, false,
-              true,  true,  false,
-              false, false, false,
-              true,  true,  true,
-              true,  true,  true]
+  imu0_config: [false, false, false,  # x, y, z
+                true,  true,  true,   # r, p, y
+                false, false, false,  # vx, vy, vz
+                true,  true,  true,   # vr, vp, vy
+                false, false, false]  # ax, ay, az
   imu0_nodelay: false
   imu0_differential: false
   imu0_relative: false
@@ -109,6 +125,33 @@ ekf_se_map:
   imu0_twist_rejection_threshold: 0.8                #
   imu0_linear_acceleration_rejection_threshold: 0.8  #
   imu0_remove_gravitational_acceleration: true
+
+  imu1: /imu_data/updated
+  imu1_config: [false, false, false,  # x, y, z
+                true,  true,  true,   # r, p, y
+                false, false, false,  # vx, vy, vz
+                true,  true,  true,   # vr, vp, vy
+                false, false, false]  # ax, ay, az
+  imu1_nodelay: false
+  imu1_differential: false
+  imu1_relative: false
+  imu1_queue_size: 10
+  imu1_pose_rejection_threshold: 0.8                 # Note the difference in parameter names
+  imu1_twist_rejection_threshold: 0.8                #
+  imu1_linear_acceleration_rejection_threshold: 0.8  #
+  imu1_remove_gravitational_acceleration: true
+
+
+  # odom1: /odometry/filtered/local
+  # odom1_config: [true,  true,  false,
+  #                false, false, false,
+  #                true,  true,  true,
+  #                false, false, false,
+  #                false, false, false]
+  # odom1_queue_size: 10
+  # odom1_nodelay: true
+  # odom1_differential: false
+  # odom1_relative: false
 
   use_control: false
 
