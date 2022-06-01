@@ -56,38 +56,39 @@ def rc_callback(message, args):
     # handle joystick inputs
     left_rpm = int((message.left_x - 1500)*(MAX_MOTOR_RPM / MAX_RPM_VALUE))
     right_rpm = int((message.right_x - 1500)*(MAX_MOTOR_RPM / MAX_RPM_VALUE))
+    
+    # write command to motor controllers
     string = "!M " + str(left_rpm) + " " + str(right_rpm) + "\r"
-
     write_string(string, (ser1, ser2))
 
 def cmd_vel_cb(cmd_vel, args):
 
     global AUTO_SWITCH
 
+    ser1 = args[0]
+    ser2 = args[1]
+
     # Auto-nav mode is off
-    if not AUTO_SWITCH:
-        AUTO_SWITCH = False
+    if AUTO_SWITCH == False:
         return
 
-    left_velocity =  cmd_vel.linear.x - (0.5 * cmd_vel.angular.z * WHEEL_BASE)
-    right_velocity = cmd_vel.linear.x + (0.5 * cmd_vel.angular.z * WHEEL_BASE)
-    rospy.logdebug("3 LEFT_VEL {} RIGHT_VEL {}".format(left_velocity, right_velocity))
+    left_velocity  =  cmd_vel.linear.x - (0.5 * cmd_vel.angular.z * WHEEL_BASE)
+    right_velocity =  cmd_vel.linear.x + (0.5 * cmd_vel.angular.z * WHEEL_BASE)
+    # rospy.logdebug("ALIBDLJFNLS:AODNFOJKSDNF LEFT_VEL: {} RIGHT_VEL: {}".format(left_velocity, right_velocity))
 
     # convert m/s to RPM
     left_rpm = left_velocity * REVS_PER_METER * 60
     right_rpm = right_velocity * REVS_PER_METER * 60
-    rospy.logdebug("4 LEFT_RPM {} RIGHT_RPM {}".format(left_rpm, right_rpm))
-
-    # Serial Write
+    # rospy.logdebug("ALIBDLJFNLS:AODNFOJKSDNF LEFT: {} RIGHT: {}".format(left_rpm, right_rpm))
+    
+    # write command to motor controllers
     string = "!M " + str(left_rpm) + " " + str(right_rpm) + "\r"
-    # write_string(string, (ser1, ser2))
-    encoded = string.encode('utf-8')
-    args[0].write(encoded)
-    args[1].write(encoded)
+    write_string(string, (ser1, ser2))
 
 def main():     
 
     rospy.init_node('motor_controller_bridge', anonymous=True, log_level=rospy.DEBUG)
+
     _port = '/dev/ttyACM0'
     ser1 = serial.Serial(
         port=_port,
@@ -113,7 +114,7 @@ def main():
     # cmd_vel_sub = rospy.Subscriber('/cmd_vel', geom.Twist, callback=cmd_vel_cb, callback_args=(ser1,ser2))
     
     # Subscribers
-    rc_sub = rospy.Subscriber("/choo_2/rc", ugv.RC, callback=rc_callback,callback_args=(ser1,ser2))
+    rc_sub = rospy.Subscriber("/choo_2/rc", ugv.RC, callback=rc_callback, callback_args=(ser1,ser2))
     cmd_vel_sub = rospy.Subscriber('/cmd_vel', geom.Twist, callback=cmd_vel_cb, callback_args=(ser1,ser2))
 
     rate = rospy.Rate(20)
