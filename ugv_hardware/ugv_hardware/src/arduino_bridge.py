@@ -164,7 +164,7 @@ def main():
             rospy.logerr_once("Issue with serial read: {}".format(e))
             continue
         # attempt to decode input, strip whitespace
-        print(input)
+        # print(input)
         try:
             input = input.decode().strip()
         except UnicodeDecodeError as e:
