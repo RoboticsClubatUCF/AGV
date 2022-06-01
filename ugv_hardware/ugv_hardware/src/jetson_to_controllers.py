@@ -56,10 +56,9 @@ def rc_callback(message, args):
     # handle joystick inputs
     left_rpm = int((message.left_x - 1500)*(MAX_MOTOR_RPM / MAX_RPM_VALUE))
     right_rpm = int((message.right_x - 1500)*(MAX_MOTOR_RPM / MAX_RPM_VALUE))
-    string = "!M " + str(right_rpm) + " " + str(left_rpm) + "\r"
+    string = "!M " + str(left_rpm) + " " + str(right_rpm) + "\r"
 
     write_string(string, (ser1, ser2))
-
 
 def cmd_vel_cb(cmd_vel, args):
 
@@ -80,7 +79,7 @@ def cmd_vel_cb(cmd_vel, args):
     rospy.logdebug("4 LEFT_RPM {} RIGHT_RPM {}".format(left_rpm, right_rpm))
 
     # Serial Write
-    string = "!M " + str(right_rpm) + " " + str(left_rpm) + "\r"
+    string = "!M " + str(left_rpm) + " " + str(right_rpm) + "\r"
     # write_string(string, (ser1, ser2))
     encoded = string.encode('utf-8')
     args[0].write(encoded)
