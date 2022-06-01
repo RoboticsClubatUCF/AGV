@@ -123,6 +123,16 @@
         <origin xyz="${imu_offset_x} ${imu_offset_y} ${imu_offset_z}" rpy="0 0 0" />
     </joint>
 
+    <!-- gps link -->
+    <xacro:box_total name="gps_link" mass="0.05" width="0.05" height="0.05" length="0.05"/>
+    <joint name="gps_joint" type="fixed">
+        <gazebo reference="gps_joint">
+        </gazebo>
+        <parent link="base_link"/>
+        <child link="gps_link"/>
+        <origin xyz="-0.4249 0 -.09" rpy="0 0 0" />
+    </joint>
+
     <!-- stereo camera link -->
     <xacro:box_total name="camera" mass="${cam_mass}" width="${cam_width}" length="${cam_length}" height="${cam_height}"/>
     <joint name="camera_joint" type="fixed">
