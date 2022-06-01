@@ -1,7 +1,7 @@
 # parameters here aren't namespaced, and will apply to all costmaps
 obstacle_range: 20
 raytrace_range: 20
-footprint: [[0.47,-0.43], [0.47,0.43], [-0.47,0.43], [-0.47,-0.43]] # TODO: update to match choo_2
+footprint: [[0.4725,-0.365], [0.4725,0.365], [-0.4725,0.365], [-0.4725,-0.365]]
 # footprint_padding: 0.01
 inflation_radius: 0.55
 
