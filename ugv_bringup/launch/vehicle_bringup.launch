@@ -11,8 +11,8 @@
     <param name="robot_description" command="$(find xacro)/xacro $(arg robot_desc)" />
 
     <!-- Robot state publisher --> 
-    <node if="$(arg robot_descr)" pkg = "robot_state_publisher" type = "robot_state_publisher" name = "robot_state_publisher" >
-	  <param name="tf_prefix" type="string" value=""/>
+    <node if="$(arg robot_descr)" pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" >
+      <param name="tf_prefix" type="string" value=""/>
     </node>
 
     <!-- publishes tf transforms between joints -->
@@ -26,7 +26,7 @@
          parameter file to reflect the imu symlink -->
 
     <!-- VECTORNAV IMU-->
-    <include file="$(find vehice_bringup)/launch/vn100_imu.launch">
+    <include file="$(find ugv_bringup)/launch/vn100_imu.launch">
         <arg name="frame_id" value="vectornav"/>
     </include>
 
@@ -35,7 +35,7 @@
     </include>
 
     <!-- Depth Camera -->
-    <include file = "$(find zed_wrapper)/launch/zed.launch">
+    <include file="$(find zed_wrapper)/launch/zed.launch">
     </include>
 
     <!-- GPS -->   
@@ -43,12 +43,17 @@
         <remap from="/an_device/NavSatFix" to="/fix"/>
         <remap from="/an_device/Imu" to="/imu_data"/>
     </node>
+    <!-- stamp updater for weird gps IMU values -->
+    <node pkg="ugv_hardware" type="stamp_updater.py" name="gps_stamp_updater" args="sensor_msgs/Imu /imu_data gps_link"/>
 
-    <!-- <node pkg = "gps_common" type="utm_odometry_node" name = "gps_common"/> -->
+    <node pkg="gps_common" type="utm_odometry_node" name="gps_common"/>
 
     <!-- Nav stack -->
     <include file="$(find ugv_nav)/launch/nav.launch">
     </include>  
     
-
+    <!-- start controllers -->
+    <include file="$(find ugv_bringup)/launch/control.launch">
+    </include>
+    
 </launch>
