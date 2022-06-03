@@ -8,6 +8,7 @@ inflation_radius: 0.55
 plugins:
   - {name: obstacles_3d,      type: "costmap_2d::VoxelLayer"}
   - {name: obstacles_2d,      type: "costmap_2d::ObstacleLayer"}
+  - {name: cv_detection_layer, type: "cv_detection_layer_namespace::CVDetectionLayer"}
   - {name: inflation_layer,   type: "costmap_2d::InflationLayer"}
 #   # - {name: external_costmap,  type: "costmap_2d::StaticLayer"}
 
