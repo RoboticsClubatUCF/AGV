@@ -41,7 +41,7 @@ class road_marking_detect:
  
         self.depth_sub = rospy.Subscriber("/zed/zed_node/depth/depth_registered", Image, callback = self.depth_callback)
 
-        self.pub = rospy.Publisher("bowser2/potholes", PolygonStamped, queue_size = 3)
+        self.pub = rospy.Publisher("/potholes", PolygonStamped, queue_size = 3)
     
     def show_image(self, img):
         cv2.imshow("Image Window", img)
@@ -114,9 +114,12 @@ class road_marking_detect:
  
     def getLocation(self, coordinate, depth):
         
+        if depth > 19:
+            return -100
+        
         # The horizontal angular distance of the point is equal to the angular distance per pixel
         # multiplied by the horizontal distance of the pixel from the center of the frame.
-        theta = ((45/640) * abs(coordinate[0] - 320))
+        theta = ((45/IMG_WIDTH) * abs(coordinate[0] - IMG_HEIGHT))
 
         # Point is in center of frame
         if theta == 0:
@@ -131,7 +134,7 @@ class road_marking_detect:
         
         xdist = math.sqrt((c*c) - (depth*depth))
 
-        if (coordinate[0] - 320) < 0:
+        if (coordinate[0] - IMG_HEIGHT) < 0:
             xdist*=-1
 
         return xdist
@@ -155,9 +158,9 @@ class road_marking_detect:
                         
                         # Get locations of road markings
                         try:
-                            depth = self.depth_img[point[1]][point[0]]
-                            xPoint = self.getLocation(point, depth)
-                            p.polygon.points.append( Point32(x=xPoint, y=0.000, z = float(depth)))
+                            xPoint = self.getLocation(point, self.depth_img[point[1]][point[0]])
+                            zPoint = self.depth_img[point[1]][point[0]]
+                            p.polygon.points.append( Point32(x=xPoint, y=0.000, z = zPoint))
                         
                         except IndexError:
                             continue
