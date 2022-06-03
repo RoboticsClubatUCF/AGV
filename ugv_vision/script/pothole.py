@@ -184,9 +184,9 @@ class road_marking_detect:
 
                 #Show what's going on as a sanity check
                 cv_img = self.img
-                cv_img = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
-                cv2.drawContours(cv_img, contours, -1, (0,250,0), 3)
-                self.show_image(cv_img)
+                test_img = cv2.cvtColor(self.depth_img, cv2.COLOR_GRAY2BGR)
+                cv2.drawContours(test_img, contours, -1, (0,250,0), 3)
+                self.show_image(test_img)
 
             
 
