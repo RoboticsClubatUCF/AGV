@@ -57,7 +57,7 @@
     </include>
 
     <!-- launch state machine -->
-    <!-- <include file="$(find ugv_states)/launch/states.launch">
-    </include> -->
+    <include file="$(find ugv_states)/launch/states.launch">
+    </include>
 
 </launch>
