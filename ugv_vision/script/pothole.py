@@ -94,6 +94,7 @@ class road_marking_detect:
         green = np.zeros_like(cv_img, np.uint8)
         green[imask] = cv_img[imask]
         cv_img = cv2.cvtColor(cv_img, cv2.COLOR_HSV2BGR)
+        cv_img = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
 
         self.img = cv_img
     
@@ -171,6 +172,7 @@ class road_marking_detect:
 
                 #Show what's going on as a sanity check
                 cv_img = self.img
+                cv_img = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
                 cv2.drawContours(cv_img, contours, -1, (0,250,0), 3)
                 self.show_image(cv_img)
 
