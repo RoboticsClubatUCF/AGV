@@ -85,7 +85,7 @@ class road_marking_detect:
         for contour in contours:
             for point in contour:
                 # Transform each point
-                point = np.dot(inv_trans, point)
+                print(np.squeeze(point))
                 
 
 
