@@ -78,15 +78,13 @@ class road_marking_detect:
         contours, hierarchy = cv2.findContours(cv_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
         cv_img = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
-            
-        
-        
-        # Reverse transforms
-        inv_trans = np.linalg.pinv(transform)
-        contours = cv2.perspectiveTransform(contours, inv_trans)
-        cv_img = cv2.perspectiveTransform(cv_img, inv_trans)
 
-        # Reverse Image 
+        # Reverse transforms
+        np.squeeze(contours)
+        inv_trans = np.linalg.pinv(transform)
+        cv2.perspectiveTransform(contours, contours, inv_trans)
+        cv2.perspectiveTransform(cv_img, cv_img, inv_trans)
+
         cv2.drawContours(cv_img, contours, -1, (0,250,0), 3)
         self.show_image(cv_img)
 
