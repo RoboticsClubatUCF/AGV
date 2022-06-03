@@ -107,7 +107,8 @@ class road_marking_detect:
                     
                     # Get locations of road markings
                     try:
-                        xPoint = self.getLocation(point, self.depth_img[point[1]][point[0]])
+                        depth = self.depth_img[point[1]][point[0]]
+                        xPoint = self.getLocation(point, depth)
                         zPoint = self.depth_img[point[1]][point[0]]
                         p.polygon.points.append( Point32(x=xPoint, y=0.000, z = zPoint))
                     
