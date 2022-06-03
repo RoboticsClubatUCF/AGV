@@ -18,6 +18,8 @@ import numpy as np
 
 IMG_WIDTH = 672
 IMG_HEIGHT = 376
+GREEN_HSV_MIN = (36, 25, 25)
+GREEN_HSV_MAX = (70, 255,255)
 
 class road_marking_detect:
 
@@ -74,32 +76,30 @@ class road_marking_detect:
 
         in_pts = np.float32([Ipt_A, Ipt_B, Ipt_C, Ipt_D])
         out_pts = np.float32([Opt_A, Opt_B, Opt_C, Opt_D])
-
         transform = cv2.getPerspectiveTransform(in_pts, out_pts)
         birds_eye = cv2.warpPerspective(cv_img, transform, (IMG_WIDTH, IMG_HEIGHT), flags=cv2.INTER_LINEAR)
 
+        # Find contours on the ground
         contours, hierarchy = cv2.findContours(birds_eye, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
         birds_eye = cv2.cvtColor(birds_eye, cv2.COLOR_GRAY2BGR)
-
         cv2.drawContours(birds_eye, contours, -1, (0,250,0), 3)
 
+        # Inverse transform to original image
         cv_img=cv2.warpPerspective(birds_eye, transform, (IMG_WIDTH, IMG_HEIGHT), flags =cv2.WARP_INVERSE_MAP)
-
         hsv = cv2.cvtColor(cv_img, cv2.COLOR_BGR2HSV)
 
+        # Isolate green contours
         mask = cv2.inRange(hsv, (36, 25, 25), (70, 255,255))
-
-        ## slice the green
         imask = mask>0
         green = np.zeros_like(cv_img, np.uint8)
         green[imask] = cv_img[imask]
         cv_img = cv2.cvtColor(cv_img, cv2.COLOR_HSV2BGR)
         cv_img = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
+
+        # Get all green contours
         contours, hierarchy = cv2.findContours(cv_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
         if not len(contours) <= 0:
-            # Polygon
             for contour in contours:
                 p = PolygonStamped()
                 # Point
@@ -179,54 +179,6 @@ class road_marking_detect:
 
             cv_img = self.img
             
-            # Find the contours in the image
-            # contours, hierarchy = cv2.findContours(cv_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-            
-            # # Find contours
-            
-            # validContours = []
-            # for i in contours:
-                
-            #     area = cv2.contourArea(i)
-            #     perimeter = cv2.arcLength(i, True)
-                
-            # #    if self.isPothole(perimeter, area):
-            # #       validContours.append(i)
-             
-            # if not len(validContours) <= 0:
-            #     # Polygon
-            #     for contour in validContours:
-            #         p = PolygonStamped()
-            #         # Point
-            #         for point in contour:
-            #             point = np.squeeze(point)
-                        
-            #             # Get locations of road markings
-            #             try:
-            #                 xPoint = self.getLocation(point, self.depth_img[point[1]][point[0]])
-            #                 zPoint = self.depth_img[point[1]][point[0]]
-            #                 p.polygon.points.append( Point32(x=xPoint, y=0.000, z = zPoint))
-                        
-            #             except IndexError:
-            #                 continue
-                        
-            #             except TypeError:
-            #                 continue
-
-            #         p.header.stamp = rospy.Time.now()
-            #         p.header.frame_id = self.frame
-            #         self.pub.publish(p)
-
-
-            # Show what's going on as a sanity check
-            ##print(cv_img)
-            ##cv_img = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
-            
-            #cv2.drawContours(cv_img, validContours, -1, (0,250,0), 3)
-
-            ##self.show_image(cv_img)
-            ##self.ready_img = False
-            ##self.ready_depth = False
 
 def main():
 
