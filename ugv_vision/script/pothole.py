@@ -27,7 +27,6 @@ class road_marking_detect:
 
         # Class members for depth camera image and flag for determining if message is sent
         self.img = None
-        #self.imgg = None
         self.ready_img = False
         self.ready_depth = False
         self.depth_img = None
@@ -46,6 +45,11 @@ class road_marking_detect:
     def show_image(self, img):
         cv2.imshow("Image Window", img)
         cv2.waitKey(1)
+
+    def depth_callback(self, depth_msg):
+        #self.depth_img = self.bridge.imgmsg_to_cv2(depth_msg)
+        self.depth_img = np.frombuffer(depth_msg.data,dtype=np.uint8).reshape(depth_msg.height,depth_msg.width,-1)
+        self.ready_depth = True
 
     def img_callback(self, img_msg):
         #cv_img = self.bridge.imgmsg_to_cv2(img_msg)
@@ -73,14 +77,11 @@ class road_marking_detect:
         self.transform = cv2.getPerspectiveTransform(in_pts, out_pts)
         cv_img = cv2.warpPerspective(cv_img, self.transform, (IMG_WIDTH, IMG_HEIGHT), flags=cv2.INTER_LINEAR)
         cv_img = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
-            
-        cv2.drawContours(cv_img, validContours, -1, (0,250,0), 3) ##
-        self.show_image(cv_img)
 
-    def depth_callback(self, depth_msg):
-        #self.depth_img = self.bridge.imgmsg_to_cv2(depth_msg)
-        self.depth_img = np.frombuffer(depth_msg.data,dtype=np.uint8).reshape(depth_msg.height,depth_msg.width,-1)
-        self.ready_depth = True
+        contours, hierarchy = cv2.findContours(cv_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            
+        cv2.drawContours(cv_img, contours, -1, (0,250,0), 3) ##
+        self.show_image(cv_img)
 
     def isPothole(self, perimeter, area):
         
