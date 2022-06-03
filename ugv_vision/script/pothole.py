@@ -76,9 +76,10 @@ class road_marking_detect:
 
         self.transform = cv2.getPerspectiveTransform(in_pts, out_pts)
         cv_img = cv2.warpPerspective(cv_img, self.transform, (IMG_WIDTH, IMG_HEIGHT), flags=cv2.INTER_LINEAR)
-        cv_img = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
 
         contours, hierarchy = cv2.findContours(cv_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+        cv_img = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
             
         cv2.drawContours(cv_img, contours, -1, (0,250,0), 3) ##
         self.show_image(cv_img)
