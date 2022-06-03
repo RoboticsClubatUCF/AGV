@@ -9,7 +9,7 @@
 
 import rospy
 from sensor_msgs.msg import Image
-from geometry_msgs.msg import Polygon, PolygonStamped, Point32
+import geometry_msgs.msg as geom
 import cv2
 import std_msgs
 from cv_bridge import CvBridge
@@ -32,7 +32,7 @@ class road_marking_detect:
         self.ready_img = False
         self.depth_img = None
         self.bridge = CvBridge()
-        self.frame = "zed_camera_center"
+        self.frame = "odom"
         #self.frame = "choo_2/camera"
 
         rospy.init_node("road_marks", anonymous = False, log_level = rospy.INFO)
@@ -41,7 +41,7 @@ class road_marking_detect:
  
         self.depth_sub = rospy.Subscriber("/zed/zed_node/depth/depth_registered", Image, callback = self.depth_callback)
 
-        self.pub = rospy.Publisher("/potholes", PolygonStamped, queue_size = 3)
+        self.pub = rospy.Publisher("/ground_marks", geom.PolygonStamped, queue_size = 3)
     
     def show_image(self, img):
         cv2.imshow("Ground Obstacles", img)
@@ -153,7 +153,7 @@ class road_marking_detect:
 
             if not len(contours) <= 0:
                 for contour in contours:
-                    p = PolygonStamped()
+                    p = geom.PolygonStamped()
                     # Point
                     for point in contour:
                         point = np.squeeze(point)
@@ -162,7 +162,11 @@ class road_marking_detect:
                         try:
                             xPoint = self.getLocation(point, self.depth_img[point[1]][point[0]])
                             zPoint = self.depth_img[point[1]][point[0]]
-                            p.polygon.points.append( Point32(x=0.000, y=zPoint, z = xPoint))
+                            pt = geom.Point()
+                            pt.x = xPoint
+                            pt.y = 0.0
+                            pt.z = zPoint
+                            p.polygon.points.append(pt)
                         
                         except IndexError:
                             continue
