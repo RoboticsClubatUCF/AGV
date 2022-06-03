@@ -79,13 +79,11 @@ class road_marking_detect:
 
         contours, hierarchy = cv2.findContours(birds_eye, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-        cv_img = cv2.cvtColor(birds_eye, cv2.COLOR_GRAY2BGR)
+        birds_eye = cv2.cvtColor(birds_eye, cv2.COLOR_GRAY2BGR)
 
-        cv2.drawContours(cv_img, contours, -1, (0,250,0), 3)
+        cv2.drawContours(birds_eye, contours, -1, (0,250,0), 3)
 
-        inv = np.linalg.inv(transform)
-
-        cv_img=cv2.warpPerspective(birds_eye, inv, (IMG_WIDTH, IMG_HEIGHT), flags =cv2.WARP_INVERSE_MAP)
+        cv_img=cv2.warpPerspective(birds_eye, transform, (IMG_WIDTH, IMG_HEIGHT), flags =cv2.WARP_INVERSE_MAP)
         self.show_image(cv_img)
         
         
