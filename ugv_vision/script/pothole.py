@@ -47,10 +47,8 @@ class road_marking_detect:
 
     def depth_callback(self, depth_msg):
         #self.depth_img = self.bridge.imgmsg_to_cv2(depth_msg)
-        self.depth_img = np.frombuffer(depth_msg.data,dtype=np.uint8).reshape(depth_msg.height,depth_msg.width,-1)
-        self.depth_img = cv2.cvtColor(self.depth_img,cv2.COLOR_BGR2GRAY)
+        self.depth_img = depth_msg
         self.ready_depth = True
-        self.show_image(self.depth_img)
 
     def img_callback(self, img_msg):
         #cv_img = self.bridge.imgmsg_to_cv2(img_msg)
@@ -112,14 +110,9 @@ class road_marking_detect:
                     try:
                         depth = self.depth_img[point[1]][point[0]]
                         xPoint = self.getLocation(point, depth)
-                        zPoint = self.depth_img[point[1]][point[0]]
-<<<<<<< HEAD
+                        zPoint = (self.depth_img[point[1]][point[0]]/255) * 25
                         p.polygon.points.append( Point32(x=xPoint, y=0.000, z = float(zPoint)))
                         
-=======
-                        print(zPoint)
-                        #p.polygon.points.append( np.float32(x=xPoint, y=0.000, z = zPoint))
->>>>>>> 9ab19f2f0bf0d6c39de974e08502c537bdba8326
                     
                     except IndexError:
                         continue
