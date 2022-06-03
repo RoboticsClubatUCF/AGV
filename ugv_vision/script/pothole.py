@@ -83,7 +83,9 @@ class road_marking_detect:
 
         cv2.drawContours(cv_img, contours, -1, (0,250,0), 3)
 
-        cv2.warpPerspective(birds_eye, cv_img, transform, (IMG_WIDTH, IMG_HEIGHT), cv2.WARP_INVERSE_MAP, cv2.BORDER_TRANSPARENT)
+        inv = np.linalg.inv(transform)
+
+        cv2.warpPerspective(birds_eye, inv, (IMG_WIDTH, IMG_HEIGHT), flags =cv2.WARP_INVERSE_MAP)
         
         
 
