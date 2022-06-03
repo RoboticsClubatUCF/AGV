@@ -32,7 +32,7 @@ class road_marking_detect:
         self.ready_img = False
         self.depth_img = None
         self.bridge = CvBridge()
-        self.frame = "zed_right_camera_frame"
+        self.frame = "zed_camera_center"
         #self.frame = "choo_2/camera"
 
         rospy.init_node("road_marks", anonymous = False, log_level = rospy.INFO)
@@ -119,8 +119,10 @@ class road_marking_detect:
         
         # The horizontal angular distance of the point is equal to the angular distance per pixel
         # multiplied by the horizontal distance of the pixel from the center of the frame.
-        theta = ((45/IMG_WIDTH) * abs(coordinate[0] - IMG_HEIGHT))
-
+        #theta = ((45/IMG_WIDTH) * abs(coordinate[0] - IMG_HEIGHT))
+        pre_theta = abs(coordinate[0] - (IMG_WIDTH / 2))
+        post_theta = 55 / float(IMG_WIDTH)
+        theta = float(post_theta) * float(pre_theta)
         # Point is in center of frame
         if theta == 0:
             return 0
@@ -134,7 +136,7 @@ class road_marking_detect:
         
         xdist = math.sqrt((c*c) - (depth*depth))
 
-        if (coordinate[0] - IMG_HEIGHT) < 0:
+        if (coordinate[0] - (IMG_WIDTH / 2)) < 0:
             xdist*=-1
 
         return xdist
@@ -160,7 +162,7 @@ class road_marking_detect:
                         try:
                             xPoint = self.getLocation(point, self.depth_img[point[1]][point[0]])
                             zPoint = self.depth_img[point[1]][point[0]]
-                            p.polygon.points.append( Point32(x=xPoint, y=0.000, z = zPoint))
+                            p.polygon.points.append( Point32(x=0.000, y=zPoint, z = xPoint))
                         
                         except IndexError:
                             continue
