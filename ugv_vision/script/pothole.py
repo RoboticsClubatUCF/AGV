@@ -1,15 +1,9 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # Marc Simmonds
 # IGVC 2022
 """ 
 
-    This script is meant to:
-    1. Listen for image messages from the depth camera
-    2. Find the potholes in the image
-    3. Get the locations of the potholes using the depth image
-    4. Publish these locations to the costmap... somehow...
-    
-    I think this works, but I need to test it
+    Detects all white colored road markings and publishes them as polygons. 
 
 """
 
@@ -22,9 +16,11 @@ from cv_bridge import CvBridge
 import math
 import numpy as np
 
-class pothole_detect:
+IMG_WIDTH = 640
+IMG_HEIGHT = 480
 
-    ERR = -100
+class road_marking_detect:
+
 
     def __init__(self):
 
@@ -35,12 +31,13 @@ class pothole_detect:
         self.depth_img = None
         self.bridge = CvBridge()
         self.frame = "bowser2/camera_link"
+        self.transform = None
 
-        rospy.init_node("potholes", anonymous = False, log_level = rospy.INFO)
+        rospy.init_node("road_marks", anonymous = False, log_level = rospy.INFO)
 
-        self.image_sub = rospy.Subscriber("/bowser2/bowser2_dc/image/image", Image, callback=self.img_callback)
+        self.image_sub = rospy.Subscriber("/zed/zed_node/rgb/image_rect_color", Image, callback=self.img_callback)
  
-        self.depth_sub = rospy.Subscriber("/bowser2/bowser2_dc/depth/image", Image, callback = self.depth_callback)
+        self.depth_sub = rospy.Subscriber("/zed/zed_node/depth/depth_registered", Image, callback = self.depth_callback)
 
         self.pub = rospy.Publisher("bowser2/potholes", PolygonStamped, queue_size = 3)
     
@@ -49,8 +46,32 @@ class pothole_detect:
         cv2.waitKey(1)
 
     def img_callback(self, img_msg):
-        self.img = self.bridge.imgmsg_to_cv2(img_msg)
+        cv_img = self.bridge.imgmsg_to_cv2(img_msg)
         self.ready_img = True
+        
+        # Pre-process image 
+        ret, cv_img = cv2.threshold(cv_img,125,255,0)
+        cv_img = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
+        cv_img = cv2.blur(cv_img, (5,5))
+
+        Ipt_A = [0, IMG_HEIGHT/2]
+        Ipt_B = [0, IMG_HEIGHT-1]
+        Ipt_C = [IMG_WIDTH-1, IMG_HEIGHT-1]
+        Ipt_D = [IMG_WIDTH-1, IMG_HEIGHT/2]
+
+        Opt_A = [0,0]
+        Opt_B = [0, IMG_HEIGHT-1]
+        Opt_C = [IMG_WIDTH-1, IMG_HEIGHT-1]
+        Opt_D = [IMG_WIDTH-1,0]
+
+        in_pts = np.float32([Ipt_A, Ipt_B, Ipt_C, Ipt_D])
+        out_pts = np.float32([Opt_A, Opt_B, Opt_C, Opt_D])
+
+        self.transform = cv2.getPerspectiveTransform(in_pts, out_pts)
+        self.transform = cv2.warpPerspective(cv_img, self.transform, (IMG_WIDTH, IMG_HEIGHT), flags=cv2.INTER_LINEAR)
+
+
+
 
     def depth_callback(self, depth_msg):
         self.depth_img = self.bridge.imgmsg_to_cv2(depth_msg)
@@ -94,7 +115,7 @@ class pothole_detect:
         return xdist
 
     # Runs the circle detection process
-    def getPotholes(self):
+    def getMarks(self):
         
         while not rospy.is_shutdown():
 
@@ -103,15 +124,11 @@ class pothole_detect:
                 continue
 
             cv_img = self.img
-
-            ret, cv_img = cv2.threshold(cv_img, 125, 255, 0)
-
-            cv_img = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
             
             # Find the contours in the image
             contours, hierarchy = cv2.findContours(cv_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
             
-            # Filter for contours with the desired area and circularity
+            # Find contours
             
             validContours = []
             for i in contours:
@@ -119,8 +136,8 @@ class pothole_detect:
                 area = cv2.contourArea(i)
                 perimeter = cv2.arcLength(i, True)
                 
-                if self.isPothole(perimeter, area):
-                    validContours.append(i)
+            #    if self.isPothole(perimeter, area):
+            #       validContours.append(i)
              
             if not len(validContours) <= 0:
                 # Polygon
@@ -129,21 +146,19 @@ class pothole_detect:
                     # Point
                     for point in contour:
                         point = np.squeeze(point)
+                        
+                        # Get locations of road markings
                         try:
-                            # Try to get the point in the contour in the depth image
-                            # Right now, this just prints the location. Sometimes it prints the max range of the sensor, 
-                            # which means it isn't detecting anything. Other times, weird shit happens.
                             xPoint = self.getLocation(point, self.depth_img[point[1]][point[0]])
                             zPoint = self.depth_img[point[1]][point[0]]
                             p.polygon.points.append( Point32(x=xPoint, y=0.000, z = zPoint))
-                            # Prints (z, x). y is assumed to be the ground plane.
-                            #print(self.depth_img[point[1]][point[0]], self.getLocation(point, self.depth_img[point[1]][point[0]]))
                         
                         except IndexError:
                             continue
                         
                         except TypeError:
                             continue
+
                     p.header.stamp = rospy.Time.now()
                     p.header.frame_id = self.frame
                     self.pub.publish(p)
@@ -161,8 +176,8 @@ class pothole_detect:
 
 def main():
 
-    img_detect_node = pothole_detect()
-    img_detect_node.getPotholes()
+    img_detect_node = road_marking_detect()
+    img_detect_node.getMarks()
 
 if __name__=='__main__':
 
