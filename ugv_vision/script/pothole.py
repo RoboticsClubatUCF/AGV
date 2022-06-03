@@ -85,7 +85,8 @@ class road_marking_detect:
 
         inv = np.linalg.inv(transform)
 
-        cv2.warpPerspective(birds_eye, inv, (IMG_WIDTH, IMG_HEIGHT), flags =cv2.WARP_INVERSE_MAP)
+        cv_img=cv2.warpPerspective(birds_eye, inv, (IMG_WIDTH, IMG_HEIGHT), flags =cv2.WARP_INVERSE_MAP)
+        self.show_image(cv_img)
         
         
 
