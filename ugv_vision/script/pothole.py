@@ -47,12 +47,14 @@ class road_marking_detect:
         cv2.waitKey(1)
 
     def depth_callback(self, depth_msg):
-        self.depth_img = np.frombuffer(depth_msg.data,dtype=np.uint8).reshape(depth_msg.height,depth_msg.width,-1)
+        self.depth_img = self.bridge.imgmsg_to_cv2(depth_msg)
+        self.show_image(self.depth_img)
+
+        print(self.depth_img)
         self.ready_depth = True
 
     def img_callback(self, img_msg):
-        #cv_img = self.bridge.imgmsg_to_cv2(img_msg)
-        cv_img = np.frombuffer(img_msg.data,dtype=np.uint8).reshape(img_msg.height,img_msg.width,-1)
+        cv_img = self.bridge.imgmsg_to_cv2(img_msg)
         if not self.ready_depth:
             return
         
@@ -111,7 +113,6 @@ class road_marking_detect:
                         xPoint = self.getLocation(point, depth)
                         zPoint = (self.depth_img[point[1]][point[0]]/255) * 25
                         p.polygon.points.append( Point32(x=xPoint, y=0.000, z = float(zPoint)))
-                        
                     
                     except IndexError:
                         continue
