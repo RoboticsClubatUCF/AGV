@@ -113,8 +113,13 @@ class road_marking_detect:
                         depth = self.depth_img[point[1]][point[0]]
                         xPoint = self.getLocation(point, depth)
                         zPoint = self.depth_img[point[1]][point[0]]
+<<<<<<< HEAD
                         p.polygon.points.append( Point32(x=xPoint, y=0.000, z = float(zPoint)))
                         
+=======
+                        print(zPoint)
+                        #p.polygon.points.append( np.float32(x=xPoint, y=0.000, z = zPoint))
+>>>>>>> 9ab19f2f0bf0d6c39de974e08502c537bdba8326
                     
                     except IndexError:
                         continue
@@ -124,7 +129,7 @@ class road_marking_detect:
 
                 p.header.stamp = rospy.Time.now()
                 p.header.frame_id = self.frame
-                self.pub.publish(p)
+                #self.pub.publish(p)
 
 
             #Show what's going on as a sanity check
