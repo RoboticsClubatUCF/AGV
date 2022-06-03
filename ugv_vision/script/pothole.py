@@ -30,7 +30,8 @@ class road_marking_detect:
         self.ready_depth = False
         self.depth_img = None
         self.bridge = CvBridge()
-        self.frame = "choo_2/camera"
+        self.frame = "zed_right_camera_frame"
+        #self.frame = "choo_2/camera"
 
         rospy.init_node("road_marks", anonymous = False, log_level = rospy.INFO)
 
@@ -47,7 +48,9 @@ class road_marking_detect:
     def depth_callback(self, depth_msg):
         #self.depth_img = self.bridge.imgmsg_to_cv2(depth_msg)
         self.depth_img = np.frombuffer(depth_msg.data,dtype=np.uint8).reshape(depth_msg.height,depth_msg.width,-1)
+        self.depth_img = cv2.cvtColor(self.depth_img,cv2.COLOR_BGR2GRAY)
         self.ready_depth = True
+        self.show_image(self.depth_img)
 
     def img_callback(self, img_msg):
         #cv_img = self.bridge.imgmsg_to_cv2(img_msg)
@@ -110,7 +113,8 @@ class road_marking_detect:
                         depth = self.depth_img[point[1]][point[0]]
                         xPoint = self.getLocation(point, depth)
                         zPoint = self.depth_img[point[1]][point[0]]
-                        p.polygon.points.append( Point32(x=xPoint, y=0.000, z = zPoint))
+                        p.polygon.points.append( Point32(x=xPoint, y=0.000, z = float(zPoint)))
+                        
                     
                     except IndexError:
                         continue
@@ -143,9 +147,6 @@ class road_marking_detect:
             return True
  
     def getLocation(self, coordinate, depth):
-        
-        if depth > 19:
-            return self.ERR
         
         # The horizontal angular distance of the point is equal to the angular distance per pixel
         # multiplied by the horizontal distance of the pixel from the center of the frame.
