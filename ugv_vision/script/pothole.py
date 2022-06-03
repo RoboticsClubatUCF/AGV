@@ -91,9 +91,10 @@ class road_marking_detect:
 
         ## slice the green
         imask = mask>0
-        green = np.zeros_like(img, np.uint8)
+        green = np.zeros_like(cv_img, np.uint8)
         green[imask] = cv_img[imask]
-
+        cv_img = cv2.cvtColor(cv_img, cv2.COLOR_HSV2BGR)
+        cv_img = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
         contours, hierarchy = cv2.findContours(cv_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
         if not len(contours) <= 0:
