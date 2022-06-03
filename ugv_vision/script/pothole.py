@@ -190,6 +190,7 @@ class road_marking_detect:
 def main():
 
     img_detect_node = road_marking_detect()
+    img_detect_node.getMarks()
 
 if __name__=='__main__':
 
