@@ -41,7 +41,7 @@ class road_marking_detect:
  
         self.depth_sub = rospy.Subscriber("/zed/zed_node/depth/depth_registered", Image, callback = self.depth_callback)
 
-        self.pub = rospy.Publisher("bowser2/potholes", PolygonStamped, queue_size = 3)
+        self.pub = rospy.Publisher("/potholes", PolygonStamped, queue_size = 3)
     
     def show_image(self, img):
         cv2.imshow("Image Window", img)
@@ -49,9 +49,9 @@ class road_marking_detect:
 
     def depth_callback(self, depth_msg):
         self.depth_img = self.bridge.imgmsg_to_cv2(depth_msg)
-        self.show_image(self.depth_img)
+        #self.show_image(self.depth_img)
 
-        print(self.depth_img)
+        #print(self.depth_img)
         self.ready_depth = True
 
     def img_callback(self, img_msg):
@@ -59,9 +59,9 @@ class road_marking_detect:
         self.ready_img = True
         
         # Pre-process image 
-        ret, cv_img = cv2.threshold(cv_img,125,255,0)
+        ret, cv_img = cv2.threshold(cv_img,220,255,0)
         cv_img = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
-        cv_img = cv2.blur(cv_img, (5,5))
+        cv_img = cv2.blur(cv_img, (7,7))
 
         # Perspective transform
         Ipt_A = [0, IMG_HEIGHT/2]
