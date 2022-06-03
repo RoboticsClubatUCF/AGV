@@ -96,41 +96,7 @@ class road_marking_detect:
         cv_img = cv2.cvtColor(cv_img, cv2.COLOR_HSV2BGR)
 
         self.img = cv_img
-        
-        # Get all green contours
-        contours, hierarchy = cv2.findContours(cv_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-        if not len(contours) <= 0:
-            for contour in contours:
-                p = PolygonStamped()
-                # Point
-                for point in contour:
-                    point = np.squeeze(point)
-                    
-                    # Get locations of road markings
-                    try:
-                        print(self.depth_img)
-                        depth = self.depth_img[point[1]][point[0]]
-                        xPoint = self.getLocation(point, depth)
-                        zPoint = (self.depth_img[point[1]][point[0]]/255) * 25
-                        p.polygon.points.append( Point32(x=xPoint, y=0.000, z = float(zPoint)))
-                    
-                    except IndexError:
-                        continue
-                    
-                    except TypeError:
-                        continue
-
-                p.header.stamp = rospy.Time.now()
-                p.header.frame_id = self.frame
-                #self.pub.publish(p)
-
-
-            #Show what's going on as a sanity check
-            #print(cv_img)
-            #cv_img = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
-            
-            # cv2.drawContours(cv_img, validContours, -1, (0,250,0), 3)
+    
         
         
 
@@ -173,7 +139,6 @@ class road_marking_detect:
     def getMarks(self):
 
         while not rospy.is_shutdown():
-
             # If the image hasn't been published, we don't do anything
             if (not self.ready_depth) or (not self.ready_img):
                 continue
