@@ -3,7 +3,7 @@ obstacle_range: 20
 raytrace_range: 20
 footprint: [[0.4725,-0.365], [0.4725,0.365], [-0.4725,0.365], [-0.4725,-0.365]]
 # footprint_padding: 0.01
-inflation_radius: 0.55
+inflation_radius: 0.25
 
 plugins:
   - {name: obstacles_3d,      type: "costmap_2d::VoxelLayer"}

@@ -59,9 +59,10 @@ class road_marking_detect:
         self.ready_img = True
         
         # Pre-process image 
-        ret, cv_img = cv2.threshold(cv_img,220,255,0)
         cv_img = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
-        cv_img = cv2.blur(cv_img, (7,7))
+        cv_img = cv2.blur(cv_img, (10,10))
+        ret, cv_img = cv2.threshold(cv_img,245,255,0)
+        
 
         # Perspective transform
         Ipt_A = [0, IMG_HEIGHT/2]
