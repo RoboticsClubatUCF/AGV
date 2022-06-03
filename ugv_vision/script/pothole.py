@@ -85,9 +85,10 @@ class road_marking_detect:
         for contour in contours:
             for point in contour:
                 # Transform each point
-                point = np.dot(inv_trans, np.squeeze(point))
+                point = cv2.perspectiveTransform(np.squeeze(point), inv_trans)
 
-        cv2.drawContours(, contours, -1, (0,250,0), 3)
+
+        cv2.drawContours(cv_img, contours, -1, (0,250,0), 3)
         self.show_image(cv_img)
 
 
