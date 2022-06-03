@@ -84,7 +84,18 @@ class road_marking_detect:
         cv2.drawContours(birds_eye, contours, -1, (0,250,0), 3)
 
         cv_img=cv2.warpPerspective(birds_eye, transform, (IMG_WIDTH, IMG_HEIGHT), flags =cv2.WARP_INVERSE_MAP)
-        self.show_image(cv_img)
+
+        hsv = cv2.cvtColor(cv_img, cv2.COLOR_BGR2HSV)
+
+        mask = cv2.inRange(hsv, (36, 25, 25), (70, 255,255))
+
+        ## slice the green
+        imask = mask>0
+        green = np.zeros_like(img, np.uint8)
+        green[imask] = cv_img[imask]
+
+
+        self.show_image(green)
         
         
 
