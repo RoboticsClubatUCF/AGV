@@ -162,6 +162,8 @@ class road_marking_detect:
                         try:
                             xPoint = self.getLocation(point, self.depth_img[point[1]][point[0]])
                             zPoint = self.depth_img[point[1]][point[0]]
+                            if math.isnan(xPoint) or math.isnan(zPoint):
+                                continue
                             pt = geom.Point()
                             pt.x = xPoint
                             pt.y = 0.0

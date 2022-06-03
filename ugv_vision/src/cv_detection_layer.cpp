@@ -27,7 +27,7 @@ void CVDetectionLayer::onInitialize()
 
     // subscribe to our PolygonStamped message 
     // TODO: for topic in topics_to_subscribe_to (defined by parameter)
-    _subs.push_back(nh.subscribe("/potholes", 10, &CVDetectionLayer::polygonStampedCallback, this));
+    _subs.push_back(nh.subscribe("/ground_marks", 10, &CVDetectionLayer::polygonStampedCallback, this));
     // ("/potholes", 1, polygonStampedCallback);
 }
 
