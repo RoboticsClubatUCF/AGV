@@ -29,6 +29,7 @@ class road_marking_detect:
         # Class members for depth camera image and flag for determining if message is sent
         self.img = None
         self.ready_depth = False
+        self.ready_img = False
         self.depth_img = None
         self.bridge = CvBridge()
         self.frame = "zed_right_camera_frame"
@@ -55,8 +56,7 @@ class road_marking_detect:
 
     def img_callback(self, img_msg):
         cv_img = self.bridge.imgmsg_to_cv2(img_msg)
-        if not self.ready_depth:
-            return
+        self.ready_img = True
         
         # Pre-process image 
         ret, cv_img = cv2.threshold(cv_img,125,255,0)
@@ -94,8 +94,9 @@ class road_marking_detect:
         green = np.zeros_like(cv_img, np.uint8)
         green[imask] = cv_img[imask]
         cv_img = cv2.cvtColor(cv_img, cv2.COLOR_HSV2BGR)
-        cv_img = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
 
+        self.img = cv_img
+        
         # Get all green contours
         contours, hierarchy = cv2.findContours(cv_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -174,10 +175,40 @@ class road_marking_detect:
         while not rospy.is_shutdown():
 
             # If the image hasn't been published, we don't do anything
-            if (not self.ready_depth):
+            if (not self.ready_depth) or (not self.ready_img):
                 continue
 
-            cv_img = self.img
+            contours, hierarchy = cv2.findContours(self.img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+            if not len(contours) <= 0:
+                for contour in contours:
+                    p = PolygonStamped()
+                    # Point
+                    for point in contour:
+                        point = np.squeeze(point)
+                        
+                        # Get locations of road markings
+                        try:
+                            depth = self.depth_img[point[1]][point[0]]
+                            xPoint = self.getLocation(point, depth)
+                            p.polygon.points.append( Point32(x=xPoint, y=0.000, z = float(depth)))
+                        
+                        except IndexError:
+                            continue
+                        
+                        except TypeError:
+                            continue
+
+                    p.header.stamp = rospy.Time.now()
+                    p.header.frame_id = self.frame
+                    self.pub.publish(p)
+
+
+                #Show what's going on as a sanity check
+                cv_img = self.img
+                cv2.drawContours(cv_img, contours, -1, (0,250,0), 3)
+                self.show_image(cv_img)
+
             
 
 def main():
