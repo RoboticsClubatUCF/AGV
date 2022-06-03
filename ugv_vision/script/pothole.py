@@ -27,12 +27,10 @@ class road_marking_detect:
 
         # Class members for depth camera image and flag for determining if message is sent
         self.img = None
-        self.ready_img = False
         self.ready_depth = False
         self.depth_img = None
         self.bridge = CvBridge()
-        self.frame = "bowser2/camera_link"
-        self.transform = None
+        self.frame = "choo_2/camera"
 
         rospy.init_node("road_marks", anonymous = False, log_level = rospy.INFO)
 
@@ -74,14 +72,22 @@ class road_marking_detect:
         in_pts = np.float32([Ipt_A, Ipt_B, Ipt_C, Ipt_D])
         out_pts = np.float32([Opt_A, Opt_B, Opt_C, Opt_D])
 
-        self.transform = cv2.getPerspectiveTransform(in_pts, out_pts)
-        cv_img = cv2.warpPerspective(cv_img, self.transform, (IMG_WIDTH, IMG_HEIGHT), flags=cv2.INTER_LINEAR)
+        transform = cv2.getPerspectiveTransform(in_pts, out_pts)
+        cv_img = cv2.warpPerspective(cv_img, transform, (IMG_WIDTH, IMG_HEIGHT), flags=cv2.INTER_LINEAR)
 
         contours, hierarchy = cv2.findContours(cv_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
         cv_img = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
             
-        cv2.drawContours(cv_img, contours, -1, (0,250,0), 3) ##
+        
+        
+        # Reverse transforms
+        inv_trans = np.linalg.pinv(transform)
+        contours = cv2.perspectiveTransform(contours, inv_trans)
+        cv_img = cv2.perspectiveTransform(cv_img, inv_trans)
+
+        # Reverse Image 
+        cv2.drawContours(cv_img, contours, -1, (0,250,0), 3)
         self.show_image(cv_img)
 
     def isPothole(self, perimeter, area):
