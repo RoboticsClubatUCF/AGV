@@ -44,7 +44,7 @@ class road_marking_detect:
         self.pub = rospy.Publisher("/potholes", PolygonStamped, queue_size = 3)
     
     def show_image(self, img):
-        cv2.imshow("Image Window", img)
+        cv2.imshow("Ground Obstacles", img)
         cv2.waitKey(1)
 
     def depth_callback(self, depth_msg):
