@@ -7,6 +7,7 @@
 
 """
 
+from pickletools import uint8
 import rospy
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import Polygon, PolygonStamped, Point32
@@ -16,8 +17,8 @@ from cv_bridge import CvBridge
 import math
 import numpy as np
 
-IMG_WIDTH = 640
-IMG_HEIGHT = 480
+IMG_WIDTH = 672
+IMG_HEIGHT = 376
 
 class road_marking_detect:
 
@@ -26,6 +27,7 @@ class road_marking_detect:
 
         # Class members for depth camera image and flag for determining if message is sent
         self.img = None
+        #self.imgg = None
         self.ready_img = False
         self.ready_depth = False
         self.depth_img = None
@@ -46,7 +48,8 @@ class road_marking_detect:
         cv2.waitKey(1)
 
     def img_callback(self, img_msg):
-        cv_img = self.bridge.imgmsg_to_cv2(img_msg)
+        #cv_img = self.bridge.imgmsg_to_cv2(img_msg)
+        cv_img = np.frombuffer(img_msg.data,dtype=np.uint8).reshape(img_msg.height,img_msg.width,-1)
         self.ready_img = True
         
         # Pre-process image 
@@ -68,13 +71,15 @@ class road_marking_detect:
         out_pts = np.float32([Opt_A, Opt_B, Opt_C, Opt_D])
 
         self.transform = cv2.getPerspectiveTransform(in_pts, out_pts)
-        self.transform = cv2.warpPerspective(cv_img, self.transform, (IMG_WIDTH, IMG_HEIGHT), flags=cv2.INTER_LINEAR)
-
-
-
+        cv_img = cv2.warpPerspective(cv_img, self.transform, (IMG_WIDTH, IMG_HEIGHT), flags=cv2.INTER_LINEAR)
+        cv_img = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
+            
+        cv2.drawContours(cv_img, validContours, -1, (0,250,0), 3) ##
+        self.show_image(cv_img)
 
     def depth_callback(self, depth_msg):
-        self.depth_img = self.bridge.imgmsg_to_cv2(depth_msg)
+        #self.depth_img = self.bridge.imgmsg_to_cv2(depth_msg)
+        self.depth_img = np.frombuffer(depth_msg.data,dtype=np.uint8).reshape(depth_msg.height,depth_msg.width,-1)
         self.ready_depth = True
 
     def isPothole(self, perimeter, area):
@@ -116,7 +121,7 @@ class road_marking_detect:
 
     # Runs the circle detection process
     def getMarks(self):
-        
+
         while not rospy.is_shutdown():
 
             # If the image hasn't been published, we don't do anything
@@ -126,53 +131,53 @@ class road_marking_detect:
             cv_img = self.img
             
             # Find the contours in the image
-            contours, hierarchy = cv2.findContours(cv_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            # contours, hierarchy = cv2.findContours(cv_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
             
-            # Find contours
+            # # Find contours
             
-            validContours = []
-            for i in contours:
+            # validContours = []
+            # for i in contours:
                 
-                area = cv2.contourArea(i)
-                perimeter = cv2.arcLength(i, True)
+            #     area = cv2.contourArea(i)
+            #     perimeter = cv2.arcLength(i, True)
                 
-            #    if self.isPothole(perimeter, area):
-            #       validContours.append(i)
+            # #    if self.isPothole(perimeter, area):
+            # #       validContours.append(i)
              
-            if not len(validContours) <= 0:
-                # Polygon
-                for contour in validContours:
-                    p = PolygonStamped()
-                    # Point
-                    for point in contour:
-                        point = np.squeeze(point)
+            # if not len(validContours) <= 0:
+            #     # Polygon
+            #     for contour in validContours:
+            #         p = PolygonStamped()
+            #         # Point
+            #         for point in contour:
+            #             point = np.squeeze(point)
                         
-                        # Get locations of road markings
-                        try:
-                            xPoint = self.getLocation(point, self.depth_img[point[1]][point[0]])
-                            zPoint = self.depth_img[point[1]][point[0]]
-                            p.polygon.points.append( Point32(x=xPoint, y=0.000, z = zPoint))
+            #             # Get locations of road markings
+            #             try:
+            #                 xPoint = self.getLocation(point, self.depth_img[point[1]][point[0]])
+            #                 zPoint = self.depth_img[point[1]][point[0]]
+            #                 p.polygon.points.append( Point32(x=xPoint, y=0.000, z = zPoint))
                         
-                        except IndexError:
-                            continue
+            #             except IndexError:
+            #                 continue
                         
-                        except TypeError:
-                            continue
+            #             except TypeError:
+            #                 continue
 
-                    p.header.stamp = rospy.Time.now()
-                    p.header.frame_id = self.frame
-                    self.pub.publish(p)
+            #         p.header.stamp = rospy.Time.now()
+            #         p.header.frame_id = self.frame
+            #         self.pub.publish(p)
 
 
             # Show what's going on as a sanity check
-
-            cv_img = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
+            ##print(cv_img)
+            ##cv_img = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
             
-            cv2.drawContours(cv_img, validContours, -1, (0,250,0), 3)
+            #cv2.drawContours(cv_img, validContours, -1, (0,250,0), 3)
 
-            self.show_image(cv_img)
-            self.ready_img = False
-            self.ready_depth = False
+            ##self.show_image(cv_img)
+            ##self.ready_img = False
+            ##self.ready_depth = False
 
 def main():
 
