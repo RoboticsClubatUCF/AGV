@@ -79,17 +79,13 @@ class road_marking_detect:
 
         contours, hierarchy = cv2.findContours(birds_eye, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-        cv_img = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
-
-        inv_trans = np.linalg.pinv(transform)
-        for contour in contours:
-            for point in contour:
-                # Transform each point
-                point = cv2.perspectiveTransform(np.squeeze(point), inv_trans)
-
+        cv_img = cv2.cvtColor(birds_eye, cv2.COLOR_GRAY2BGR)
 
         cv2.drawContours(cv_img, contours, -1, (0,250,0), 3)
-        self.show_image(cv_img)
+
+        cv2.warpPerspective(birds_eye, cv_img, transform, (IMG_WIDTH, IMG_HEIGHT), cv2.WARP_INVERSE_MAP, cv2.BORDER_TRANSPARENT)
+        
+        
 
 
     def isPothole(self, perimeter, area):
