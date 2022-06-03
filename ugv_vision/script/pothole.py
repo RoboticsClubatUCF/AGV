@@ -52,13 +52,15 @@ class road_marking_detect:
     def img_callback(self, img_msg):
         #cv_img = self.bridge.imgmsg_to_cv2(img_msg)
         cv_img = np.frombuffer(img_msg.data,dtype=np.uint8).reshape(img_msg.height,img_msg.width,-1)
-        self.ready_img = True
+        if not self.ready_depth:
+            return
         
         # Pre-process image 
         ret, cv_img = cv2.threshold(cv_img,125,255,0)
         cv_img = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
         cv_img = cv2.blur(cv_img, (5,5))
 
+        # Perspective transform
         Ipt_A = [0, IMG_HEIGHT/2]
         Ipt_B = [0, IMG_HEIGHT-1]
         Ipt_C = [IMG_WIDTH-1, IMG_HEIGHT-1]
@@ -73,17 +75,17 @@ class road_marking_detect:
         out_pts = np.float32([Opt_A, Opt_B, Opt_C, Opt_D])
 
         transform = cv2.getPerspectiveTransform(in_pts, out_pts)
-        cv_img = cv2.warpPerspective(cv_img, transform, (IMG_WIDTH, IMG_HEIGHT), flags=cv2.INTER_LINEAR)
+        birds_eye = cv2.warpPerspective(cv_img, transform, (IMG_WIDTH, IMG_HEIGHT), flags=cv2.INTER_LINEAR)
 
-        contours, hierarchy = cv2.findContours(cv_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours, hierarchy = cv2.findContours(birds_eye, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
         cv_img = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
 
         # Reverse transforms
         np.squeeze(contours)
         inv_trans = np.linalg.pinv(transform)
-        cv2.perspectiveTransform(contours, contours, inv_trans)
-        cv2.perspectiveTransform(cv_img, cv_img, inv_trans)
+        a_transformed = np.dot(inv_trans, contours)
+
 
         cv2.drawContours(cv_img, contours, -1, (0,250,0), 3)
         self.show_image(cv_img)
@@ -131,7 +133,7 @@ class road_marking_detect:
         while not rospy.is_shutdown():
 
             # If the image hasn't been published, we don't do anything
-            if (not self.ready_img) and (not self.ready_depth):
+            if (not self.ready_depth):
                 continue
 
             cv_img = self.img
@@ -188,7 +190,6 @@ class road_marking_detect:
 def main():
 
     img_detect_node = road_marking_detect()
-    img_detect_node.getMarks()
 
 if __name__=='__main__':
 
