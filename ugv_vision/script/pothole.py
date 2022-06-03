@@ -108,6 +108,7 @@ class road_marking_detect:
                     
                     # Get locations of road markings
                     try:
+                        print(self.depth_img)
                         depth = self.depth_img[point[1]][point[0]]
                         xPoint = self.getLocation(point, depth)
                         zPoint = (self.depth_img[point[1]][point[0]]/255) * 25
