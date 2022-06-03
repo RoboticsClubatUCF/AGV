@@ -94,8 +94,38 @@ class road_marking_detect:
         green = np.zeros_like(img, np.uint8)
         green[imask] = cv_img[imask]
 
+        contours, hierarchy = cv2.findContours(cv_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-        self.show_image(green)
+        if not len(contours) <= 0:
+            # Polygon
+            for contour in contours:
+                p = PolygonStamped()
+                # Point
+                for point in contour:
+                    point = np.squeeze(point)
+                    
+                    # Get locations of road markings
+                    try:
+                        xPoint = self.getLocation(point, self.depth_img[point[1]][point[0]])
+                        zPoint = self.depth_img[point[1]][point[0]]
+                        p.polygon.points.append( Point32(x=xPoint, y=0.000, z = zPoint))
+                    
+                    except IndexError:
+                        continue
+                    
+                    except TypeError:
+                        continue
+
+                p.header.stamp = rospy.Time.now()
+                p.header.frame_id = self.frame
+                self.pub.publish(p)
+
+
+            #Show what's going on as a sanity check
+            #print(cv_img)
+            #cv_img = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
+            
+            # cv2.drawContours(cv_img, validContours, -1, (0,250,0), 3)
         
         
 
