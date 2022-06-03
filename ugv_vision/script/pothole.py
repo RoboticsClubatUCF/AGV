@@ -81,11 +81,13 @@ class road_marking_detect:
 
         cv_img = cv2.cvtColor(cv_img, cv2.COLOR_GRAY2BGR)
 
-        if len(contours) > 0:
-            # Reverse transforms
-            np.squeeze(contours)
-            inv_trans = np.linalg.pinv(transform)
-            a_transformed = np.dot(inv_trans, contours)
+        inv_trans = np.linalg.pinv(transform)
+        for contour in contours:
+            for point in contour:
+                # Transform each point
+                point = np.dot(inv_trans, point)
+                
+
 
 
         cv2.drawContours(cv_img, contours, -1, (0,250,0), 3)
