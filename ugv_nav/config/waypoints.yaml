@@ -13,16 +13,26 @@ waypoints:
   wp_0: 
     label: "start"
     frame_id: odom
-    coords: [2.0, 0.0]
+    coords: [5, 0]
   wp_1: 
     label: ""
     frame_id: odom
-    coords: [3.0, 0.0]
+    coords: [10, 0]
   wp_2: 
     label: ""
     frame_id: odom
-    coords: [4.0, 0.0]
-  wp_3: 
-    label: "end"
-    frame_id: odom
-    coords: [5.0, 0.0]
+    coords: [15, 0]
+  # wp_3: 
+  #   label: "end"
+  #   frame_id: utm
+  #   coords: [5.0, 0.0]
+
+
+    # wp_0:
+    #   label: "start"
+    #   frame_id: odom
+    #   coords: [2.0,0.0]
+    # wp_1:
+    #   label: ""
+    #   frame_id: odom
+    #   coords: [3.0, 0.0]

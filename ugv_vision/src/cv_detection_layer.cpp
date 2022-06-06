@@ -89,7 +89,7 @@ void CVDetectionLayer::matchSize()
  */
 void CVDetectionLayer::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int min_j, int max_i, int max_j)
 {
-    // ROS_INFO("updateCosts()");
+    ROS_INFO("updateCosts()");
 
     if (!enabled_)
         return;
@@ -102,8 +102,8 @@ void CVDetectionLayer::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i
             if (costmap_[index] == NO_INFORMATION)
                 continue;
             master_grid.setCost(i, j, costmap_[index]); 
-            // ROS_INFO("index value: %d", costmap_[index]);
-            // ROS_INFO("master grid value: %d", master_grid.getCost(i, j));
+            ROS_INFO("index value: %d", costmap_[index]);
+            ROS_INFO("master grid value: %d", master_grid.getCost(i, j));
         }
     }
 }
@@ -115,7 +115,7 @@ void CVDetectionLayer::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i
  */
 void CVDetectionLayer::polygonStampedCallback(const geometry_msgs::PolygonStamped::ConstPtr& msg)
 {
-    // ROS_INFO("polygonStampedCallback()");
+    ROS_INFO("polygonStampedCallback()");
 
     if (!enabled_)
         return;

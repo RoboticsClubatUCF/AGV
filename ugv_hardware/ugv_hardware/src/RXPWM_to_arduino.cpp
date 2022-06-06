@@ -1,6 +1,7 @@
 /**
  * @file RXPWM_to_arduino.cpp
  * @author Wesley Fletcher, Tevin Mukudi, Marc Simmonds
+ * @corrections_by Peter Cross
  * @brief 
  * @version 0.1
  * @date 2022-05-12
@@ -13,12 +14,12 @@
 #include <Encoder.h>
 #include <FastLED.h>
 
-// RC Receiver
+// RC Receiver3
 #define RC_RJ_x   2  // right joystick, x-axis - pin 6 on receiver
 #define RC_RJ_y   3  // right joystick, y-axis - pin # on receiver
 #define RC_LJ_y   4  // left joystick, y-axis - pin # on receiver
 #define RC_LJ_x   5  // left joystick, x-axis - pin # on receiver
-#define RC_ESTOP  6  // e-stop switch
+#define RC_ESTOP  6  // e-stop switch - pin 3 on receiver
 #define RC_DIAL   7  // dial
 #define RC_AUTO   8  // Auto-nav switch - pin 7 on receiver 
 // Encoders
@@ -39,7 +40,7 @@
 #define R2        11
 #define R3        12
 #define R4        13
-// for LEDs
+// for LEDs3
 #define LED_PIN   9
 #define NUM_LEDS  16
 static const char * LIT_FLASH = "X_X\0";
@@ -236,7 +237,9 @@ int handle_input(char *incoming)
     
     // set lights
     fill_solid(leds, NUM_LEDS, CRGB::Red); // turn E-STOP LEDs on
+    flash = false; // fixes the light issue with the estop
     FastLED.show();
+    
 
     return EXIT_SUCCESS;
   }

@@ -61,7 +61,7 @@ class road_marking_detect:
         # Pre-process image 
         cv_img = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
         cv_img = cv2.blur(cv_img, (10,10))
-        ret, cv_img = cv2.threshold(cv_img,245,255,0)
+        ret, cv_img = cv2.threshold(cv_img,230,255,0)
         
 
         # Perspective transform
@@ -98,6 +98,7 @@ class road_marking_detect:
         cv_img = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
 
         self.img = cv_img
+        self.show_image(cv_img)
     
         
         
@@ -151,7 +152,6 @@ class road_marking_detect:
                 continue
 
             contours, hierarchy = cv2.findContours(self.img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
             if not len(contours) <= 0:
                 for contour in contours:
                     p = geom.PolygonStamped()
@@ -166,9 +166,9 @@ class road_marking_detect:
                             if math.isnan(xPoint) or math.isnan(zPoint):
                                 continue
                             pt = geom.Point()
-                            pt.x = xPoint
-                            pt.y = 0.0
-                            pt.z = zPoint
+                            pt.x = zPoint
+                            pt.y = xPoint * -1
+                            pt.z = 0.00
                             p.polygon.points.append(pt)
                         
                         except IndexError:
@@ -186,7 +186,7 @@ class road_marking_detect:
                 cv_img = self.img
                 test_img = cv2.cvtColor(self.depth_img, cv2.COLOR_GRAY2BGR)
                 cv2.drawContours(test_img, contours, -1, (0,250,0), 3)
-                self.show_image(test_img)
+                #self.show_image(test_img)
 
             
 

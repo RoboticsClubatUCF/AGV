@@ -68,7 +68,13 @@ def str_to_RC_message(rc_list):
     # populate header
     rc_msg.header = std.Header()
     rc_msg.header.stamp = rospy.Time.now()
-    rc_msg.header.frame_id = "" # frame is meaningless in this context
+    rc_msg.header.frame_id = "" # f # if(int(rc_list[4] >= 1800)):
+    #     rc_msg.switch_e = True
+    # elif (int(rc_list[4]) > 1000 and int(rc_list[4]) < 1300):
+    #     rc_msg.switch_d = True
+    # else:
+    #     rc_msg.switch_e = False
+    #     rc_msg.switch_d = Falserame is meaningless in this context
     # populate the sticks
     right_x = int(rc_list[0])
     left_x = int(rc_list[3])
@@ -85,9 +91,16 @@ def str_to_RC_message(rc_list):
     rc_msg.right_x = right_x
     rc_msg.left_x = left_x
     # populate the switches
-    rc_msg.switch_e = (int(rc_list[4]) <= 1200) # E-STOP
+    rc_msg.switch_e = (int(rc_list[4]) <= 1800) # E-STOP
+    # if(int(rc_list[4] >= 1800)):
+    #     rc_msg.switch_e = True
+    # elif (int(rc_list[4]) > 1000 and int(rc_list[4]) < 1300):
+    #     rc_msg.switch_d = True
+    # else:
+    #     rc_msg.switch_e = False
+    #     rc_msg.switch_d = False
     rc_msg.switch_g = int(rc_list[5])
-    rc_msg.switch_d = (int(rc_list[6]) >= 1500) # AUTO
+    rc_msg.switch_d = (int(rc_list[6]) >= 1100) # AUTO
 
     return rc_msg
 

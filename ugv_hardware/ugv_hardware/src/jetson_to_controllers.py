@@ -20,8 +20,9 @@ WHEEL_BASE = 0.67
 WHEEL_RADIUS = 0.10795
 METERS_PER_REV = WHEEL_RADIUS * math.pi * 2
 REVS_PER_METER = 1 / METERS_PER_REV
-MAX_MOTOR_RPM = 375.0
-MAX_RPM_VALUE = 1000.0
+#originally 1000
+MAX_MOTOR_RPM = 375
+MAX_RPM_VALUE = 375
 
 def write_string(input, serials):
     """
@@ -56,9 +57,10 @@ def rc_callback(message, args):
     # handle joystick inputs
     left_rpm = int((message.left_x - 1500)*(MAX_MOTOR_RPM / MAX_RPM_VALUE))
     right_rpm = int((message.right_x - 1500)*(MAX_MOTOR_RPM / MAX_RPM_VALUE))
-    
+    rospy.logdebug("joystick : left : " + str(left_rpm) + " right : " + str(right_rpm))
     # write command to motor controllers
     string = "!M " + str(left_rpm) + " " + str(right_rpm) + "\r"
+    print(string)
     write_string(string, (ser1, ser2))
 
 def cmd_vel_cb(cmd_vel, args):
@@ -69,24 +71,25 @@ def cmd_vel_cb(cmd_vel, args):
     ser2 = args[1]
 
     # Auto-nav mode is off
-    if AUTO_SWITCH == False:
-        return
+    # if AUTO_SWITCH == False:
+    #     return
 
     left_velocity  =  cmd_vel.linear.x - (0.5 * cmd_vel.angular.z * WHEEL_BASE)
     right_velocity =  cmd_vel.linear.x + (0.5 * cmd_vel.angular.z * WHEEL_BASE)
-    # rospy.logdebug("ALIBDLJFNLS:AODNFOJKSDNF LEFT_VEL: {} RIGHT_VEL: {}".format(left_velocity, right_velocity))
+    rospy.logdebug("ALIBDLJFNLS:AODNFOJKSDNF LEFT_VEL: {} RIGHT_VEL: {}".format(left_velocity, right_velocity))
 
     # convert m/s to RPM
-    left_rpm = left_velocity * REVS_PER_METER * 60
-    right_rpm = right_velocity * REVS_PER_METER * 60
-    # rospy.logdebug("ALIBDLJFNLS:AODNFOJKSDNF LEFT: {} RIGHT: {}".format(left_rpm, right_rpm))
-    
+    left_rpm = left_velocity * REVS_PER_METER * 60 * 10
+    right_rpm = right_velocity * REVS_PER_METER * 60 * 10
+    rospy.logdebug("ALIBDLJFNLS:AODNFOJKSDNF LEFT: {} RIGHT: {}".format(left_rpm, right_rpm))
+    rospy.logdebug("auto : left : " + str(left_rpm) + " right : " + str(right_rpm))
     # write command to motor controllers
     string = "!M " + str(left_rpm) + " " + str(right_rpm) + "\r"
+    print(string)
     write_string(string, (ser1, ser2))
 
 def main():     
-
+    print("fuck")
     rospy.init_node('motor_controller_bridge', anonymous=True, log_level=rospy.DEBUG)
 
     _port = '/dev/ttyACM0'
