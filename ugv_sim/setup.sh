@@ -4,7 +4,7 @@ then
 	echo "ROS not found, installing ROS Noetic"
 	sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 	
-	sudo apt install c-y url # if you haven't already installed curl
+	sudo apt install curl # if you haven't already installed curl
 	curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
 	
 	sudo apt update
@@ -28,6 +28,7 @@ pip3 install pynput
 # ugv_sim dependencies:
 sudo apt install -y ros-noetic-navigation
 sudo apt install -y ros-noetic-slam-toolbox
+sudo apt install -y ros-noetic-robot-localization
 
 # if we somehow don't have a catkin_ws, we're gonna make one and clone our code into it
 if ! [ -d "/home/$USER/catkin_ws/" ]
@@ -35,7 +36,7 @@ then
 	echo "Creating catkin workspace at: /home/$USER/catkin_ws"
 	mkdir -p /home/$USER/catkin_ws/src
 	cd /home/$USER/catkin_ws/src
-	git clone https://github.com/RoboticsClubatUCF/UNTITLED_UGV.git
+	git clone https://github.com/RoboticsClubatUCF/Choo-Choo.git
 	cd /home/$USER/catkin_ws
 	catkin_make # catkin_make to create our build and devel folders
 fi
@@ -63,12 +64,12 @@ fi
 if ! grep -q "GAZEBO_MODEL_PATH=" $bashrc; then
 	echo "GAZEBO_MODEL_PATH not found, setting GAZEBO_MODEL_PATH"
 	echo "export GAZEBO_MODEL_PATH=/usr/share/gazebo-11/models" >> $bashrc
-	echo "export GAZEBO_MODEL_PATH=\$GAZEBO_MODEL_PATH:/home/\$USER/catkin_ws/src/UNTITLED_UGV/ugv_sim/models" >> $bashrc
+	echo "export GAZEBO_MODEL_PATH=\$GAZEBO_MODEL_PATH:/home/\$USER/catkin_ws/src/Choo-Choo/ugv_sim/models" >> $bashrc
 fi
 
 if ! grep -q "GAZEBO_RESOURCE_PATH=" $bashrc; then
 	echo "GAZEBO_RESOURCE PATH not found, setting GAZEBO_RESOURCE_PATH"
-	echo "export GAZEBO_RESOURCE_PATH=\$GAZEBO_RESOURCE_PATH:/home/\$USER/catkin_ws/src/UNTITLED_UGV/ugv_sim/meshes" >> $bashrc
+	echo "export GAZEBO_RESOURCE_PATH=\$GAZEBO_RESOURCE_PATH:/home/\$USER/catkin_ws/src/Choo-Choo/ugv_sim/meshes" >> $bashrc
 fi
 
 source $bashrc
