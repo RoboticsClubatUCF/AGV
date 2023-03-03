@@ -281,13 +281,13 @@ void print_rc_inputs()
 {
   Serial.print("$RCX");
   Serial.print(" ");
-  Serial.print(get_input(RC_RJ_x));
+  Serial.print(map(get_input(RC_RJ_x),922,2080,1000,2000)); // cleans up arduino output
   Serial.print(" ");
   Serial.print(get_input(RC_RJ_y));
   Serial.print(" ");
   Serial.print(get_input(RC_LJ_y));
   Serial.print(" ");
-  Serial.print(get_input(RC_LJ_x));
+  Serial.print(map(get_input(RC_LJ_x),1095,1910,1000,2000)); // cleans up arduino output
   Serial.print(" ");
   Serial.print(get_input(RC_ESTOP));
   Serial.print(" ");

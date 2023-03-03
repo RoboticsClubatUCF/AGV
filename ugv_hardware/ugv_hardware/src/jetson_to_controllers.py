@@ -24,6 +24,10 @@ REVS_PER_METER = 1 / METERS_PER_REV
 MAX_MOTOR_RPM = 375
 MAX_RPM_VALUE = 375
 
+def write_uart():
+	# TODO: everything
+	return
+
 def write_string(input, serials):
     """
     Writes a given string to the motor controllers.

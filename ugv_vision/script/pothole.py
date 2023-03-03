@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+
+
 # Marc Simmonds
 # IGVC 2022
 """ 
@@ -61,7 +63,7 @@ class road_marking_detect:
         # Pre-process image 
         cv_img = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
         cv_img = cv2.blur(cv_img, (10,10))
-        ret, cv_img = cv2.threshold(cv_img,230,255,0)
+        ret, cv_img = cv2.threshold(cv_img,240,255,0)
         
 
         # Perspective transform
@@ -98,7 +100,7 @@ class road_marking_detect:
         cv_img = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
 
         self.img = cv_img
-        self.show_image(cv_img)
+        # self.show_image(cv_img)
     
         
         
@@ -121,7 +123,7 @@ class road_marking_detect:
         
         # The horizontal angular distance of the point is equal to the angular distance per pixel
         # multiplied by the horizontal distance of the pixel from the center of the frame.
-        #theta = ((45/IMG_WIDTH) * abs(coordinate[0] - IMG_HEIGHT))
+        # theta = ((45/IMG_WIDTH) * abs(coordinate[0] - IMG_HEIGHT))
         pre_theta = abs(coordinate[0] - (IMG_WIDTH / 2))
         post_theta = 55 / float(IMG_WIDTH)
         theta = float(post_theta) * float(pre_theta)
@@ -152,6 +154,10 @@ class road_marking_detect:
                 continue
 
             contours, hierarchy = cv2.findContours(self.img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+            # self.ready_depth = False
+            # self.ready_img = False
+
             if not len(contours) <= 0:
                 for contour in contours:
                     p = geom.PolygonStamped()
@@ -185,8 +191,8 @@ class road_marking_detect:
                 #Show what's going on as a sanity check
                 cv_img = self.img
                 test_img = cv2.cvtColor(self.depth_img, cv2.COLOR_GRAY2BGR)
-                cv2.drawContours(test_img, contours, -1, (0,250,0), 3)
-                #self.show_image(test_img)
+                cv2.drawContours(test_img, contours, -1, (0,0,250), 3)
+                self.show_image(test_img)
 
             
 

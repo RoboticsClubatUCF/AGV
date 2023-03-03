@@ -29,7 +29,7 @@ TrajectoryPlannerROS:
   heading_lookahead: 0.325
   heading_scoring: false
   heading_scoring_timestep: 0.8
-  global_frame_id: odom
+  global_frame_id: map
 
   # oscillation prevention parameters
   oscillation_reset_dist: 0.05

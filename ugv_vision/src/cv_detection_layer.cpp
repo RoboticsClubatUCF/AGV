@@ -1,6 +1,8 @@
 #include <cv_detection_layer.h>
 #include <pluginlib/class_list_macros.h>
 
+// TODO: Add polygons to vector when subscribed to, then update costs for all polygons in updateCosts()
+
 PLUGINLIB_EXPORT_CLASS(cv_detection_layer_namespace::CVDetectionLayer, costmap_2d::Layer)
 
 using costmap_2d::LETHAL_OBSTACLE;
@@ -29,6 +31,7 @@ void CVDetectionLayer::onInitialize()
     // TODO: for topic in topics_to_subscribe_to (defined by parameter)
     _subs.push_back(nh.subscribe("/ground_marks", 10, &CVDetectionLayer::polygonStampedCallback, this));
     // ("/potholes", 1, polygonStampedCallback);
+
 }
 
 /**
@@ -55,7 +58,6 @@ void CVDetectionLayer::reconfigureCB(costmap_2d::GenericPluginConfig &config, ui
  */
 void CVDetectionLayer::updateBounds(double robot_x, double robot_y, double robot_yaw, double* min_x, double* min_y, double* max_x, double* max_y)
 {
-    // ROS_INFO("updateBounds()");
 
     if (!enabled_)
         return;
@@ -69,6 +71,8 @@ void CVDetectionLayer::updateBounds(double robot_x, double robot_y, double robot
     *min_y = std::min(*min_y, mark_y_);
     *max_x = std::max(*max_x, mark_x_);
     *max_y = std::max(*max_y, mark_y_);
+
+    // bounds for polygon
 }
 
 void CVDetectionLayer::matchSize()
@@ -89,7 +93,6 @@ void CVDetectionLayer::matchSize()
  */
 void CVDetectionLayer::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i, int min_j, int max_i, int max_j)
 {
-    ROS_INFO("updateCosts()");
 
     if (!enabled_)
         return;
@@ -99,47 +102,85 @@ void CVDetectionLayer::updateCosts(costmap_2d::Costmap2D& master_grid, int min_i
         for (int i = min_i; i < max_i; i++)
         {
             int index = getIndex(i, j);
+
             if (costmap_[index] == NO_INFORMATION)
                 continue;
-            master_grid.setCost(i, j, costmap_[index]); 
-            ROS_INFO("index value: %d", costmap_[index]);
-            ROS_INFO("master grid value: %d", master_grid.getCost(i, j));
+
+            master_grid.setCost(i, j, costmap_[index]);
+
         }
+    }
+
+    // Mark polygons
+
+    for (int i = 0; i<_ground_obstacles.size(); i++)
+    {
+        setPolyCost(master_grid, min_i, min_j, max_i, max_j, _ground_obstacles[i]);
+    }
+
+    _ground_obstacles.clear();
+
+}
+
+/**
+ * @brief Sets the cost of the surrounding cells in a polygon in the master grid.
+ * 
+ * @param master_grid The layered_costmap "main" grid to be updated with this layer's info.
+ * @param min_i 
+ * @param min_j 
+ * @param max_i 
+ * @param max_j
+ * @param poly The actual polygon we want to mark on the grid.
+ */
+void CVDetectionLayer::setPolyCost(costmap_2d::Costmap2D& master_grid, int min_i, int min_j, int max_i, int max_j, Polygon poly)
+{
+    // map to world bounds
+    std::vector<PointInt> mapped_poly;
+    for(int i = 0; i<poly.size(); i++)
+    {
+        PointInt loc;
+
+        master_grid.worldToMapNoBounds(poly[i].x, poly[i].y, loc.x, loc.y);
+        mapped_poly.push_back(loc);
+    }
+
+    // actually mark points
+    int mx, my;
+    for (int i = 0; i<mapped_poly.size(); i++)
+    {
+        mx = mapped_poly[i].x;
+        my = mapped_poly[i].y;
+        // check if point is within bounds
+        if(mx < min_i || my > max_i )
+            continue;
+
+        if(my < min_j || my > max_j)
+            continue;
+        
+        // mark point in master grid 
+        master_grid.setCost(mx,my,LETHAL_OBSTACLE);
+
     }
 }
 
 /**
- * @brief PolygonStamped callback; marks polygon on internal costmap
+ * @brief PolygonStamped callback; adds polygon points to point vector
  * 
  * @param msg PolygonStamped message containing points
  */
 void CVDetectionLayer::polygonStampedCallback(const geometry_msgs::PolygonStamped::ConstPtr& msg)
 {
-    ROS_INFO("polygonStampedCallback()");
-
-    if (!enabled_)
-        return;
-
-    double world_x, world_y;
-    unsigned int mx, my;
-
-    // loop over all points in polygon to mark map
-    for (int idx = 0; idx < msg->polygon.points.size(); idx++)
+    
+    Polygon pts;
+    
+    // Add polygons to global polygon structure.
+    for (int i = 0; i<msg->polygon.points.size(); i++)
     {
-        world_x = msg->polygon.points.at(idx).x;
-        world_y = msg->polygon.points.at(idx).y;
-
-        // convert world points to map points
-        worldToMap(world_x, world_y, mx, my);
-
-        // costmaps are stored as 1D, so we need to get the index
-        int index = getIndex(mx, my);
-
-        // mark every point in the polygon as lethal
-        costmap_[index] = LETHAL_OBSTACLE;
+        pts.push_back(msg->polygon.points.at(i));
     }
 
-    return;
+    _ground_obstacles.push_back(pts);
+
 }
 
 }   // namespace cv_detection_layer_namespace

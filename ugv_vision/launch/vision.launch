@@ -1,0 +1,4 @@
+<launch>
+    <!-- road mark detection script -->
+    <node pkg="ugv_vision" name="pothole" type="pothole.py"/>
+</launch>

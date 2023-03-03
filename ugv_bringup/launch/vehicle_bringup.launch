@@ -28,36 +28,42 @@
     <!-- VECTORNAV IMU-->
     <include file="$(find ugv_bringup)/launch/vn100_imu.launch">
         <arg name="frame_id" value="vectornav"/>
-    </include>
+    </include> 
 
     <!-- Velodyne -->
     <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch">
-    </include>
+    </include> 
 
     <!-- Depth Camera -->
     <include file="$(find zed_wrapper)/launch/zed.launch">
+    </include> 
+ 
+    <!-- Vision Package -->
+     <include file="$(find ugv_vision)/launch/vision.launch"> 
     </include>
 
     <!-- GPS -->   
-    <node pkg="advanced_navigation_driver" type="advanced_navigation_driver" name="gps_data" args ="/dev/gps 1000000">
-        <remap from="/an_device/NavSatFix" to="/fix"/>
-        <remap from="/an_device/Imu" to="/imu_data"/>
-    </node>
-    <!-- stamp updater for weird gps IMU values -->
-    <node pkg="ugv_hardware" type="stamp_updater.py" name="gps_stamp_updater" args="sensor_msgs/Imu /imu_data gps_link"/>
+     <node pkg="advanced_navigation_driver" type="advanced_navigation_driver" name="gps_data" args ="/dev/gps 1000000"> 
+             <remap from="/an_device/NavSatFix" to="/fix"/>
+             <remap from="/an_device/Imu" to="/imu_data"/> 
+             
+         </node> 
 
-    <node pkg="gps_common" type="utm_odometry_node" name="gps_common"/>
+     <!--stamp updater for weird gps IMU values -->
+         <node pkg="ugv_hardware" type="stamp_updater.py" name="gps_stamp_updater" args="sensor_msgs/Imu /imu_data gps_link"/> 
+
+    <node pkg="gps_common" type="utm_odometry_node" name="gps_common"/> -->
 
     <!-- Nav stack -->
     <include file="$(find ugv_nav)/launch/nav.launch">
-    </include>  
+    </include>
     
     <!-- start controllers -->
-    <include file="$(find ugv_bringup)/launch/control.launch">
-    </include>
+    <!-- <include file="$(find ugv_bringup)/launch/control.launch">
+    </include> -->
 
     <!-- launch state machine -->
-    <include file="$(find ugv_states)/launch/states.launch">
-    </include>
+    <!-- <include file="$(find ugv_states)/launch/states.launch">
+    </include> -->
 
 </launch>
