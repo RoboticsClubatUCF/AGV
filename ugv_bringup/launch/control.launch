@@ -4,4 +4,12 @@
 
     <node pkg="ugv_hardware" type="jetson_to_controllers.py" name="jetson_to_controllers" output="screen" />
 
+    <!-- Launch the rosserial node and enable serial communication between the jetson and ESP -->
+    <arg name="ESP_serial_port" default="/dev/ttyTHS2"/>
+    <node pkg="rosserial_python" type="serial_node.py" name="serial_node" args="$(arg ESP_serial_port)"  output="screen">
+        <!-- Set comm port -->
+        <param name="~port" value="$(arg ESP_serial_port)" />
+        <!-- Set baud rate -->
+        <param name="~baud" value="115200" />
+    </node>
 </launch>
