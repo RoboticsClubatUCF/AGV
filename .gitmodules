@@ -1,15 +1,12 @@
 [submodule "velodyne_simulator"]
 	path = ugv_sim/velodyne_simulator
 	url = https://bitbucket.org/DataspeedInc/velodyne_simulator.git
-[submodule "vectornav"]
-	path = drivers/vectornav
-	url = https://github.com/dawonn/vectornav.git
-[submodule "velodyne"]
+[submodule "drivers/velodyne"]
 	path = drivers/velodyne
 	url = https://github.com/ros-drivers/velodyne.git
-[submodule "gps_umd"]
-	path = gps_umd
-	url = https://github.com/swri-robotics/gps_umd.git
-[submodule "advanced_navigation_driver"]
+[submodule "drivers/vectornav"]
+	path = drivers/vectornav
+	url = https://github.com/dawonn/vectornav.git
+[submodule "drivers/advanced_navigation_driver"]
 	path = drivers/advanced_navigation_driver
 	url = https://github.com/ros-drivers/advanced_navigation_driver
